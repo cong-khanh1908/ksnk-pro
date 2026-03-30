@@ -75,7 +75,7 @@ body.sb-open .hd-burger span:nth-child(3){transform:translateY(-6.8px) rotate(-4
 body.sb-open .sb-overlay{display:block;opacity:1}
 @media(min-width:801px){.sb-overlay{display:none!important}}
 /* SIDEBAR */
-.sb{position:fixed;top:var(--hh);left:0;bottom:0;width:min(280px,85vw);background:var(--card);border-right:1px solid var(--border);overflow-y:auto;overflow-x:hidden;transition:transform var(--t-med);z-index:150;display:flex;flex-direction:column;box-shadow:2px 0 16px rgba(10,45,74,.08);-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:env(safe-area-inset-bottom);transform:translateX(-100%)}
+.sb{position:fixed;top:var(--hh);left:0;bottom:0;width:min(288px,88vw);background:var(--card);border-right:1px solid var(--border);overflow-y:auto;overflow-x:hidden;transition:transform var(--t-med);z-index:150;display:flex;flex-direction:column;box-shadow:2px 0 16px rgba(10,45,74,.08);-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(env(safe-area-inset-bottom) + 12px);transform:translateX(-100%)}
 body.sb-open .sb{transform:translateX(0)}
 @media(min-width:801px){.sb{transform:translateX(0)!important}.sb.hidden{transform:translateX(-100%)!important}}
 .sb-top{padding:12px 12px 10px;border-bottom:1px solid var(--border-2);margin-bottom:2px;flex-shrink:0}
@@ -90,7 +90,7 @@ body.sb-open .sb{transform:translateX(0)}
 .nav-ic{width:28px;height:28px;border-radius:7px;background:var(--bg);display:grid;place-items:center;font-size:13px;flex-shrink:0;transition:all var(--t-fast)}
 .nav.on .nav-ic{background:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(21,101,192,.3)}
 .nav-badge{margin-left:auto;background:var(--red);color:#fff;border-radius:20px;padding:2px 7px;font-size:10px;font-weight:700;min-width:20px;text-align:center}
-.sb-footer{margin-top:auto;padding:10px 16px;border-top:1px solid var(--border-2);font-size:11px;color:var(--text-3);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.sb-footer{flex-shrink:0;padding:10px 12px;border-top:1px solid var(--border-2);font-size:11px;color:var(--text-3);display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--card);position:sticky;bottom:0}
 .sb-version{background:var(--teal-l);color:var(--teal);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700}
 /* BOTTOM NAV */
 .bnav{display:none;position:fixed;bottom:0;left:0;right:0;height:var(--bnav);background:var(--card);border-top:1px solid var(--border-2);z-index:100;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 12px rgba(10,45,74,.08)}
@@ -102,8 +102,8 @@ body.sb-open .sb{transform:translateX(0)}
 .bnav-ic{font-size:20px;line-height:1}
 .bnav-badge{position:absolute;top:4px;right:calc(50% - 14px);background:var(--red);color:#fff;border-radius:20px;padding:1px 5px;font-size:9px;font-weight:700;min-width:16px;text-align:center}
 /* MAIN */
-.mc{margin-left:0;margin-top:var(--hh);padding:14px;padding-bottom:calc(var(--bnav) + 14px + env(safe-area-inset-bottom));transition:margin var(--t-med);min-height:calc(100vh - var(--hh))}
-@media(min-width:801px){.mc{margin-left:280px;padding:20px 22px;padding-bottom:20px}.mc.exp{margin-left:0}}
+.mc{margin-left:0;margin-top:var(--hh);padding:14px;padding-bottom:calc(var(--bnav) + 20px + env(safe-area-inset-bottom));transition:margin var(--t-med);min-height:calc(100vh - var(--hh))}
+@media(min-width:801px){.mc{margin-left:288px;padding:20px 22px;padding-bottom:24px}.mc.exp{margin-left:0}}
 @media(min-width:1200px){.mc{padding:22px 28px}}
 .pg{display:none;animation:fadeIn .2s ease}.pg.on{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
@@ -957,6 +957,21 @@ body.is-admin .admin-only-flex{display:flex!important}
     </div>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(this)">
   </div>
+  <!-- CẤU HÌNH HỆ THỐNG: Lưu & Tải -->
+  <div class="card">
+    <div class="card-hd" style="margin-bottom:10px">
+      <div class="card-title">⚙️ Cấu hình hệ thống — Lưu & Tải</div>
+    </div>
+    <div class="tip-box" style="margin-bottom:12px">
+      <b>📦</b><span>Xuất file cấu hình để sử dụng lại trên các thiết bị khác. File cấu hình chứa: thông tin bệnh viện, danh mục khoa phòng, cài đặt Google Sheets, tùy chọn đồng bộ và danh sách người dùng. <b>Không chứa Service Account Key và dữ liệu phiếu giám sát.</b></span>
+    </div>
+    <div class="bg" style="flex-wrap:wrap;row-gap:6px;margin-bottom:10px">
+      <button class="btn btn-p" onclick="exportSystemConfig()">📤 Xuất cấu hình (.json)</button>
+      <button class="btn btn-o" onclick="document.getElementById('importCfgFile').click()">📥 Tải cấu hình</button>
+    </div>
+    <input type="file" id="importCfgFile" accept=".json" style="display:none" onchange="handleImportConfig(this)">
+    <div id="cfgLastExport" style="font-size:11.5px;color:var(--text-3)"></div>
+  </div>
   <div class="card">
     <div class="card-title" style="margin-bottom:14px">📊 Tóm tắt dữ liệu</div>
     <div id="adminStats" class="sg"></div>
@@ -1042,10 +1057,16 @@ body.is-admin .admin-only-flex{display:flex!important}
       </div>
       <div><button class="btn btn-p" onclick="saveGSConfig()">💾 Lưu cấu hình</button></div>
     </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-2);border-radius:var(--r-sm);border:1px solid var(--border-2);margin-bottom:10px">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;flex:1">
+        <input type="checkbox" id="cfg-syncsave" style="width:18px;height:18px;accent-color:var(--blue)">
+        <div><div style="font-weight:600;font-size:13px">🚀 Đồng bộ ngay lập tức khi lưu phiếu</div><div style="font-size:11.5px;color:var(--text-3)">Mỗi lần nhấn "Lưu phiếu" sẽ tự động đồng bộ ngay (yêu cầu có internet)</div></div>
+      </label>
+    </div>
     <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-2);border-radius:var(--r-sm);border:1px solid var(--border-2);margin-bottom:14px">
       <label style="display:flex;align-items:center;gap:10px;cursor:pointer;flex:1">
         <input type="checkbox" id="cfg-autosync" style="width:18px;height:18px">
-        <div><div style="font-weight:600;font-size:13px">Tự động đồng bộ sau khi lưu phiếu</div><div style="font-size:11.5px;color:var(--text-3)">Bao gồm cả phiếu bảng kiểm và đánh giá C4</div></div>
+        <div><div style="font-weight:600;font-size:13px">⏱️ Tự động đồng bộ định kỳ</div><div style="font-size:11.5px;color:var(--text-3)">Tự động đồng bộ theo chu kỳ thời gian cài đặt</div></div>
       </label>
       <select class="fc" id="cfg-syncinterval" style="width:80px"><option value="0">Tắt</option><option value="5">5p</option><option value="10" selected>10p</option><option value="15">15p</option><option value="30">30p</option></select>
     </div>
@@ -1848,20 +1869,66 @@ body.is-admin .admin-only-flex{display:flex!important}
 </div>
 <!-- ══ QUẢN LÝ NGƯỜI DÙNG (Admin only) ══ -->
 <div class="pg" id="pg-users">
-  <div class="card">
-    <div class="card-hd">
+  <!-- Toolbar -->
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-hd" style="margin-bottom:10px">
       <div class="card-title">👥 Quản lý tài khoản người dùng</div>
-      <button class="btn btn-p btn-sm" onclick="showAddUserModal()">＋ Thêm người dùng</button>
+      <div class="bg" style="flex-wrap:wrap;row-gap:6px">
+        <button class="btn btn-p btn-sm" onclick="showAddUserModal()">＋ Thêm người dùng</button>
+        <button class="btn btn-o btn-sm" onclick="showBulkImportModal()">📥 Nhập hàng loạt</button>
+        <button class="btn btn-o btn-sm" onclick="downloadUserTemplate()">📋 Tải file mẫu</button>
+        <button class="btn btn-o btn-sm" onclick="exportUserList()">📊 Xuất danh sách</button>
+      </div>
     </div>
-    <div class="tip-box" style="margin-bottom:12px">
-      <b>💡</b><span>Mặc định: tên đăng nhập là <b>Số CMND/CCCD</b>, mật khẩu mặc định <b>bvps@123</b>. Người dùng có thể tự đổi mật khẩu sau khi đăng nhập.</span>
+    <div class="tip-box">
+      <b>💡</b><span>Tên đăng nhập = <b>Số CMND/CCCD</b>, mật khẩu mặc định <b>bvps@123</b>. Dùng <b>"Nhập hàng loạt"</b> để tạo nhiều tài khoản cùng lúc từ file Excel.</span>
     </div>
+    <!-- Search bar -->
+    <div class="sb-search" style="margin-top:10px" onclick="document.getElementById('userSearch').focus()">
+      <span>🔍</span><input type="text" id="userSearch" placeholder="Tìm kiếm theo tên, CMND, khoa..." oninput="renderUserList()" style="border:none;background:none;outline:none;font-size:13px;font-family:inherit;flex:1;min-width:0">
+    </div>
+  </div>
+  <!-- User list -->
+  <div class="card">
     <div id="userListBody"></div>
   </div>
   <!-- Yêu cầu chờ duyệt -->
   <div class="card">
     <div class="card-hd"><div class="card-title">📩 Yêu cầu chờ xử lý <span class="nav-badge" id="pendReqBadge" style="display:none">0</span></div><button class="btn btn-o btn-sm" onclick="renderPendingRequests()">🔄 Làm mới</button></div>
     <div id="pendReqBody"><div style="text-align:center;color:var(--text-3);padding:16px;font-size:13px">Không có yêu cầu nào</div></div>
+  </div>
+</div>
+
+<!-- BULK IMPORT MODAL -->
+<div class="mo" id="bulkImportMo">
+  <div class="md" style="max-width:540px">
+    <div class="md-hd"><span class="md-title">📥 Nhập hàng loạt người dùng</span><button class="md-x" onclick="closeMo('bulkImportMo')">✕</button></div>
+    <div class="md-body">
+      <div class="tip-box" style="margin-bottom:12px">
+        <b>📋</b><span>Tải <b>file mẫu Excel</b>, điền thông tin, rồi upload lại. Hệ thống sẽ tự tạo tài khoản hàng loạt. Cột bắt buộc: <b>Họ tên, CMND/CCCD</b>.</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn btn-o" onclick="downloadUserTemplate()">📋 Tải file mẫu Excel</button>
+      </div>
+      <!-- Drop zone -->
+      <div class="json-drop" id="bulkDropZone" onclick="document.getElementById('bulkImportFile').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleBulkDrop(event)" style="margin-bottom:12px">
+        <div style="font-size:28px;margin-bottom:6px">📊</div>
+        <div style="font-size:13px;color:var(--text-2)"><b>Nhấn hoặc kéo thả file Excel (.xlsx)</b><br><span style="font-size:11px;color:var(--text-3)">danh_sach_nguoi_dung.xlsx</span></div>
+        <input type="file" id="bulkImportFile" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleBulkImportFile(this)">
+      </div>
+      <!-- Preview -->
+      <div id="bulkPreview" style="display:none">
+        <div class="sec-label" style="margin-bottom:8px">Xem trước dữ liệu</div>
+        <div style="overflow-x:auto;max-height:240px;overflow-y:auto;border:1px solid var(--border-2);border-radius:var(--r-xs)">
+          <table class="dt" id="bulkPreviewTable" style="font-size:11.5px"></table>
+        </div>
+        <div id="bulkSummary" style="margin-top:8px;font-size:12.5px;color:var(--text-2)"></div>
+      </div>
+    </div>
+    <div class="md-ft">
+      <button class="btn btn-o" onclick="closeMo('bulkImportMo')">Hủy</button>
+      <button class="btn btn-p" id="bulkImportOkBtn" onclick="executeBulkImport()" style="display:none">✅ Nhập tất cả</button>
+    </div>
   </div>
 </div>
 
@@ -3022,9 +3089,13 @@ function buildC4Row(r){
 function logSync(type,msg){const el=document.getElementById('syncLog');if(!el) return;el.style.display='block';const cls=type==='ok'?'log-ok':type==='err'?'log-err':type==='warn'?'log-warn':'log-info';el.innerHTML+=`<span class="${cls}">[${new Date().toLocaleTimeString('vi-VN')}] ${msg}</span>\n`;el.scrollTop=el.scrollHeight;}
 
 function saveGSConfig(){
+  // Handled by the enhanced saveGSConfig defined in the auth/config section below
   const sid=document.getElementById('cfg-sid').value.trim();if(!sid){showNotif('Vui lòng nhập Spreadsheet ID','err');return;}
-  S.config.spreadsheetId=sid;S.config.autoSync=document.getElementById('cfg-autosync').checked;S.config.syncInterval=parseInt(document.getElementById('cfg-syncinterval').value)||10;
-  save();setupAutoSyncTimer();showNotif('✅ Đã lưu cấu hình','ok');updateGSStatusBar();
+  S.config.spreadsheetId=sid;
+  S.config.autoSync=document.getElementById('cfg-autosync').checked;
+  S.config.syncInterval=parseInt(document.getElementById('cfg-syncinterval').value)||10;
+  S.config.syncOnSave=document.getElementById('cfg-syncsave')?.checked||false;
+  save();setupAutoSyncTimer();showNotif('✅ Đã lưu cấu hình Google Sheets','ok');updateGSStatusBar();
 }
 function openSheet(){if(S.config.spreadsheetId) window.open(`https://docs.google.com/spreadsheets/d/${S.config.spreadsheetId}/edit`,'_blank');}
 function setupAutoSyncTimer(){if(_autoSyncTimer) clearInterval(_autoSyncTimer);if(S.config.syncInterval>0&&S.serviceAccount&&S.config.spreadsheetId){_autoSyncTimer=setInterval(()=>{if(navigator.onLine&&(S.records.some(r=>!r.synced)||S.c4records.some(r=>!r.synced))){logSync('info','⏱️ Tự động đồng bộ...');doSync();}},S.config.syncInterval*60*1000);}}
@@ -4306,16 +4377,27 @@ window.go = function(p){
 };
 
 // ── Patch saveForm() & saveC4() & saveNKBV() để ghi log ───────
+// Capture original doSync FIRST before any patches
+const _origDoSync = doSync;
+window.doSync = async function(){
+  addLog('Đồng bộ dữ liệu lên Google Sheets');
+  return _origDoSync();
+};
+
 const _origSaveForm = saveForm;
 window.saveForm = function(key){
   _origSaveForm(key);
-  // Gắn operator vào record vừa lưu
   if(currentUser && S.records.length){
     const last = S.records[S.records.length-1];
     if(!last.operator){ last.operator = currentUser.username; last.operatorName = currentUser.name; save(); }
   }
   addLog(`Lưu phiếu: ${FC[key]?.label||key}`);
+  if(S.config.syncOnSave && S.serviceAccount && S.config.spreadsheetId && navigator.onLine){
+    showNotif('🚀 Đang đồng bộ ngay...','info');
+    setTimeout(_origDoSync, 300);
+  }
 };
+
 const _origSaveC4 = saveC4;
 window.saveC4 = function(cid){
   _origSaveC4(cid);
@@ -4324,11 +4406,9 @@ window.saveC4 = function(cid){
     if(!last.operator){ last.operator = currentUser.username; last.operatorName = currentUser.name; save(); }
   }
   addLog(`Lưu đánh giá C4: ${C4[cid]?.code||cid}`);
-};
-const _origDoSync = doSync;
-window.doSync = async function(){
-  addLog('Đồng bộ dữ liệu lên Google Sheets');
-  return _origDoSync();
+  if(S.config.syncOnSave && S.serviceAccount && S.config.spreadsheetId && navigator.onLine){
+    setTimeout(_origDoSync, 300);
+  }
 };
 
 // Patch saveNKBV để ghi log
@@ -4340,15 +4420,302 @@ window.saveNKBV = function(){
     if(!last.operator){ last.operator = currentUser.username; last.operatorName = currentUser.name; save(); }
   }
   addLog('Ghi nhận ca NKBV');
+  if(S.config.syncOnSave && S.serviceAccount && S.config.spreadsheetId && navigator.onLine){
+    setTimeout(_origDoSync, 300);
+  }
 };
 
-// ── Patch init để chạy Auth trước ────────────────────────────
-const _origDOMReady = document._ksnkInit;
+// ── Bulk User Import ──────────────────────────────────────────
+let _bulkData = [];
 
-// Overwrite DOMContentLoaded init to inject auth
+function showBulkImportModal(){
+  _bulkData = [];
+  document.getElementById('bulkPreview').style.display='none';
+  document.getElementById('bulkImportOkBtn').style.display='none';
+  document.getElementById('bulkDropZone').classList.remove('loaded');
+  openMo('bulkImportMo');
+}
+
+function downloadUserTemplate(){
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['Họ và tên','CMND / CCCD','Khoa / Phòng','Vai trò','Mật khẩu ban đầu','Ghi chú'],
+    ['Nguyễn Văn A','012345678901','Khoa Sản A','user','bvps@123',''],
+    ['Trần Thị B','098765432101','Khoa Nội','supervisor','bvps@123','Giám sát viên'],
+    ['Lê Văn C','001122334455','Phòng Mổ','user','bvps@123',''],
+  ]);
+  // Set column widths
+  ws['!cols'] = [{wch:22},{wch:16},{wch:18},{wch:14},{wch:16},{wch:20}];
+  XLSX.utils.book_append_sheet(wb, ws, 'DanhSachNguoiDung');
+  XLSX.writeFile(wb, 'MauNhapNguoiDung_KSNKPro.xlsx');
+  showNotif('📋 Đã tải file mẫu Excel','ok');
+}
+
+function handleBulkDrop(event){
+  event.preventDefault();
+  document.getElementById('bulkDropZone').classList.remove('drag');
+  const f = event.dataTransfer.files[0];
+  if(f) processBulkFile(f);
+}
+
+function handleBulkImportFile(input){
+  const f = input.files[0];
+  if(f) processBulkFile(f);
+  input.value='';
+}
+
+function processBulkFile(file){
+  const r = new FileReader();
+  r.onload = e => {
+    try{
+      const wb = XLSX.read(e.target.result, {type:'binary'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+      if(rows.length < 2){ showNotif('❌ File không có dữ liệu','err'); return; }
+      // Skip header row (row 0)
+      const data = rows.slice(1).filter(r => r[0] && r[1]); // cần Họ tên + CMND
+      _bulkData = data.map(r => ({
+        name: String(r[0]||'').trim(),
+        username: String(r[1]||'').trim(),
+        khoa: String(r[2]||'').trim(),
+        role: String(r[3]||'user').trim().toLowerCase() || 'user',
+        password: String(r[4]||DEFAULT_PASS).trim() || DEFAULT_PASS,
+        note: String(r[5]||'').trim()
+      })).filter(u => u.name && u.username);
+
+      // Preview table
+      const existing = loadUsers();
+      const existingIds = new Set(existing.map(u=>u.username));
+      const previewBody = _bulkData.map(u => {
+        const dup = existingIds.has(u.username);
+        return `<tr style="${dup?'background:#fff3e0':''}">
+          <td>${u.name}</td>
+          <td style="font-family:monospace">${u.username}</td>
+          <td>${u.khoa||'—'}</td>
+          <td><span class="badge bg-blue">${u.role}</span></td>
+          <td><span class="badge ${dup?'bg-warn':'bg-ok'}">${dup?'⚠️ Đã tồn tại':'✅ Mới'}</span></td>
+        </tr>`;
+      }).join('');
+
+      document.getElementById('bulkPreviewTable').innerHTML = `
+        <thead><tr><th>Họ tên</th><th>CMND/CCCD</th><th>Khoa</th><th>Vai trò</th><th>Trạng thái</th></tr></thead>
+        <tbody>${previewBody}</tbody>`;
+
+      const newCount = _bulkData.filter(u=>!existingIds.has(u.username)).length;
+      const dupCount = _bulkData.length - newCount;
+      document.getElementById('bulkSummary').innerHTML =
+        `<b>${_bulkData.length}</b> dòng: <span style="color:var(--green)">✅ ${newCount} mới</span>${dupCount?` · <span style="color:var(--amber)">⚠️ ${dupCount} đã tồn tại (sẽ bỏ qua)</span>`:''}`;
+
+      document.getElementById('bulkPreview').style.display = 'block';
+      document.getElementById('bulkImportOkBtn').style.display = _bulkData.length ? '' : 'none';
+      document.getElementById('bulkDropZone').classList.add('loaded');
+    }catch(err){
+      showNotif('❌ Lỗi đọc file Excel: '+err.message,'err');
+    }
+  };
+  r.readAsBinaryString(file);
+}
+
+function executeBulkImport(){
+  if(!_bulkData.length){ showNotif('Không có dữ liệu để nhập','err'); return; }
+  const users = loadUsers();
+  const existingIds = new Set(users.map(u=>u.username));
+  let added = 0, skipped = 0;
+  _bulkData.forEach(u => {
+    if(existingIds.has(u.username)){ skipped++; return; }
+    users.push({
+      username: u.username, name: u.name, role: u.role||'user',
+      khoa: u.khoa||'', password: hashPass(u.password||DEFAULT_PASS),
+      active: true, mustChangePass: true, createdAt: new Date().toISOString()
+    });
+    added++;
+  });
+  saveUsers(users);
+  addLog(`Nhập hàng loạt ${added} tài khoản (bỏ qua ${skipped} trùng)`);
+  syncUsersToSheet();
+  closeMo('bulkImportMo');
+  renderUserList();
+  showNotif(`✅ Đã tạo ${added} tài khoản${skipped?`, bỏ qua ${skipped} trùng`:''}`, 'ok');
+}
+
+function exportUserList(){
+  const users = loadUsers();
+  if(!users.length){ showNotif('Chưa có người dùng nào','err'); return; }
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['CMND/CCCD','Họ tên','Vai trò','Khoa/Phòng','Trạng thái','Tạo lúc'],
+    ...users.map(u=>[u.username,u.name,u.role,u.khoa||'',u.active?'Hoạt động':'Vô hiệu',u.createdAt||''])
+  ]);
+  ws['!cols']=[{wch:16},{wch:22},{wch:14},{wch:18},{wch:12},{wch:22}];
+  XLSX.utils.book_append_sheet(wb,ws,'DanhSachNguoiDung');
+  XLSX.writeFile(wb,`DanhSachNguoiDung_${new Date().toLocaleDateString('vi-VN').replace(/\//g,'-')}.xlsx`);
+  showNotif('📊 Đã xuất danh sách người dùng','ok');
+}
+
+// ── System Config Export/Import ───────────────────────────────
+function exportSystemConfig(){
+  const cfgPayload = {
+    _type: 'ksnk_system_config',
+    _version: '7.0',
+    _exportedAt: new Date().toISOString(),
+    _exportedBy: currentUser?.name || 'admin',
+    config: { ...S.config },
+    users: loadUsers().map(u=>({...u})), // Include users (no passwords shown in plain)
+    syncSettings: {
+      spreadsheetId: S.config.spreadsheetId,
+      autoSync: S.config.autoSync,
+      syncInterval: S.config.syncInterval,
+      syncOnSave: S.config.syncOnSave || false
+    }
+  };
+  const blob = new Blob([JSON.stringify(cfgPayload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `KSNKPro_Config_${new Date().toLocaleDateString('vi-VN').replace(/\//g,'-')}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  // Remember last export time
+  localStorage.setItem('ksnk_last_cfg_export', new Date().toISOString());
+  const el = document.getElementById('cfgLastExport');
+  if(el) el.textContent = '📦 Xuất lần cuối: ' + new Date().toLocaleString('vi-VN');
+  addLog('Xuất file cấu hình hệ thống');
+  showNotif('📤 Đã xuất cấu hình hệ thống','ok');
+}
+
+function handleImportConfig(input){
+  const f = input.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    try{
+      const d = JSON.parse(e.target.result);
+      if(d._type !== 'ksnk_system_config'){
+        showNotif('❌ File không phải cấu hình KSNK Pro','err'); return;
+      }
+      showConfirm('📥 Tải cấu hình',
+        `<div style="font-size:13px;line-height:1.8">
+          <b>File cấu hình từ:</b> ${d._exportedBy||'?'}<br>
+          <b>Thời gian xuất:</b> ${new Date(d._exportedAt).toLocaleString('vi-VN')}<br>
+          <b>Bệnh viện:</b> ${d.config?.bv||'?'}<br>
+          <b>Số khoa:</b> ${d.config?.khoas?.length||0}<br>
+          <b>Số người dùng:</b> ${d.users?.length||0}<br><br>
+          <span style="color:var(--amber)">⚠️ Cài đặt hiện tại sẽ bị ghi đè. Tiếp tục?</span>
+        </div>`,
+        () => applyImportedConfig(d)
+      );
+    }catch(err){
+      showNotif('❌ Lỗi đọc file cấu hình','err');
+    }
+  };
+  r.readAsText(f);
+  input.value='';
+}
+
+function applyImportedConfig(d){
+  // Apply config
+  if(d.config){
+    Object.assign(S.config, d.config);
+    save();
+  }
+  // Apply sync settings
+  if(d.syncSettings){
+    S.config.spreadsheetId = d.syncSettings.spreadsheetId || S.config.spreadsheetId;
+    S.config.autoSync = d.syncSettings.autoSync !== undefined ? d.syncSettings.autoSync : S.config.autoSync;
+    S.config.syncInterval = d.syncSettings.syncInterval || S.config.syncInterval;
+    S.config.syncOnSave = d.syncSettings.syncOnSave || false;
+    save();
+  }
+  // Apply users (merge, don't override existing)
+  if(d.users && Array.isArray(d.users)){
+    const existing = loadUsers();
+    const existingIds = new Set(existing.map(u=>u.username));
+    let added = 0;
+    d.users.forEach(u=>{
+      if(!existingIds.has(u.username) && u.username && u.name){
+        existing.push({...u});
+        added++;
+      }
+    });
+    saveUsers(existing);
+    if(added > 0) showNotif(`✅ Đã tải cấu hình + thêm ${added} người dùng mới`,'ok');
+  }
+  // Refresh UI
+  document.getElementById('cfg-bv').value = S.config.bv;
+  document.getElementById('cfg-so').value = S.config.so;
+  document.getElementById('cfg-kk').value = S.config.kk;
+  if(S.config.spreadsheetId) document.getElementById('cfg-sid').value = S.config.spreadsheetId;
+  const autoEl = document.getElementById('cfg-autosync');
+  if(autoEl) autoEl.checked = S.config.autoSync !== false;
+  const intervalEl = document.getElementById('cfg-syncinterval');
+  if(intervalEl) intervalEl.value = S.config.syncInterval || 10;
+  const syncSaveEl = document.getElementById('cfg-syncsave');
+  if(syncSaveEl) syncSaveEl.checked = S.config.syncOnSave || false;
+  renderKhoaList();
+  populateKhoas();
+  renderUserList();
+  document.getElementById('heroUnit').textContent = `${S.config.bv} – ${S.config.kk}`;
+  addLog('Tải cấu hình hệ thống từ file');
+  showNotif('✅ Đã áp dụng cấu hình hệ thống!','ok');
+}
+
+// Override saveCfg to also reload cfgLastExport label
+const _origSaveCfg = saveCfg;
+window.saveCfg = function(){
+  _origSaveCfg();
+  const lce = localStorage.getItem('ksnk_last_cfg_export');
+  const el = document.getElementById('cfgLastExport');
+  if(el && lce) el.textContent = '📦 Xuất lần cuối: ' + new Date(lce).toLocaleString('vi-VN');
+};
+
+// ── Improved renderUserList with search ───────────────────────
+// Override the previously defined renderUserList
+window.renderUserList = function(){
+  const q = (document.getElementById('userSearch')?.value||'').toLowerCase();
+  let users = loadUsers();
+  if(q) users = users.filter(u =>
+    u.name?.toLowerCase().includes(q) ||
+    u.username?.toLowerCase().includes(q) ||
+    u.khoa?.toLowerCase().includes(q)
+  );
+  const body = document.getElementById('userListBody');
+  if(!body) return;
+  if(!users.length){
+    body.innerHTML=`<div style="text-align:center;color:var(--text-3);padding:24px;font-size:13px">${q?'🔍 Không tìm thấy người dùng nào phù hợp':'Chưa có người dùng nào. Nhấn <b>Thêm người dùng</b> hoặc <b>Nhập hàng loạt</b>.'}</div>`;
+    return;
+  }
+  const roleLabels={admin:'👑 Admin',supervisor:'🔍 Giám sát',user:'👤 Người dùng'};
+  body.innerHTML=`<div style="overflow-x:auto"><table class="dt"><thead><tr>
+    <th>Họ tên</th><th>CMND/CCCD</th><th>Vai trò</th><th>Khoa/Phòng</th><th>Trạng thái</th><th>Thao tác</th>
+  </tr></thead><tbody>
+  ${users.map(u=>`<tr>
+    <td><b>${u.name}</b></td>
+    <td style="font-family:monospace;font-size:12px">${u.username}</td>
+    <td><span class="badge bg-blue">${roleLabels[u.role]||u.role}</span></td>
+    <td>${u.khoa||'—'}</td>
+    <td><span class="badge ${u.active?'bg-ok':'bg-bad'}">${u.active?'✅ Hoạt động':'🚫 Vô hiệu'}</span>
+      ${u.mustChangePass?'<span class="badge bg-warn" style="margin-left:4px;font-size:9px">Đổi MK</span>':''}</td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-o btn-xs" onclick="resetUserPass('${u.username}')" title="Reset mật khẩu">🔑</button>
+      <button class="btn ${u.active?'btn-a':'btn-g'} btn-xs" onclick="toggleUserActive('${u.username}')" title="${u.active?'Vô hiệu hóa':'Kích hoạt'}">${u.active?'🚫':'✅'}</button>
+      <button class="btn btn-r btn-xs" onclick="deleteUser('${u.username}')" title="Xóa">🗑️</button>
+    </td>
+  </tr>`).join('')}
+  </tbody></table></div><div style="font-size:11.5px;color:var(--text-3);padding:8px 4px">Hiển thị ${users.length}/${loadUsers().length} người dùng</div>`;
+};
+
+// Overwrite DOMContentLoaded init to inject auth + extra inits
 document.addEventListener('DOMContentLoaded', ()=>{
   // Auth init AFTER main init (runs after existing DOMContentLoaded)
-  setTimeout(authInit, 50);
+  setTimeout(()=>{
+    authInit();
+    // Load syncOnSave setting into checkbox
+    const syncSaveEl = document.getElementById('cfg-syncsave');
+    if(syncSaveEl) syncSaveEl.checked = S.config.syncOnSave || false;
+    // Show last config export time
+    const lce = localStorage.getItem('ksnk_last_cfg_export');
+    const cfgEl = document.getElementById('cfgLastExport');
+    if(cfgEl && lce) cfgEl.textContent = '📦 Xuất lần cuối: ' + new Date(lce).toLocaleString('vi-VN');
+  }, 50);
 });
 
 // v7: cache invalidation – _dashCache cleared inside renderDashboard directly
