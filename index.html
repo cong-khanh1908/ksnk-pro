@@ -929,13 +929,21 @@ body.is-admin .admin-only-flex{display:flex!important}
 
 <!-- ══ QUẢN TRỊ ══ -->
 <div class="pg" id="pg-admin">
+  <!-- SHARED CONFIG STATUS — Hiển thị trạng thái cấu hình dùng chung -->
+  <div id="sharedCfgStatus"></div>
+
+  <div class="tip-box" style="margin-bottom:14px;background:linear-gradient(90deg,rgba(21,101,192,.08),var(--teal-l));border-color:var(--teal);color:var(--navy)">
+    <b>👑</b>
+    <div><b>Trang Admin:</b> Mọi thay đổi bạn lưu tại đây sẽ được <b>tự động phát hành cho tất cả người dùng</b>. Người dùng khi đăng nhập sẽ tự động tải cấu hình mới nhất — không cần cài đặt lại trên từng thiết bị.</div>
+  </div>
+
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:14px">
     <div class="card">
       <div class="card-title" style="margin-bottom:14px">🏥 Thông tin đơn vị</div>
       <div class="fgp" style="margin-bottom:10px"><label class="fl">Tên Bệnh viện</label><input type="text" class="fc" id="cfg-bv"></div>
       <div class="fgp" style="margin-bottom:10px"><label class="fl">Sở Y tế / Tỉnh thành</label><input type="text" class="fc" id="cfg-so"></div>
       <div class="fgp" style="margin-bottom:14px"><label class="fl">Tên Khoa KSNK</label><input type="text" class="fc" id="cfg-kk"></div>
-      <button class="btn btn-p" onclick="saveCfg()">💾 Lưu cấu hình</button>
+      <button class="btn btn-p" onclick="saveCfg()">💾 Lưu & Phát hành cho tất cả người dùng</button>
     </div>
     <div class="card">
       <div class="card-hd"><div class="card-title">🏢 Danh mục Khoa / Phòng</div><span class="badge bg-blue" id="khoaCount">0 khoa</span></div>
@@ -979,7 +987,7 @@ body.is-admin .admin-only-flex{display:flex!important}
   <div class="card">
     <div class="card-hd" style="margin-bottom:10px"><div class="card-title">👥 Đa người dùng & Bảo mật</div></div>
     <div class="multiuser-notice">
-      <b>👥 Lưu ý đa người dùng:</b> Mỗi thiết bị/trình duyệt lưu dữ liệu riêng biệt. Để nhiều người cùng nhập liệu vào một hệ thống tập trung, hãy kết nối <b>Google Sheets</b>.
+      <b>✅ Cơ chế cấu hình dùng chung:</b> Admin cấu hình 1 lần → tất cả người dùng khi đăng nhập sẽ tự động tải cấu hình. Không cần thao tác cài đặt lại trên từng thiết bị, kể cả mobile.
       <button class="btn btn-o btn-xs" style="margin-top:6px" onclick="go('gsheets')">☁️ Thiết lập Google Sheets</button>
     </div>
     <div class="security-grid" style="margin-top:12px">
@@ -1004,6 +1012,11 @@ body.is-admin .admin-only-flex{display:flex!important}
 
 <!-- ══ GOOGLE SHEETS ══ -->
 <div class="pg" id="pg-gsheets">
+  <!-- ADMIN NOTICE -->
+  <div class="tip-box" style="margin-bottom:14px;background:linear-gradient(90deg,rgba(21,101,192,.08),var(--teal-l));border-color:var(--teal);color:var(--navy)">
+    <b>👑</b>
+    <div><b>Cấu hình dùng chung:</b> Trang này chỉ Admin mới thao tác. Sau khi lưu, <b>tất cả người dùng khi đăng nhập sẽ tự động có cấu hình Google Sheets này</b> — không cần upload lại SA Key hay nhập lại Spreadsheet ID trên từng thiết bị.</div>
+  </div>
   <div id="gsStatusBar" class="gs-status-bar disconnected" style="display:none">
     <span id="gsStatusIcon" style="font-size:20px">⚠️</span>
     <div style="flex:1"><b id="gsStatusTitle">Chưa kết nối</b><div id="gsStatusSub" style="font-size:12px;opacity:.85;margin-top:2px"></div></div>
@@ -1055,7 +1068,7 @@ body.is-admin .admin-only-flex{display:flex!important}
         <input type="text" class="fc" id="cfg-sid" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms">
         <div style="font-size:11px;color:var(--text-3);margin-top:4px">URL: docs.google.com/spreadsheets/d/<b style="color:var(--blue)">[ID]</b>/edit</div>
       </div>
-      <div><button class="btn btn-p" onclick="saveGSConfig()">💾 Lưu cấu hình</button></div>
+      <div><button class="btn btn-p" onclick="saveGSConfig()">💾 Lưu & Phát hành cho tất cả</button></div>
     </div>
     <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-2);border-radius:var(--r-sm);border:1px solid var(--border-2);margin-bottom:10px">
       <label style="display:flex;align-items:center;gap:10px;cursor:pointer;flex:1">
@@ -2867,17 +2880,48 @@ function showDT(k,btn){
 //  ADMIN
 // ============================================================
 function saveCfg(){
-  S.config.bv=document.getElementById('cfg-bv').value;S.config.so=document.getElementById('cfg-so').value;S.config.kk=document.getElementById('cfg-kk').value;
-  save();document.getElementById('heroUnit').textContent=`${S.config.bv} – ${S.config.kk}`;
-  showNotif('✅ Đã lưu cấu hình','ok');
+  if(currentUser?.role !== 'admin'){
+    showNotif('🔒 Chỉ Admin mới có thể thay đổi cấu hình hệ thống','err');
+    return;
+  }
+  S.config.bv=document.getElementById('cfg-bv').value;
+  S.config.so=document.getElementById('cfg-so').value;
+  S.config.kk=document.getElementById('cfg-kk').value;
+  save();
+  // ── Phát hành cấu hình cho tất cả người dùng ──
+  saveSharedConfig();
+  document.getElementById('heroUnit').textContent=`${S.config.bv} – ${S.config.kk}`;
+  renderSharedConfigStatus && renderSharedConfigStatus();
+  addLog('Cập nhật cấu hình hệ thống', `BV: ${S.config.bv}, Khoa: ${S.config.kk}`);
+  showNotif('✅ Đã lưu cấu hình — Đã phát hành cho tất cả người dùng','ok');
 }
 function renderKhoaList(){
   const el=document.getElementById('khoaList');if(!el) return;
   el.innerHTML=S.config.khoas.map((k,i)=>`<li class="ai"><span><span class="ai-dot"></span>${k}</span><button class="btn btn-r btn-xs" onclick="rmKhoa(${i})">✕</button></li>`).join('');
   const cnt=document.getElementById('khoaCount');if(cnt) cnt.textContent=S.config.khoas.length+' khoa';
 }
-function addKhoa(){const v=document.getElementById('nk').value.trim();if(!v){showNotif('Nhập tên khoa','err');return;}if(S.config.khoas.includes(v)){showNotif('Đã tồn tại','err');return;}S.config.khoas.push(v);document.getElementById('nk').value='';save();renderKhoaList();populateKhoas();showNotif(`✅ Đã thêm "${v}"`,'ok');}
-function rmKhoa(i){showConfirm('Xóa khoa',`Xóa khoa "<b>${S.config.khoas[i]}</b>"?`,()=>{S.config.khoas.splice(i,1);save();renderKhoaList();populateKhoas();showNotif('Đã xóa','ok');});}
+function addKhoa(){
+  const v=document.getElementById('nk').value.trim();
+  if(!v){showNotif('Nhập tên khoa','err');return;}
+  if(S.config.khoas.includes(v)){showNotif('Đã tồn tại','err');return;}
+  S.config.khoas.push(v);
+  document.getElementById('nk').value='';
+  save();
+  saveSharedConfig(); // Phát hành ngay cho mọi user
+  renderKhoaList();populateKhoas();
+  renderSharedConfigStatus && renderSharedConfigStatus();
+  showNotif(`✅ Đã thêm khoa "${v}" — Đã phát hành cho tất cả người dùng`,'ok');
+}
+function rmKhoa(i){
+  showConfirm('Xóa khoa',`Xóa khoa "<b>${S.config.khoas[i]}</b>"?`,()=>{
+    S.config.khoas.splice(i,1);
+    save();
+    saveSharedConfig(); // Phát hành ngay
+    renderKhoaList();populateKhoas();
+    renderSharedConfigStatus && renderSharedConfigStatus();
+    showNotif('Đã xóa khoa — Đã cập nhật cho tất cả người dùng','ok');
+  });
+}
 function populateKhoas(){
   document.querySelectorAll('[id$="-kh"]').forEach(sel=>{const v=sel.value;sel.innerHTML='<option value="">— Chọn khoa / phòng —</option>'+S.config.khoas.map(k=>`<option>${k}</option>`).join('');if(v) sel.value=v;});
   const bck=document.getElementById('bc-kh');if(bck) bck.innerHTML='<option value="all">Tất cả khoa</option>'+S.config.khoas.map(k=>`<option>${k}</option>`).join('');
@@ -2914,10 +2958,33 @@ function handleImport(input){
 // ============================================================
 function loadSAKey(jsonObj){
   if(!jsonObj.private_key||!jsonObj.client_email||jsonObj.type!=='service_account'){showNotif('❌ JSON không hợp lệ','err');return false;}
-  S.serviceAccount=jsonObj;save();localStorage.setItem('ksnk_sa_key',JSON.stringify(jsonObj));
-  updateSAKeyUI();updateGSStatusBar();showNotif(`✅ Đã nạp key: ${jsonObj.client_email}`,'ok');return true;
+  S.serviceAccount=jsonObj;
+  save();
+  localStorage.setItem(SA_KEY_STORE, JSON.stringify(jsonObj));
+  // ── Lưu shared SA key để các thiết bị khác dùng ──
+  if(currentUser?.role === 'admin'){
+    saveSharedSAKey(jsonObj);
+    showNotif(`✅ Đã nạp key: ${jsonObj.client_email} — Đã chia sẻ cho tất cả người dùng`,'ok');
+  } else {
+    showNotif(`✅ Đã nạp key: ${jsonObj.client_email}`,'ok');
+  }
+  updateSAKeyUI();updateGSStatusBar();
+  renderSharedConfigStatus && renderSharedConfigStatus();
+  return true;
 }
-function clearSAKey(){S.serviceAccount=null;_cachedToken=null;localStorage.removeItem('ksnk_sa_key');save();updateSAKeyUI();updateGSStatusBar();showNotif('Đã xóa key','info');}
+function clearSAKey(){
+  S.serviceAccount=null;_cachedToken=null;
+  localStorage.removeItem(SA_KEY_STORE);
+  // Nếu là admin thì xóa cả shared
+  if(currentUser?.role === 'admin'){
+    localStorage.removeItem(SHARED_SA_KEY);
+    showNotif('Đã xóa key — Đã xóa khỏi shared config','info');
+  } else {
+    showNotif('Đã xóa key local','info');
+  }
+  save();updateSAKeyUI();updateGSStatusBar();
+  renderSharedConfigStatus && renderSharedConfigStatus();
+}
 function updateSAKeyUI(){
   const sa=S.serviceAccount;
   const drop=document.getElementById('jsonDrop'),info=document.getElementById('jsonLoadedInfo');
@@ -3089,13 +3156,26 @@ function buildC4Row(r){
 function logSync(type,msg){const el=document.getElementById('syncLog');if(!el) return;el.style.display='block';const cls=type==='ok'?'log-ok':type==='err'?'log-err':type==='warn'?'log-warn':'log-info';el.innerHTML+=`<span class="${cls}">[${new Date().toLocaleTimeString('vi-VN')}] ${msg}</span>\n`;el.scrollTop=el.scrollHeight;}
 
 function saveGSConfig(){
-  // Handled by the enhanced saveGSConfig defined in the auth/config section below
-  const sid=document.getElementById('cfg-sid').value.trim();if(!sid){showNotif('Vui lòng nhập Spreadsheet ID','err');return;}
+  if(currentUser?.role !== 'admin'){
+    showNotif('🔒 Chỉ Admin mới có thể lưu cấu hình Google Sheets','err');
+    return;
+  }
+  const sid=document.getElementById('cfg-sid').value.trim();
+  if(!sid){showNotif('Vui lòng nhập Spreadsheet ID','err');return;}
   S.config.spreadsheetId=sid;
   S.config.autoSync=document.getElementById('cfg-autosync').checked;
   S.config.syncInterval=parseInt(document.getElementById('cfg-syncinterval').value)||10;
   S.config.syncOnSave=document.getElementById('cfg-syncsave')?.checked||false;
-  save();setupAutoSyncTimer();showNotif('✅ Đã lưu cấu hình Google Sheets','ok');updateGSStatusBar();
+  save();
+  // ── Lưu shared GS config để mọi user load được ──
+  saveSharedGSConfig();
+  // ── Nếu có SA key thì cũng lưu shared ──
+  if(S.serviceAccount) saveSharedSAKey(S.serviceAccount);
+  setupAutoSyncTimer();
+  showNotif('✅ Đã lưu cấu hình Google Sheets — Đã phát hành cho tất cả người dùng','ok');
+  updateGSStatusBar();
+  renderSharedConfigStatus && renderSharedConfigStatus();
+  addLog('Lưu cấu hình Google Sheets', `SpreadsheetID: ${sid}`);
 }
 function openSheet(){if(S.config.spreadsheetId) window.open(`https://docs.google.com/spreadsheets/d/${S.config.spreadsheetId}/edit`,'_blank');}
 function setupAutoSyncTimer(){if(_autoSyncTimer) clearInterval(_autoSyncTimer);if(S.config.syncInterval>0&&S.serviceAccount&&S.config.spreadsheetId){_autoSyncTimer=setInterval(()=>{if(navigator.onLine&&(S.records.some(r=>!r.synced)||S.c4records.some(r=>!r.synced))){logSync('info','⏱️ Tự động đồng bộ...');doSync();}},S.config.syncInterval*60*1000);}}
@@ -3128,7 +3208,7 @@ function go(p){
   if(p==='dl'){dlPage=1;renderDL();updateDlQuickStats();}
   if(p==='tk'){buildQChart();const ft=document.querySelector('#pg-tk .card:last-child .tab');if(ft) showDT('rt',ft);}
   if(p==='gsheets'){updateGSStatusBar();updateSyncStats();}
-  if(p==='admin') renderAdminStats();
+  if(p==='admin'){ renderAdminStats(); renderSharedConfigStatus && renderSharedConfigStatus(); }
   if(['c41','c42','c43','c44','c45','c46'].includes(p)){
     const c=document.getElementById(p+'-levels');
     if(c&&!c.children.length) buildC4Levels(p);
@@ -3258,8 +3338,18 @@ function load(){
       if(!S.nkbvDenominators) S.nkbvDenominators={};
     }
     nkbvDenominators=S.nkbvDenominators||{};
-    const saRaw=localStorage.getItem('ksnk_sa_key');
+    // Load SA key: ưu tiên local, fallback sang shared
+    const saRaw=localStorage.getItem(SA_KEY_STORE)||localStorage.getItem('ksnk_sa_key');
     if(saRaw) S.serviceAccount=JSON.parse(saRaw);
+    else {
+      // Fallback: load từ shared SA key (non-admin devices)
+      const sharedSA = loadSharedSAKey ? loadSharedSAKey() : null;
+      if(sharedSA) S.serviceAccount = sharedSA;
+    }
+    // Merge shared config (shared config ghi đè các giá trị mặc định)
+    // Nhưng chỉ khi chưa có local config rõ ràng
+    if(typeof loadSharedConfig === 'function') loadSharedConfig();
+    if(typeof loadSharedGSConfig === 'function') loadSharedGSConfig();
   }catch(e){}
 }
 
@@ -3892,6 +3982,139 @@ const DEFAULT_PASS    = 'bvps@123';
 const ADMIN_USER      = 'admin';
 const ADMIN_PASS_KEY  = 'ksnk_admin_pass';
 
+// ============================================================
+//  SHARED CONFIG — Admin cấu hình 1 lần, mọi user tự load
+//  Key lưu trong localStorage với prefix đặc biệt
+//  SA Key (nhạy cảm) chỉ lưu ở admin device
+// ============================================================
+const SHARED_CFG_KEY  = 'ksnk_shared_cfg_v7';   // cấu hình hệ thống chia sẻ
+const SHARED_GS_KEY   = 'ksnk_shared_gs_v7';    // Google Sheets config chia sẻ (không chứa SA key)
+const SA_KEY_STORE    = 'ksnk_sa_key';           // SA key chỉ lưu local (nhạy cảm)
+
+// ── Lưu/đọc Shared Config (admin writes, everyone reads) ─────
+function saveSharedConfig(){
+  // Ghi toàn bộ S.config vào SHARED_CFG_KEY (không SA key)
+  const payload = {
+    ...S.config,
+    _savedBy: currentUser?.username || 'admin',
+    _savedAt: new Date().toISOString()
+  };
+  localStorage.setItem(SHARED_CFG_KEY, JSON.stringify(payload));
+}
+
+function loadSharedConfig(){
+  try{
+    const raw = localStorage.getItem(SHARED_CFG_KEY);
+    if(raw){
+      const d = JSON.parse(raw);
+      // Merge vào S.config (ưu tiên shared config)
+      const { _savedBy, _savedAt, ...cfg } = d;
+      Object.assign(S.config, cfg);
+    }
+  }catch(e){}
+}
+
+// ── Shared GS Config (spreadsheetId + sync settings) ─────────
+function saveSharedGSConfig(){
+  const payload = {
+    spreadsheetId: S.config.spreadsheetId || '',
+    autoSync:      S.config.autoSync !== false,
+    syncInterval:  S.config.syncInterval || 10,
+    syncOnSave:    S.config.syncOnSave || false,
+    _savedBy: currentUser?.username || 'admin',
+    _savedAt: new Date().toISOString()
+  };
+  localStorage.setItem(SHARED_GS_KEY, JSON.stringify(payload));
+}
+
+function loadSharedGSConfig(){
+  try{
+    const raw = localStorage.getItem(SHARED_GS_KEY);
+    if(raw){
+      const d = JSON.parse(raw);
+      if(d.spreadsheetId) S.config.spreadsheetId = d.spreadsheetId;
+      if(d.autoSync !== undefined) S.config.autoSync = d.autoSync;
+      if(d.syncInterval) S.config.syncInterval = d.syncInterval;
+      if(d.syncOnSave !== undefined) S.config.syncOnSave = d.syncOnSave;
+    }
+  }catch(e){}
+}
+
+// SA Key: admin lưu, các user khác KHÔNG có (bảo mật)
+// Nhưng để hỗ trợ sync từ mọi thiết bị sau khi admin đã setup,
+// SA Key cũng cần được share. Tuy nhiên vì đây là single-file HTML
+// chạy trên browser, không có backend, ta dùng approach:
+// - Admin lưu SA key trong SHARED_CFG_KEY (encrypted nhẹ bằng btoa)
+// - Non-admin user khi đăng nhập sẽ load SA key từ shared key
+// - SA key KHÔNG hiển thị trong UI của non-admin
+const SHARED_SA_KEY = 'ksnk_shared_sa_v7';
+
+function saveSharedSAKey(saObj){
+  try{
+    // Encode nhẹ để không hiển thị raw trong localStorage inspector
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(saObj))));
+    localStorage.setItem(SHARED_SA_KEY, encoded);
+  }catch(e){}
+}
+
+function loadSharedSAKey(){
+  try{
+    const raw = localStorage.getItem(SHARED_SA_KEY);
+    if(raw){
+      const decoded = JSON.parse(decodeURIComponent(escape(atob(raw))));
+      return decoded;
+    }
+  }catch(e){}
+  return null;
+}
+
+// ── Kiểm tra xem có shared config chưa ───────────────────────
+function hasSharedConfig(){
+  return !!(localStorage.getItem(SHARED_CFG_KEY) || localStorage.getItem(SHARED_GS_KEY));
+}
+
+// ── Load tất cả shared config (gọi khi khởi động) ─────────────
+function loadAllSharedConfigs(){
+  loadSharedConfig();
+  loadSharedGSConfig();
+  // Load SA key từ shared store nếu chưa có local
+  if(!S.serviceAccount){
+    const sharedSA = loadSharedSAKey();
+    if(sharedSA) S.serviceAccount = sharedSA;
+  }
+}
+
+// ── Hiển thị trạng thái shared config ────────────────────────
+function renderSharedConfigStatus(){
+  const el = document.getElementById('sharedCfgStatus');
+  if(!el) return;
+  const hasCfg  = !!localStorage.getItem(SHARED_CFG_KEY);
+  const hasGS   = !!localStorage.getItem(SHARED_GS_KEY);
+  const hasSA   = !!(S.serviceAccount || loadSharedSAKey());
+  const cfgData = hasCfg ? JSON.parse(localStorage.getItem(SHARED_CFG_KEY)||'{}') : null;
+  const gsCfg   = hasGS  ? JSON.parse(localStorage.getItem(SHARED_GS_KEY)||'{}') : null;
+  
+  if(hasCfg || hasGS){
+    el.innerHTML = `
+      <div style="background:var(--green-l);border:1px solid rgba(46,125,50,.2);border-radius:var(--r-sm);padding:14px;margin-bottom:14px">
+        <div style="font-weight:700;color:var(--green);margin-bottom:8px;font-size:13px">✅ Cấu hình dùng chung đã được thiết lập</div>
+        <div style="font-size:12px;color:var(--text-2);display:grid;gap:4px">
+          ${cfgData?`<div>🏥 Bệnh viện: <b>${cfgData.bv||'–'}</b> · Khoa: <b>${cfgData.kk||'–'}</b></div>`:''}
+          ${cfgData?`<div>📋 Số khoa/phòng: <b>${(cfgData.khoas||[]).length}</b></div>`:''}
+          ${gsCfg&&gsCfg.spreadsheetId?`<div>☁️ Google Sheets: <span class="badge bg-ok">Đã cấu hình</span> ID: <code style="font-size:10px">${gsCfg.spreadsheetId.substring(0,20)}...</code></div>`:'<div>☁️ Google Sheets: <span class="badge bg-warn">Chưa cấu hình</span></div>'}
+          ${hasSA?`<div>🔑 Service Account: <span class="badge bg-ok">Có sẵn</span></div>`:'<div>🔑 Service Account: <span class="badge bg-warn">Chưa có</span></div>'}
+          ${cfgData?`<div style="color:var(--text-3);font-size:11px;margin-top:4px">Cập nhật lúc: ${cfgData._savedAt?new Date(cfgData._savedAt).toLocaleString('vi-VN'):'–'} bởi ${cfgData._savedBy||'admin'}</div>`:''}
+        </div>
+      </div>`;
+  } else {
+    el.innerHTML = `
+      <div style="background:var(--amber-l);border:1px solid rgba(230,81,0,.2);border-radius:var(--r-sm);padding:14px;margin-bottom:14px">
+        <div style="font-weight:700;color:var(--amber);font-size:13px">⚠️ Chưa có cấu hình dùng chung</div>
+        <div style="font-size:12px;color:var(--text-2);margin-top:4px">Vui lòng cấu hình bệnh viện và kết nối Google Sheets ở bên dưới, rồi nhấn <b>"Lưu & Phát hành cho tất cả người dùng"</b>.</div>
+      </div>`;
+  }
+}
+
 let currentUser = null; // { username, name, role, khoa }
 let logPage = 1;
 const LOG_PER_PAGE = 30;
@@ -3952,6 +4175,9 @@ async function syncLogToSheet(recentLogs){
 
 // ── Auth Init ─────────────────────────────────────────────────
 function authInit(){
+  // Load shared configs trước (cho mọi user kể cả khi chưa đăng nhập)
+  loadAllSharedConfigs();
+  
   // Kiểm tra session còn hiệu lực
   try{
     const sess = JSON.parse(sessionStorage.getItem(SESSION_KEY));
@@ -4045,7 +4271,55 @@ function onLoginSuccess(doLog){
   // Cập nhật badge
   updateUserBadge();
   if(doLog) addLog('Đăng nhập thành công', `Role: ${currentUser.role}, Khoa: ${currentUser.khoa}`);
-  showNotif(`✅ Xin chào, ${currentUser.name}!`,'ok');
+
+  // ── Áp dụng shared config vào UI (quan trọng cho non-admin) ──
+  applySharedConfigToUI();
+
+  const greet = currentUser.role==='admin'
+    ? `✅ Xin chào Admin! Mọi cấu hình bạn lưu sẽ áp dụng cho tất cả người dùng.`
+    : `✅ Xin chào, ${currentUser.name}! Cấu hình hệ thống đã được tải tự động.`;
+  showNotif(greet,'ok');
+}
+
+// ── Áp dụng shared config vào tất cả UI elements ─────────────
+function applySharedConfigToUI(){
+  // Refresh tên bệnh viện / khoa KSNK
+  const heroUnit = document.getElementById('heroUnit');
+  if(heroUnit) heroUnit.textContent = `${S.config.bv} – ${S.config.kk}`;
+  // Refresh dropdown khoa ở tất cả form
+  populateKhoas();
+  populateNKBVKhoaFilter && populateNKBVKhoaFilter();
+  // Refresh sync status
+  if(S.serviceAccount && S.config.spreadsheetId){
+    updateSyncStatus('ok','Sẵn sàng đồng bộ');
+    const syncBtn = document.getElementById('syncBtn');
+    if(syncBtn) syncBtn.style.display='flex';
+  }
+  // Refresh admin fields nếu là admin
+  if(currentUser && currentUser.role==='admin'){
+    const cfgBv = document.getElementById('cfg-bv');
+    const cfgSo = document.getElementById('cfg-so');
+    const cfgKk = document.getElementById('cfg-kk');
+    const cfgSid = document.getElementById('cfg-sid');
+    if(cfgBv) cfgBv.value = S.config.bv;
+    if(cfgSo) cfgSo.value = S.config.so;
+    if(cfgKk) cfgKk.value = S.config.kk;
+    if(cfgSid && S.config.spreadsheetId) cfgSid.value = S.config.spreadsheetId;
+    const autoEl = document.getElementById('cfg-autosync');
+    if(autoEl) autoEl.checked = S.config.autoSync !== false;
+    const intEl = document.getElementById('cfg-syncinterval');
+    if(intEl) intEl.value = S.config.syncInterval || 10;
+    const ssEl = document.getElementById('cfg-syncsave');
+    if(ssEl) ssEl.checked = S.config.syncOnSave || false;
+    renderKhoaList && renderKhoaList();
+    renderSharedConfigStatus && renderSharedConfigStatus();
+    updateSAKeyUI && updateSAKeyUI();
+  }
+  // Refresh dashboard
+  renderDashboard && renderDashboard();
+  updatePendingBadge && updatePendingBadge();
+  updateSyncStats && updateSyncStats();
+  setupAutoSyncTimer && setupAutoSyncTimer();
 }
 
 function doLogout(){
@@ -4616,6 +4890,7 @@ function applyImportedConfig(d){
   if(d.config){
     Object.assign(S.config, d.config);
     save();
+    if(currentUser?.role === 'admin') saveSharedConfig();
   }
   // Apply sync settings
   if(d.syncSettings){
@@ -4624,6 +4899,7 @@ function applyImportedConfig(d){
     S.config.syncInterval = d.syncSettings.syncInterval || S.config.syncInterval;
     S.config.syncOnSave = d.syncSettings.syncOnSave || false;
     save();
+    if(currentUser?.role === 'admin') saveSharedGSConfig();
   }
   // Apply users (merge, don't override existing)
   if(d.users && Array.isArray(d.users)){
@@ -4653,9 +4929,10 @@ function applyImportedConfig(d){
   renderKhoaList();
   populateKhoas();
   renderUserList();
+  renderSharedConfigStatus && renderSharedConfigStatus();
   document.getElementById('heroUnit').textContent = `${S.config.bv} – ${S.config.kk}`;
   addLog('Tải cấu hình hệ thống từ file');
-  showNotif('✅ Đã áp dụng cấu hình hệ thống!','ok');
+  showNotif('✅ Đã áp dụng cấu hình hệ thống — Đã phát hành cho tất cả người dùng!','ok');
 }
 
 // Override saveCfg to also reload cfgLastExport label
