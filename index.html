@@ -354,11 +354,153 @@ textarea.fc{min-height:90px;resize:vertical;line-height:1.7;font-size:14px}
 /* Performance indicator */
 .perf-bar{height:3px;background:var(--border-2);border-radius:2px;margin-top:4px;overflow:hidden}
 .perf-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--green),#43a047);transition:width .5s}
+
+/* ================================================================
+   AUTH SYSTEM — Đăng nhập & Quản lý người dùng
+================================================================ */
+.auth-overlay{position:fixed;inset:0;background:linear-gradient(135deg,var(--navy) 0%,#0e3d62 50%,#0d6e6e 100%);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
+.auth-card{background:var(--card);border-radius:16px;padding:28px 24px;width:100%;max-width:400px;box-shadow:var(--shadow-xl);animation:authIn .3s cubic-bezier(.4,0,.2,1)}
+@keyframes authIn{from{opacity:0;transform:scale(.95) translateY(16px)}to{opacity:1;transform:none}}
+.auth-logo{text-align:center;margin-bottom:20px}
+.auth-logo-ic{width:60px;height:60px;background:linear-gradient(135deg,var(--teal-2),#00acc1);border-radius:14px;display:inline-grid;place-items:center;font-size:28px;box-shadow:0 4px 16px rgba(0,121,107,.3);margin-bottom:10px}
+.auth-logo-t{font-family:'Lexend Deca',sans-serif;font-weight:800;font-size:18px;color:var(--navy);letter-spacing:-.02em}
+.auth-logo-s{font-size:11px;color:var(--text-3);margin-top:2px}
+.auth-title{font-family:'Lexend Deca',sans-serif;font-weight:700;font-size:15px;color:var(--navy);margin-bottom:16px;text-align:center}
+.auth-err{background:var(--red-l);border:1px solid rgba(198,40,40,.2);border-radius:var(--r-xs);padding:10px 12px;font-size:12.5px;color:var(--red);margin-bottom:12px;display:none}
+.auth-info{background:var(--blue-l);border:1px solid rgba(21,101,192,.2);border-radius:var(--r-xs);padding:10px 12px;font-size:12px;color:var(--blue);margin-bottom:12px}
+.auth-footer{text-align:center;font-size:11px;color:var(--text-3);margin-top:14px;line-height:1.6}
+.auth-req-link{color:var(--blue);cursor:pointer;text-decoration:underline;font-size:12px}
+/* User badge in header */
+.user-badge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:4px 10px;cursor:pointer;transition:background var(--t-fast)}
+.user-badge:hover{background:rgba(255,255,255,.2)}
+.user-badge-av{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--teal-2),#00acc1);display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0}
+.user-badge-nm{font-size:11px;color:#fff;font-weight:500;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:479px){.user-badge-nm{display:none}}
+/* Admin-only UI guard */
+.admin-only{display:none}
+body.is-admin .admin-only{display:block}
+body.is-admin .admin-only-flex{display:flex!important}
+.admin-required-overlay{background:var(--red-l);border:1.5px solid rgba(198,40,40,.2);border-radius:var(--r);padding:24px;text-align:center;color:var(--red)}
+/* Log page */
+.log-row{display:grid;grid-template-columns:130px 1fr auto;gap:8px;padding:9px 10px;border-bottom:1px solid var(--border-2);font-size:12px;align-items:start}
+.log-row:last-child{border-bottom:none}
+.log-row-time{color:var(--text-3);font-size:11px;white-space:nowrap}
+.log-row-action{color:var(--text-2);line-height:1.5}
+.log-row-user{font-size:10.5px;font-weight:600;color:var(--blue);white-space:nowrap}
+/* User management table */
+.user-row{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:10px 4px;border-bottom:1px solid var(--border-2);align-items:center;font-size:13px}
+.user-row:last-child{border-bottom:none}
+/* Request modal */
+.req-item{background:var(--bg-2);border:1px solid var(--border-2);border-radius:var(--r-xs);padding:12px;margin-bottom:8px;font-size:12.5px}
+.req-item:last-child{margin-bottom:0}
 </style>
 </style>
 </head>
 <body>
-<div class="sb-overlay" onclick="closeSB()"></div>
+<!-- ══ AUTH OVERLAY ══ -->
+<div class="auth-overlay" id="authOverlay">
+  <!-- LOGIN PANEL -->
+  <div class="auth-card" id="authLoginCard">
+    <div class="auth-logo">
+      <div class="auth-logo-ic">🏥</div>
+      <div class="auth-logo-t">KSNK Pro v7</div>
+      <div class="auth-logo-s">Hệ thống Giám sát Kiểm soát Nhiễm khuẩn</div>
+    </div>
+    <div class="auth-title">🔐 Đăng nhập hệ thống</div>
+    <div class="auth-err" id="authErr"></div>
+    <div id="authDefaultInfo" class="auth-info" style="display:none">
+      <b>💡 Tài khoản mặc định:</b><br>
+      Tên đăng nhập: <b>Số CMND/CCCD</b><br>
+      Mật khẩu: <b>bvps@123</b>
+    </div>
+    <div class="fgp" style="margin-bottom:10px">
+      <label class="fl">Tên đăng nhập</label>
+      <input type="text" class="fc" id="loginUser" placeholder="CMND/CCCD hoặc admin" autocomplete="username" autocapitalize="none">
+    </div>
+    <div class="fgp" style="margin-bottom:14px">
+      <label class="fl">Mật khẩu</label>
+      <div style="position:relative">
+        <input type="password" class="fc" id="loginPass" placeholder="Nhập mật khẩu" autocomplete="current-password" onkeypress="if(event.key==='Enter')doLogin()">
+        <button onclick="togglePwd('loginPass',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-3)" title="Hiện/ẩn mật khẩu">👁️</button>
+      </div>
+    </div>
+    <button class="btn btn-p btn-full" onclick="doLogin()">🔓 Đăng nhập</button>
+    <div class="auth-footer">
+      <span class="auth-req-link" onclick="showRequestPanel()">📩 Yêu cầu cấp / reset tài khoản</span><br>
+      <span id="authShowDefault" class="auth-req-link" onclick="toggleDefaultInfo()">💡 Thông tin đăng nhập mặc định</span>
+    </div>
+  </div>
+
+  <!-- REQUEST ACCOUNT PANEL -->
+  <div class="auth-card" id="authRequestCard" style="display:none">
+    <div class="auth-title">📩 Yêu cầu cấp / Reset tài khoản</div>
+    <div class="auth-info">Yêu cầu sẽ được gửi đến Admin. Admin sẽ xử lý và thông báo cho bạn.</div>
+    <div class="fgp" style="margin-bottom:10px">
+      <label class="fl fl-req">Họ và tên</label>
+      <input type="text" class="fc" id="reqHoTen" placeholder="Nguyễn Văn A">
+    </div>
+    <div class="fgp" style="margin-bottom:10px">
+      <label class="fl fl-req">Số CMND / CCCD</label>
+      <input type="text" class="fc" id="reqCMND" placeholder="012345678901" inputmode="numeric">
+    </div>
+    <div class="fgp" style="margin-bottom:10px">
+      <label class="fl fl-req">Khoa / Phòng công tác</label>
+      <input type="text" class="fc" id="reqKhoa" placeholder="Khoa Sản A, Phòng Mổ...">
+    </div>
+    <div class="fgp" style="margin-bottom:10px">
+      <label class="fl fl-req">Loại yêu cầu</label>
+      <select class="fc" id="reqType">
+        <option value="cap">Cấp tài khoản mới</option>
+        <option value="reset">Reset mật khẩu</option>
+      </select>
+    </div>
+    <div class="fgp" style="margin-bottom:14px">
+      <label class="fl">Ghi chú thêm</label>
+      <textarea class="fc" id="reqNote" placeholder="Lý do, chức danh..." style="min-height:70px;resize:none"></textarea>
+    </div>
+    <button class="btn btn-p btn-full" onclick="submitRequest()" style="margin-bottom:8px">📩 Gửi yêu cầu</button>
+    <button class="btn btn-o btn-full" onclick="showLoginPanel()">← Quay lại đăng nhập</button>
+  </div>
+</div>
+
+<!-- USER MENU DROPDOWN -->
+<div id="userMenu" style="position:fixed;top:56px;right:14px;background:var(--card);border-radius:var(--r);box-shadow:var(--shadow-lg);border:1px solid var(--border-2);z-index:250;min-width:220px;display:none;overflow:hidden">
+  <div style="padding:14px 16px;background:linear-gradient(135deg,var(--navy),var(--navy-2));color:#fff">
+    <div style="font-weight:700;font-size:13px" id="umName">—</div>
+    <div style="font-size:11px;opacity:.7;margin-top:2px" id="umRole">—</div>
+    <div style="font-size:10px;opacity:.6;margin-top:1px" id="umKhoa">—</div>
+  </div>
+  <div style="padding:8px">
+    <button class="btn btn-o" style="width:100%;justify-content:flex-start;margin-bottom:6px" onclick="showChangePassModal()">🔑 Đổi mật khẩu</button>
+    <button class="btn btn-r" style="width:100%;justify-content:flex-start" onclick="doLogout()">🚪 Đăng xuất</button>
+  </div>
+</div>
+
+<!-- CHANGE PASSWORD MODAL -->
+<div class="mo" id="changePassMo">
+  <div class="md" style="max-width:420px">
+    <div class="md-hd"><span class="md-title">🔑 Đổi mật khẩu</span><button class="md-x" onclick="closeMo('changePassMo')">✕</button></div>
+    <div class="md-body">
+      <div class="auth-err" id="cpErr"></div>
+      <div class="fgp" style="margin-bottom:10px">
+        <label class="fl fl-req">Mật khẩu hiện tại</label>
+        <input type="password" class="fc" id="cpOld" placeholder="Nhập mật khẩu hiện tại">
+      </div>
+      <div class="fgp" style="margin-bottom:10px">
+        <label class="fl fl-req">Mật khẩu mới</label>
+        <input type="password" class="fc" id="cpNew" placeholder="Tối thiểu 6 ký tự">
+      </div>
+      <div class="fgp" style="margin-bottom:4px">
+        <label class="fl fl-req">Xác nhận mật khẩu mới</label>
+        <input type="password" class="fc" id="cpNew2" placeholder="Nhập lại mật khẩu mới">
+      </div>
+    </div>
+    <div class="md-ft">
+      <button class="btn btn-o" onclick="closeMo('changePassMo')">Hủy</button>
+      <button class="btn btn-p" onclick="doChangePass()">💾 Lưu mật khẩu</button>
+    </div>
+  </div>
+</div>
 <div class="ob" id="ob">📵 Không có Internet — Dữ liệu đang lưu cục bộ, sẽ tự đồng bộ khi kết nối lại</div>
 <header class="hd">
   <button class="hd-burger" onclick="toggleSB()"><span></span><span></span><span></span></button>
@@ -366,9 +508,14 @@ textarea.fc{min-height:90px;resize:vertical;line-height:1.7;font-size:14px}
     <div class="hd-logo-icon">🏥</div>
     <div><div class="hd-logo-t">KSNK Pro</div><div class="hd-logo-s">QĐ 6858 · TT 16/2018 · v7.0</div></div>
   </a>
-  <div class="hd-right">
+    <div class="hd-right">
     <div class="sync-pill" id="syncPill"><div class="sd off" id="sd"></div><span id="syncTxt">Chưa cấu hình</span></div>
-    <div id="userArea"></div>
+    <div id="userArea">
+      <div class="user-badge" id="userBadgeBtn" onclick="toggleUserMenu()" style="display:none">
+        <div class="user-badge-av" id="userBadgeAv">?</div>
+        <div class="user-badge-nm" id="userBadgeNm">—</div>
+      </div>
+    </div>
     <button class="hd-btn" onclick="go('hdsd')" title="Hướng dẫn sử dụng" aria-label="Hướng dẫn">❓</button>
     <button class="hd-btn" id="syncBtn" onclick="doSync()" style="display:none">🔄 Đồng bộ</button>
   </div>
@@ -403,12 +550,14 @@ textarea.fc{min-height:90px;resize:vertical;line-height:1.7;font-size:14px}
   <button class="nav" onclick="go('tk')" data-p="tk"><span class="nav-ic">📈</span>Thống kê so sánh</button>
   <button class="nav" onclick="go('dl')" data-p="dl"><span class="nav-ic">🗂️</span>Dữ liệu đã nhập<span class="nav-badge" id="pendBadge" style="display:none">0</span></button>
   <div class="sb-sec">Hệ thống</div>
-  <button class="nav" onclick="go('admin')" data-p="admin"><span class="nav-ic">⚙️</span>Quản trị / Cấu hình</button>
-  <button class="nav" onclick="go('gsheets')" data-p="gsheets"><span class="nav-ic">☁️</span>Kết nối Google Sheets</button>
+  <button class="nav admin-only" onclick="go('admin')" data-p="admin"><span class="nav-ic">⚙️</span>Quản trị / Cấu hình</button>
+  <button class="nav admin-only" onclick="go('gsheets')" data-p="gsheets"><span class="nav-ic">☁️</span>Kết nối Google Sheets</button>
+  <button class="nav admin-only" onclick="go('users')" data-p="users"><span class="nav-ic">👥</span>Quản lý người dùng</button>
+  <button class="nav admin-only" onclick="go('actlog')" data-p="actlog"><span class="nav-ic">📋</span>Nhật ký thao tác</button>
   <div class="sb-sec">Hỗ trợ</div>
   <button class="nav" onclick="go('hdsd')" data-p="hdsd"><span class="nav-ic">📖</span>Hướng dẫn sử dụng</button>
   <div class="sb-footer">
-    <span title="Alt+H: Hướng dẫn | Alt+D: Dashboard | Esc: Đóng">KSNK Pro · QĐ 6858</span><span class="sb-version">v7.0</span>
+    <span title="Alt+H: Hướng dẫn | Alt+D: Dashboard | Esc: Đóng" id="sbFooterUser">KSNK Pro · QĐ 6858</span><span class="sb-version">v7.0</span>
   </div>
 </nav>
 
@@ -1697,6 +1846,87 @@ textarea.fc{min-height:90px;resize:vertical;line-height:1.7;font-size:14px}
     </div>
   </div>
 </div>
+<!-- ══ QUẢN LÝ NGƯỜI DÙNG (Admin only) ══ -->
+<div class="pg" id="pg-users">
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-title">👥 Quản lý tài khoản người dùng</div>
+      <button class="btn btn-p btn-sm" onclick="showAddUserModal()">＋ Thêm người dùng</button>
+    </div>
+    <div class="tip-box" style="margin-bottom:12px">
+      <b>💡</b><span>Mặc định: tên đăng nhập là <b>Số CMND/CCCD</b>, mật khẩu mặc định <b>bvps@123</b>. Người dùng có thể tự đổi mật khẩu sau khi đăng nhập.</span>
+    </div>
+    <div id="userListBody"></div>
+  </div>
+  <!-- Yêu cầu chờ duyệt -->
+  <div class="card">
+    <div class="card-hd"><div class="card-title">📩 Yêu cầu chờ xử lý <span class="nav-badge" id="pendReqBadge" style="display:none">0</span></div><button class="btn btn-o btn-sm" onclick="renderPendingRequests()">🔄 Làm mới</button></div>
+    <div id="pendReqBody"><div style="text-align:center;color:var(--text-3);padding:16px;font-size:13px">Không có yêu cầu nào</div></div>
+  </div>
+</div>
+
+<!-- ADD USER MODAL -->
+<div class="mo" id="addUserMo">
+  <div class="md" style="max-width:440px">
+    <div class="md-hd"><span class="md-title">👤 Thêm / Cấp tài khoản</span><button class="md-x" onclick="closeMo('addUserMo')">✕</button></div>
+    <div class="md-body">
+      <div class="fgp" style="margin-bottom:10px">
+        <label class="fl fl-req">Họ và tên</label>
+        <input type="text" class="fc" id="au-name" placeholder="Nguyễn Văn A">
+      </div>
+      <div class="fgp" style="margin-bottom:10px">
+        <label class="fl fl-req">Số CMND / CCCD (dùng làm tên đăng nhập)</label>
+        <input type="text" class="fc" id="au-cmnd" placeholder="012345678901" inputmode="numeric">
+      </div>
+      <div class="fgp" style="margin-bottom:10px">
+        <label class="fl">Chức danh / Vị trí</label>
+        <select class="fc" id="au-role-val">
+          <option value="user">Người dùng thường</option>
+          <option value="supervisor">Giám sát viên</option>
+        </select>
+      </div>
+      <div class="fgp" style="margin-bottom:10px">
+        <label class="fl">Khoa / Phòng</label>
+        <select class="fc" id="au-khoa"></select>
+      </div>
+      <div class="fgp" style="margin-bottom:4px">
+        <label class="fl">Mật khẩu ban đầu</label>
+        <input type="text" class="fc" id="au-pass" value="bvps@123" placeholder="Mật khẩu ban đầu">
+      </div>
+      <div style="font-size:11.5px;color:var(--text-3);margin-top:4px">💡 Người dùng nên đổi mật khẩu sau lần đăng nhập đầu tiên.</div>
+    </div>
+    <div class="md-ft">
+      <button class="btn btn-o" onclick="closeMo('addUserMo')">Hủy</button>
+      <button class="btn btn-p" onclick="saveNewUser()">💾 Tạo tài khoản</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ NHẬT KÝ THAO TÁC (Admin only) ══ -->
+<div class="pg" id="pg-actlog">
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-title">📋 Nhật ký thao tác hệ thống</div>
+      <div class="bg" style="flex-wrap:wrap;row-gap:6px">
+        <select class="fc" id="log-filter-user" onchange="renderActivityLog()" style="width:auto;font-size:14px">
+          <option value="all">Tất cả người dùng</option>
+        </select>
+        <button class="btn btn-o btn-sm" onclick="exportActivityLog()">📊 Xuất Excel</button>
+        <button class="btn btn-r btn-sm" onclick="clearActivityLog()">🗑️ Xóa log</button>
+      </div>
+    </div>
+    <div class="tip-box" style="margin-bottom:12px"><b>🔍</b><span>Nhật ký ghi lại toàn bộ thao tác đăng nhập, nhập liệu, và đồng bộ theo từng tài khoản. Dữ liệu được đồng bộ lên Google Sheets khi có kết nối.</span></div>
+    <div style="background:var(--bg-2);border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border-2)">
+      <div style="display:grid;grid-template-columns:130px 1fr auto;gap:8px;padding:8px 10px;background:var(--navy);color:rgba(255,255,255,.8);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em">
+        <span>Thời gian</span><span>Thao tác</span><span>Người dùng</span>
+      </div>
+      <div id="actLogBody" style="max-height:500px;overflow-y:auto">
+        <div style="text-align:center;color:var(--text-3);padding:24px;font-size:13px">Chưa có nhật ký</div>
+      </div>
+    </div>
+    <div id="actLogPagination" style="display:flex;justify-content:center;gap:6px;margin-top:12px;flex-wrap:wrap"></div>
+  </div>
+</div>
 
 </main>
 
@@ -2685,23 +2915,28 @@ async function setupSheet(){
   const info=await gFetch('GET','');if(!info){showNotif('Không kết nối được','err');return;}
   const existing=info.sheets.map(s=>s.properties.title);
   const reqs=[];Object.values(SH).forEach(name=>{if(!existing.includes(name))reqs.push({addSheet:{properties:{title:name}}});});
+  // Thêm sheets cho Users và Log
+  ['Nguoi_Dung','Nhat_Ky_Thao_Tac'].forEach(name=>{if(!existing.includes(name))reqs.push({addSheet:{properties:{title:name}}});});
   if(reqs.length) await gFetch('POST',':batchUpdate',{requests:reqs});
   const hdrs={
-    rt:['ID','Người TH','Khoa','Ngày giờ','Chỉ định','Động tác','Tổng TC','Tuân thủ','Tỷ lệ (%)',...FC.rt.criteria,'Tạo lúc'],
-    tb:['ID','Người TH','Khoa','Ngày giờ','Mã vết mổ','Tổng TC','Tuân thủ','Tỷ lệ (%)',...FC.tb.criteria,'Tạo lúc'],
-    td:['ID','Người TH','Khoa','Ngày giờ','Mã TD','Tổng TC','Tuân thủ','Tỷ lệ (%)',...FC.td.criteria,'Tạo lúc'],
-    tm:['ID','Người TH','Khoa','Ngày giờ','Mã TM','Tổng TC','Tuân thủ','Tỷ lệ (%)',...FC.tm.criteria,'Tạo lúc'],
-    c41:['ID','Tiêu chí','Khoa/Đơn vị','Ngày đánh giá','Mức đạt','Người đánh giá','Ghi chú','Tạo lúc'],
-    c42:['ID','Tiêu chí','Khoa/Đơn vị','Ngày đánh giá','Mức đạt','Người đánh giá','Tạo lúc'],
-    c43:['ID','Tiêu chí','Khoa/Đơn vị','Ngày đánh giá','Mức đạt','Tỷ lệ VSTay (%)','Người đánh giá','Tạo lúc'],
-    c44:['ID','Tiêu chí','Khoa/Đơn vị','Ngày đánh giá','Mức đạt','Kỳ đánh giá','Người đánh giá','Tạo lúc'],
-    c45:['ID','Tiêu chí','Khoa/Đơn vị','Ngày đánh giá','Mức đạt','Kỳ đánh giá','Người đánh giá','Tạo lúc'],
-    c46:['ID','Tiêu chí','Cơ sở','Ngày đánh giá','Mức đạt','Kỳ đánh giá','Người đánh giá','Tạo lúc'],
+    rt:['ID','Người TH','Khoa','Ngày giờ','Chỉ định','Động tác','Tổng TC','Tuân thủ','Tỷ lệ (%)','Tài khoản NV',...FC.rt.criteria,'Tạo lúc'],
+    tb:['ID','Người TH','Khoa','Ngày giờ','Mã vết mổ','Tổng TC','Tuân thủ','Tỷ lệ (%)','Tài khoản NV',...FC.tb.criteria,'Tạo lúc'],
+    td:['ID','Người TH','Khoa','Ngày giờ','Mã TD','Tổng TC','Tuân thủ','Tỷ lệ (%)','Tài khoản NV',...FC.td.criteria,'Tạo lúc'],
+    tm:['ID','Người TH','Khoa','Ngày giờ','Mã TM','Tổng TC','Tuân thủ','Tỷ lệ (%)','Tài khoản NV',...FC.tm.criteria,'Tạo lúc'],
+    c41:['ID','Tiêu chí','Khoa/Đơn vị','Ngày đánh giá','Mức đạt','Người đánh giá','Tài khoản NV','Ghi chú','Tạo lúc'],
+    c42:['ID','Tiêu chí','Khoa/Đơn vị','Ngày đánh giá','Mức đạt','Người đánh giá','Tài khoản NV','Tạo lúc'],
+    c43:['ID','Tiêu chí','Khoa/Đơn vị','Ngày đánh giá','Mức đạt','Tỷ lệ VSTay (%)','Người đánh giá','Tài khoản NV','Tạo lúc'],
+    c44:['ID','Tiêu chí','Khoa/Đơn vị','Ngày đánh giá','Mức đạt','Kỳ đánh giá','Người đánh giá','Tài khoản NV','Tạo lúc'],
+    c45:['ID','Tiêu chí','Khoa/Đơn vị','Ngày đánh giá','Mức đạt','Kỳ đánh giá','Người đánh giá','Tài khoản NV','Tạo lúc'],
+    c46:['ID','Tiêu chí','Cơ sở','Ngày đánh giá','Mức đạt','Kỳ đánh giá','Người đánh giá','Tài khoản NV','Tạo lúc'],
   };
   const data=Object.entries(hdrs).map(([k,h])=>({range:`${SH[k]}!A1`,values:[h]}));
   data.push({range:`${SH.sum}!A1`,values:[['Tiêu chí','Số phiếu/đánh giá','Kết quả TB','Ghi chú','Cập nhật']]});
+  data.push({range:`Nguoi_Dung!A1`,values:[['CMND/CCCD','Họ tên','Vai trò','Khoa/Phòng','Trạng thái','Tạo lúc']]});
+  data.push({range:`Nhat_Ky_Thao_Tac!A1`,values:[['Thời gian','Người dùng','Họ tên','Vai trò','Thao tác','Chi tiết']]});
   await gFetch('POST','/values:batchUpdate',{valueInputOption:'RAW',data});
-  logSync('ok','✅ Đã tạo cấu trúc Sheet thành công!');showNotif('✅ Đã tạo cấu trúc Sheet','ok');
+  logSync('ok','✅ Đã tạo cấu trúc Sheet thành công! (bao gồm sheet Người dùng và Nhật ký)');
+  showNotif('✅ Đã tạo cấu trúc Sheet','ok');
 }
 
 async function doSync(){
@@ -2710,7 +2945,11 @@ async function doSync(){
   if(!navigator.onLine){showNotif('Không có Internet','err');return;}
   const unsync=S.records.filter(r=>!r.synced);
   const c4unsync=S.c4records.filter(r=>!r.synced);
-  if(!unsync.length&&!c4unsync.length){showNotif('Không có dữ liệu mới cần đồng bộ','info');await updateSummarySheet();return;}
+  if(!unsync.length&&!c4unsync.length){showNotif('Không có dữ liệu mới cần đồng bộ','info');await updateSummarySheet();
+    // Flush pending offline logs even if no data
+    await _flushOfflineLogs();
+    return;
+  }
   updateSyncStatus('syncing',`Đang đồng bộ ${unsync.length+c4unsync.length} bản ghi...`);
   logSync('info',`🔄 Đồng bộ ${unsync.length} phiếu bảng kiểm + ${c4unsync.length} đánh giá C4...`);
   let okCount=0,failCount=0;
@@ -2730,9 +2969,23 @@ async function doSync(){
     else{failCount+=rows.length;logSync('err',`  ❌ ${rows.length} đánh giá ${k}`);}
   }
   await updateSummarySheet();
+  // Đồng bộ nhật ký thao tác
+  await _flushOfflineLogs();
   S.sync.lastSync=new Date().toISOString();save();
   if(okCount>0){updateSyncStatus('ok',`Đồng bộ ${okCount} lúc ${new Date().toLocaleTimeString('vi-VN')}`);logSync('ok',`\n✅ Hoàn thành! ${okCount} bản ghi.`);showNotif(`☁️ Đã đồng bộ ${okCount} bản ghi`,'ok');renderDashboard();renderDL();updatePendingBadge();updateSyncStats();}
   if(failCount>0){showNotif(`⚠️ ${failCount} bản ghi lỗi`,'err');updateSyncStatus('off',`${failCount} lỗi`);}
+}
+
+// Đẩy log cục bộ chưa sync lên GSheet
+async function _flushOfflineLogs(){
+  try{
+    const pendKey='ksnk_log_pending';
+    const pending=JSON.parse(localStorage.getItem(pendKey)||'[]');
+    if(!pending.length) return;
+    const rows=pending.map(l=>[l.ts,l.user,l.name||'',l.role||'',l.action,l.detail||'']);
+    const res=await gFetch('POST',`/values/Nhat_Ky_Thao_Tac!A1:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,{values:rows});
+    if(res){ localStorage.removeItem(pendKey); logSync('ok',`  ✅ Đã đồng bộ ${rows.length} nhật ký thao tác`); }
+  }catch(e){}
 }
 
 async function syncPendingOnly(){await doSync();}
@@ -2754,14 +3007,16 @@ async function resetSyncStatus(){
 
 function buildRow(r){
   const base=[r.id,r.nguoi,r.khoa,r.ngay];
-  if(r.key==='rt'){const cd=r.chiDinhs?.map(x=>x.cd).join('; ')||'',dt=r.chiDinhs?.map(x=>x.dt).join('; ')||'';return [...base,cd,dt,r.total,r.tt,r.pct/100,...r.checks.map(v=>v?'Có':'Không'),r.createdAt];}
-  return [...base,r.eid||'',r.total,r.tt,r.pct/100,...r.checks.map(v=>v?'Có':'Không'),r.createdAt];
+  const op=r.operator||currentUser?.username||'';
+  if(r.key==='rt'){const cd=r.chiDinhs?.map(x=>x.cd).join('; ')||'',dt=r.chiDinhs?.map(x=>x.dt).join('; ')||'';return [...base,cd,dt,r.total,r.tt,r.pct/100,op,...r.checks.map(v=>v?'Có':'Không'),r.createdAt];}
+  return [...base,r.eid||'',r.total,r.tt,r.pct/100,op,...r.checks.map(v=>v?'Có':'Không'),r.createdAt];
 }
 
 function buildC4Row(r){
   const kyEl=document.getElementById(`${r.key}-ky`);
   const rate=document.getElementById(`${r.key}-rate`)?.value||'';
-  return [r.id,C4[r.key]?.code||r.key,r.khoa||'–',r.ngay,r.score,r.nguoi||'',rate||'',r.createdAt];
+  const op=r.operator||currentUser?.username||'';
+  return [r.id,C4[r.key]?.code||r.key,r.khoa||'–',r.ngay,r.score,r.nguoi||'',op,rate||'',r.createdAt];
 }
 
 function logSync(type,msg){const el=document.getElementById('syncLog');if(!el) return;el.style.display='block';const cls=type==='ok'?'log-ok':type==='err'?'log-err':type==='warn'?'log-warn':'log-info';el.innerHTML+=`<span class="${cls}">[${new Date().toLocaleTimeString('vi-VN')}] ${msg}</span>\n`;el.scrollTop=el.scrollHeight;}
@@ -2942,7 +3197,15 @@ function load(){
 // ============================================================
 function setupOffline(){
   const ob=document.getElementById('ob');
-  window.addEventListener('online',()=>{ob.style.display='none';if(S.serviceAccount&&S.config.spreadsheetId){updateSyncStatus('ok','Trực tuyến');if(S.records.some(r=>!r.synced)||S.c4records.some(r=>!r.synced)) doSync();}});
+  window.addEventListener('online',()=>{
+    ob.style.display='none';
+    if(S.serviceAccount&&S.config.spreadsheetId){
+      updateSyncStatus('ok','Trực tuyến');
+      if(S.records.some(r=>!r.synced)||S.c4records.some(r=>!r.synced)) doSync();
+      // Flush offline logs khi có lại internet
+      else setTimeout(_flushOfflineLogs, 2000);
+    }
+  });
   window.addEventListener('offline',()=>{ob.style.display='block';updateSyncStatus('off','Ngoại tuyến');});
   if(!navigator.onLine){ob.style.display='block';updateSyncStatus('off','Ngoại tuyến');}
 }
@@ -3543,6 +3806,550 @@ function getDashStats(){
   _dashCacheKey = key;
   return _dashCache;
 }
+
+
+// ============================================================
+//  AUTH & USER MANAGEMENT SYSTEM — KSNK Pro v7
+// ============================================================
+
+// Khởi tạo người dùng
+const AUTH_STORE_KEY  = 'ksnk_users_v7';
+const SESSION_KEY     = 'ksnk_session_v7';
+const LOG_STORE_KEY   = 'ksnk_actlog_v7';
+const REQ_STORE_KEY   = 'ksnk_requests_v7';
+const DEFAULT_PASS    = 'bvps@123';
+const ADMIN_USER      = 'admin';
+const ADMIN_PASS_KEY  = 'ksnk_admin_pass';
+
+let currentUser = null; // { username, name, role, khoa }
+let logPage = 1;
+const LOG_PER_PAGE = 30;
+
+// ── Helpers ──────────────────────────────────────────────────
+function hashPass(p){ return btoa(unescape(encodeURIComponent(p + '_ksnk'))); }
+
+function loadUsers(){
+  try{ return JSON.parse(localStorage.getItem(AUTH_STORE_KEY)) || []; }catch(e){ return []; }
+}
+function saveUsers(arr){ localStorage.setItem(AUTH_STORE_KEY, JSON.stringify(arr)); }
+
+function loadRequests(){
+  try{ return JSON.parse(localStorage.getItem(REQ_STORE_KEY)) || []; }catch(e){ return []; }
+}
+function saveRequests(arr){ localStorage.setItem(REQ_STORE_KEY, JSON.stringify(arr)); }
+
+function loadAdminPass(){
+  return localStorage.getItem(ADMIN_PASS_KEY) || hashPass('admin');
+}
+
+// ── Activity Log ──────────────────────────────────────────────
+function addLog(action, detail=''){
+  try{
+    const logEntry = {
+      ts: new Date().toISOString(),
+      user: currentUser?.username || 'system',
+      name: currentUser?.name || 'Hệ thống',
+      role: currentUser?.role || '',
+      action,
+      detail
+    };
+    // Lưu vào localStorage chính
+    const logs = JSON.parse(localStorage.getItem(LOG_STORE_KEY)) || [];
+    logs.push(logEntry);
+    // Giới hạn 2000 dòng log
+    if(logs.length > 2000) logs.splice(0, logs.length - 2000);
+    localStorage.setItem(LOG_STORE_KEY, JSON.stringify(logs));
+    // Queue để đồng bộ lên GSheets
+    const pendKey='ksnk_log_pending';
+    const pending=JSON.parse(localStorage.getItem(pendKey)||'[]');
+    pending.push(logEntry);
+    localStorage.setItem(pendKey, JSON.stringify(pending));
+    // Nếu đang online và có kết nối GSheets, flush ngay (async, non-blocking)
+    if(S.serviceAccount && S.config.spreadsheetId && navigator.onLine){
+      setTimeout(()=>_flushOfflineLogs(), 3000);
+    }
+  }catch(e){}
+}
+
+async function syncLogToSheet(recentLogs){
+  try{
+    const shName = 'Nhat_Ky_Thao_Tac';
+    const rows = recentLogs.map(l=>[l.ts, l.user, l.name, l.role, l.action, l.detail]);
+    await gFetch('POST',`/values/${shName}!A1:append?valueInputOption=USER_ENTERED`,{values:rows});
+  }catch(e){}
+}
+
+// ── Auth Init ─────────────────────────────────────────────────
+function authInit(){
+  // Kiểm tra session còn hiệu lực
+  try{
+    const sess = JSON.parse(sessionStorage.getItem(SESSION_KEY));
+    if(sess && sess.username){
+      currentUser = sess;
+      onLoginSuccess(false);
+      return;
+    }
+  }catch(e){}
+  // Hiển thị overlay đăng nhập
+  document.getElementById('authOverlay').style.display = 'flex';
+}
+
+function toggleDefaultInfo(){
+  const el = document.getElementById('authDefaultInfo');
+  el.style.display = el.style.display==='none' ? 'block' : 'none';
+}
+
+function togglePwd(inputId, btn){
+  const inp = document.getElementById(inputId);
+  if(!inp) return;
+  inp.type = inp.type==='password' ? 'text' : 'password';
+  btn.textContent = inp.type==='password' ? '👁️' : '🙈';
+}
+
+function showLoginPanel(){
+  document.getElementById('authLoginCard').style.display='';
+  document.getElementById('authRequestCard').style.display='none';
+}
+
+function showRequestPanel(){
+  document.getElementById('authLoginCard').style.display='none';
+  document.getElementById('authRequestCard').style.display='';
+}
+
+// ── Đăng nhập ─────────────────────────────────────────────────
+function doLogin(){
+  const u = (document.getElementById('loginUser').value||'').trim();
+  const p = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('authErr');
+  errEl.style.display='none';
+
+  if(!u || !p){
+    errEl.textContent='⚠️ Vui lòng nhập tên đăng nhập và mật khẩu.';
+    errEl.style.display='block'; return;
+  }
+
+  // Kiểm tra admin
+  if(u.toLowerCase() === ADMIN_USER){
+    if(hashPass(p) === loadAdminPass()){
+      currentUser = { username:'admin', name:'Quản trị viên', role:'admin', khoa:'Hệ thống' };
+      onLoginSuccess(true);
+      return;
+    } else {
+      errEl.textContent='❌ Sai mật khẩu admin.';
+      errEl.style.display='block';
+      addLog('Đăng nhập thất bại', `Sai mật khẩu admin, username: ${u}`);
+      return;
+    }
+  }
+
+  // Kiểm tra người dùng thường
+  const users = loadUsers();
+  const found = users.find(x => x.username === u);
+  if(!found){
+    errEl.textContent='❌ Tài khoản không tồn tại hoặc chưa được cấp.';
+    errEl.style.display='block';
+    return;
+  }
+  if(!found.active){
+    errEl.textContent='❌ Tài khoản đã bị vô hiệu hóa. Liên hệ Admin.';
+    errEl.style.display='block'; return;
+  }
+  if(found.password !== hashPass(p)){
+    errEl.textContent='❌ Sai mật khẩu. Vui lòng thử lại.';
+    errEl.style.display='block';
+    addLog('Đăng nhập thất bại', `Sai mật khẩu, username: ${u}`);
+    return;
+  }
+  currentUser = { username: found.username, name: found.name, role: found.role||'user', khoa: found.khoa||'' };
+  onLoginSuccess(true);
+}
+
+function onLoginSuccess(doLog){
+  // Lưu session
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
+  // Ẩn overlay
+  document.getElementById('authOverlay').style.display='none';
+  // Gán class is-admin nếu là admin
+  document.body.classList.toggle('is-admin', currentUser.role==='admin');
+  // Cập nhật badge
+  updateUserBadge();
+  if(doLog) addLog('Đăng nhập thành công', `Role: ${currentUser.role}, Khoa: ${currentUser.khoa}`);
+  showNotif(`✅ Xin chào, ${currentUser.name}!`,'ok');
+}
+
+function doLogout(){
+  closeUserMenu();
+  addLog('Đăng xuất');
+  sessionStorage.removeItem(SESSION_KEY);
+  currentUser = null;
+  document.body.classList.remove('is-admin');
+  // Reset fields
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+  document.getElementById('authErr').style.display='none';
+  document.getElementById('authDefaultInfo').style.display='none';
+  document.getElementById('authOverlay').style.display='flex';
+  showLoginPanel();
+}
+
+// ── User Badge ─────────────────────────────────────────────────
+function updateUserBadge(){
+  if(!currentUser) return;
+  const av = document.getElementById('userBadgeAv');
+  const nm = document.getElementById('userBadgeNm');
+  const btn = document.getElementById('userBadgeBtn');
+  if(av) av.textContent = (currentUser.name||'?').charAt(0).toUpperCase();
+  if(nm) nm.textContent = currentUser.name;
+  if(btn) btn.style.display='flex';
+  // Update user menu info
+  const umName=document.getElementById('umName');
+  const umRole=document.getElementById('umRole');
+  const umKhoa=document.getElementById('umKhoa');
+  const roleLabels={admin:'👑 Quản trị viên',supervisor:'🔍 Giám sát viên',user:'👤 Người dùng'};
+  if(umName) umName.textContent=currentUser.name;
+  if(umRole) umRole.textContent=roleLabels[currentUser.role]||currentUser.role;
+  if(umKhoa) umKhoa.textContent=currentUser.khoa||'—';
+  // Cập nhật sidebar footer
+  const sbFoot=document.getElementById('sbFooterUser');
+  if(sbFoot) sbFoot.textContent=`${currentUser.name} · ${roleLabels[currentUser.role]||currentUser.role}`;
+  // Cập nhật pending request badge nếu admin
+  if(currentUser.role==='admin'){
+    const reqs=loadRequests().filter(r=>r.status==='pending');
+    const badge=document.getElementById('pendReqBadge');
+    if(badge){ badge.textContent=reqs.length; badge.style.display=reqs.length?'':'none'; }
+  }
+}
+
+function toggleUserMenu(){
+  const m=document.getElementById('userMenu');
+  m.style.display = m.style.display==='none' ? 'block' : 'none';
+}
+function closeUserMenu(){ document.getElementById('userMenu').style.display='none'; }
+document.addEventListener('click',e=>{
+  if(!document.getElementById('userBadgeBtn')?.contains(e.target) &&
+     !document.getElementById('userMenu')?.contains(e.target)){
+    closeUserMenu();
+  }
+});
+
+// ── Đổi mật khẩu ──────────────────────────────────────────────
+function showChangePassModal(){
+  closeUserMenu();
+  document.getElementById('cpOld').value='';
+  document.getElementById('cpNew').value='';
+  document.getElementById('cpNew2').value='';
+  document.getElementById('cpErr').style.display='none';
+  openMo('changePassMo');
+}
+
+function doChangePass(){
+  const old = document.getElementById('cpOld').value;
+  const nw  = document.getElementById('cpNew').value;
+  const nw2 = document.getElementById('cpNew2').value;
+  const errEl = document.getElementById('cpErr');
+  errEl.style.display='none';
+  if(!old||!nw||!nw2){ errEl.textContent='⚠️ Vui lòng điền đầy đủ.'; errEl.style.display='block'; return; }
+  if(nw.length < 6){ errEl.textContent='⚠️ Mật khẩu mới tối thiểu 6 ký tự.'; errEl.style.display='block'; return; }
+  if(nw !== nw2){ errEl.textContent='❌ Mật khẩu xác nhận không khớp.'; errEl.style.display='block'; return; }
+
+  if(currentUser.role==='admin'){
+    if(hashPass(old) !== loadAdminPass()){ errEl.textContent='❌ Mật khẩu hiện tại không đúng.'; errEl.style.display='block'; return; }
+    localStorage.setItem(ADMIN_PASS_KEY, hashPass(nw));
+  } else {
+    const users = loadUsers();
+    const idx = users.findIndex(x=>x.username===currentUser.username);
+    if(idx<0){ errEl.textContent='❌ Không tìm thấy tài khoản.'; errEl.style.display='block'; return; }
+    if(users[idx].password !== hashPass(old)){ errEl.textContent='❌ Mật khẩu hiện tại không đúng.'; errEl.style.display='block'; return; }
+    users[idx].password = hashPass(nw);
+    users[idx].mustChangePass = false;
+    saveUsers(users);
+  }
+  addLog('Đổi mật khẩu thành công');
+  closeMo('changePassMo');
+  showNotif('✅ Đã đổi mật khẩu thành công!','ok');
+}
+
+// ── Quản lý người dùng (Admin) ────────────────────────────────
+function renderUserList(){
+  const users = loadUsers();
+  const body = document.getElementById('userListBody');
+  if(!body) return;
+  if(!users.length){
+    body.innerHTML='<div style="text-align:center;color:var(--text-3);padding:20px;font-size:13px">Chưa có người dùng nào. Nhấn <b>Thêm người dùng</b> để bắt đầu.</div>';
+    return;
+  }
+  const roleLabels={admin:'👑 Admin',supervisor:'🔍 Giám sát',user:'👤 Người dùng'};
+  body.innerHTML=`<div style="overflow-x:auto"><table class="dt"><thead><tr>
+    <th>Họ tên</th><th>CMND/CCCD</th><th>Vai trò</th><th>Khoa/Phòng</th><th>Trạng thái</th><th>Thao tác</th>
+  </tr></thead><tbody>
+  ${users.map(u=>`<tr>
+    <td><b>${u.name}</b></td>
+    <td style="font-family:monospace;font-size:12px">${u.username}</td>
+    <td><span class="badge bg-blue">${roleLabels[u.role]||u.role}</span></td>
+    <td>${u.khoa||'—'}</td>
+    <td><span class="badge ${u.active?'bg-ok':'bg-bad'}">${u.active?'✅ Hoạt động':'🚫 Vô hiệu'}</span></td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-o btn-xs" onclick="resetUserPass('${u.username}')" title="Reset mật khẩu">🔑</button>
+      <button class="btn ${u.active?'btn-a':'btn-g'} btn-xs" onclick="toggleUserActive('${u.username}')" title="${u.active?'Vô hiệu hóa':'Kích hoạt'}">${u.active?'🚫':'✅'}</button>
+      <button class="btn btn-r btn-xs" onclick="deleteUser('${u.username}')" title="Xóa">🗑️</button>
+    </td>
+  </tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+function showAddUserModal(){
+  document.getElementById('au-name').value='';
+  document.getElementById('au-cmnd').value='';
+  document.getElementById('au-pass').value=DEFAULT_PASS;
+  // Populate khoa select
+  const kSel=document.getElementById('au-khoa');
+  kSel.innerHTML='<option value="">— Chọn khoa —</option>'+S.config.khoas.map(k=>`<option>${k}</option>`).join('');
+  openMo('addUserMo');
+}
+
+function saveNewUser(){
+  const name=(document.getElementById('au-name').value||'').trim();
+  const cmnd=(document.getElementById('au-cmnd').value||'').trim();
+  const role=document.getElementById('au-role-val').value;
+  const khoa=document.getElementById('au-khoa').value;
+  const pass=document.getElementById('au-pass').value||DEFAULT_PASS;
+  if(!name||!cmnd){ showNotif('⚠️ Vui lòng nhập họ tên và CMND/CCCD','err'); return; }
+  const users=loadUsers();
+  if(users.find(u=>u.username===cmnd)){ showNotif('❌ Tài khoản đã tồn tại','err'); return; }
+  users.push({ username:cmnd, name, role, khoa, password:hashPass(pass), active:true, mustChangePass:true, createdAt:new Date().toISOString() });
+  saveUsers(users);
+  addLog(`Tạo tài khoản: ${name} (${cmnd})`, `Role: ${role}, Khoa: ${khoa}`);
+  closeMo('addUserMo');
+  renderUserList();
+  // Đồng bộ lên sheet nếu có thể
+  syncUsersToSheet();
+  showNotif(`✅ Đã tạo tài khoản cho ${name}`,'ok');
+}
+
+function resetUserPass(username){
+  showConfirm('Reset mật khẩu',`Reset mật khẩu của <b>${username}</b> về <b>${DEFAULT_PASS}</b>?`,()=>{
+    const users=loadUsers();
+    const idx=users.findIndex(u=>u.username===username);
+    if(idx>=0){ users[idx].password=hashPass(DEFAULT_PASS); users[idx].mustChangePass=true; saveUsers(users); }
+    addLog(`Reset mật khẩu: ${username}`);
+    syncUsersToSheet();
+    showNotif(`✅ Đã reset mật khẩu của ${username}`,'ok');
+  });
+}
+
+function toggleUserActive(username){
+  const users=loadUsers();
+  const idx=users.findIndex(u=>u.username===username);
+  if(idx>=0){ users[idx].active=!users[idx].active; saveUsers(users); renderUserList(); addLog(`${users[idx].active?'Kích hoạt':'Vô hiệu hóa'} tài khoản: ${username}`); }
+}
+
+function deleteUser(username){
+  showConfirm('Xóa tài khoản',`Xóa tài khoản <b>${username}</b>? Không thể phục hồi.`,()=>{
+    const users=loadUsers().filter(u=>u.username!==username);
+    saveUsers(users); renderUserList();
+    addLog(`Xóa tài khoản: ${username}`);
+    showNotif(`✅ Đã xóa tài khoản ${username}`,'ok');
+  });
+}
+
+// ── Yêu cầu tài khoản ─────────────────────────────────────────
+function submitRequest(){
+  const hoTen=(document.getElementById('reqHoTen').value||'').trim();
+  const cmnd=(document.getElementById('reqCMND').value||'').trim();
+  const khoa=(document.getElementById('reqKhoa').value||'').trim();
+  const type=document.getElementById('reqType').value;
+  const note=document.getElementById('reqNote').value||'';
+  if(!hoTen||!cmnd||!khoa){ showNotif('⚠️ Vui lòng điền đầy đủ thông tin bắt buộc','err'); return; }
+  const reqs=loadRequests();
+  reqs.push({ id:genId(), hoTen, cmnd, khoa, type, note, status:'pending', createdAt:new Date().toISOString() });
+  saveRequests(reqs);
+  // Cũng lưu offline log nếu có GS
+  showNotif('✅ Đã gửi yêu cầu. Vui lòng liên hệ Admin để được xử lý.','ok');
+  showLoginPanel();
+  document.getElementById('reqHoTen').value='';
+  document.getElementById('reqCMND').value='';
+  document.getElementById('reqKhoa').value='';
+  document.getElementById('reqNote').value='';
+}
+
+function renderPendingRequests(){
+  const reqs=loadRequests().filter(r=>r.status==='pending');
+  const body=document.getElementById('pendReqBody');
+  const badge=document.getElementById('pendReqBadge');
+  if(badge){ badge.textContent=reqs.length; badge.style.display=reqs.length?'':'none'; }
+  if(!body) return;
+  if(!reqs.length){ body.innerHTML='<div style="text-align:center;color:var(--text-3);padding:16px;font-size:13px">Không có yêu cầu nào</div>'; return; }
+  body.innerHTML=reqs.map(r=>`<div class="req-item">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+      <div><b>${r.hoTen}</b> — <span style="font-family:monospace">${r.cmnd}</span> — ${r.khoa}</div>
+      <span class="badge bg-warn">${r.type==='cap'?'Cấp mới':'Reset MK'}</span>
+    </div>
+    ${r.note?`<div style="color:var(--text-2);margin-top:4px;font-size:12px">📝 ${r.note}</div>`:''}
+    <div style="font-size:11px;color:var(--text-3);margin-top:3px">${new Date(r.createdAt).toLocaleString('vi-VN')}</div>
+    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn btn-g btn-xs" onclick="approveRequest('${r.id}')">✅ Duyệt & Cấp tài khoản</button>
+      <button class="btn btn-r btn-xs" onclick="rejectRequest('${r.id}')">❌ Từ chối</button>
+    </div>
+  </div>`).join('');
+}
+
+function approveRequest(id){
+  const reqs=loadRequests();
+  const idx=reqs.findIndex(r=>r.id===id);
+  if(idx<0) return;
+  const r=reqs[idx];
+  // Tạo hoặc reset tài khoản
+  const users=loadUsers();
+  const existing=users.findIndex(u=>u.username===r.cmnd);
+  if(r.type==='cap'){
+    if(existing>=0){ showNotif('ℹ️ Tài khoản đã tồn tại, reset mật khẩu về mặc định','info'); users[existing].password=hashPass(DEFAULT_PASS); users[existing].active=true; users[existing].mustChangePass=true; }
+    else { users.push({ username:r.cmnd, name:r.hoTen, role:'user', khoa:r.khoa, password:hashPass(DEFAULT_PASS), active:true, mustChangePass:true, createdAt:new Date().toISOString() }); }
+  } else if(r.type==='reset'){
+    if(existing>=0){ users[existing].password=hashPass(DEFAULT_PASS); users[existing].mustChangePass=true; }
+    else { showNotif('⚠️ Không tìm thấy tài khoản để reset','err'); return; }
+  }
+  saveUsers(users);
+  reqs[idx].status='approved';
+  saveRequests(reqs);
+  renderPendingRequests();
+  renderUserList();
+  addLog(`Duyệt yêu cầu ${r.type}: ${r.hoTen} (${r.cmnd})`);
+  syncUsersToSheet();
+  showNotif(`✅ Đã duyệt yêu cầu cho ${r.hoTen}`,'ok');
+}
+
+function rejectRequest(id){
+  const reqs=loadRequests();
+  const idx=reqs.findIndex(r=>r.id===id);
+  if(idx>=0){ reqs[idx].status='rejected'; saveRequests(reqs); renderPendingRequests(); showNotif('✅ Đã từ chối yêu cầu','info'); }
+}
+
+// ── Nhật ký thao tác ──────────────────────────────────────────
+function renderActivityLog(){
+  const filterUser=document.getElementById('log-filter-user')?.value||'all';
+  let logs=[...( JSON.parse(localStorage.getItem(LOG_STORE_KEY)||'[]') )].reverse();
+  if(filterUser!=='all') logs=logs.filter(l=>l.user===filterUser);
+  const total=logs.length,pages=Math.ceil(total/LOG_PER_PAGE)||1;
+  if(logPage>pages) logPage=pages;
+  const pageL=logs.slice((logPage-1)*LOG_PER_PAGE,logPage*LOG_PER_PAGE);
+  const body=document.getElementById('actLogBody');
+  if(!body) return;
+  if(!pageL.length){ body.innerHTML='<div style="text-align:center;color:var(--text-3);padding:24px;font-size:13px">Chưa có nhật ký</div>'; return; }
+  body.innerHTML=pageL.map(l=>`<div class="log-row">
+    <span class="log-row-time">${new Date(l.ts).toLocaleString('vi-VN')}</span>
+    <span class="log-row-action"><b>${l.action}</b>${l.detail?`<br><span style="color:var(--text-3)">${l.detail}</span>`:''}</span>
+    <span class="log-row-user">${l.name||l.user}</span>
+  </div>`).join('');
+  // Pagination
+  const pag=document.getElementById('actLogPagination');
+  if(!pag) return;
+  pag.innerHTML='';
+  if(pages>1){
+    const prev=document.createElement('button');prev.className='btn btn-o btn-xs';prev.textContent='‹';prev.disabled=logPage<=1;prev.onclick=()=>{logPage--;renderActivityLog();};pag.appendChild(prev);
+    for(let i=Math.max(1,logPage-2);i<=Math.min(pages,logPage+2);i++){const pb=document.createElement('button');pb.className=`btn ${i===logPage?'btn-p':'btn-o'} btn-xs`;pb.textContent=i;pb.onclick=(()=>{const pg=i;return()=>{logPage=pg;renderActivityLog();}})();pag.appendChild(pb);}
+    const next=document.createElement('button');next.className='btn btn-o btn-xs';next.textContent='›';next.disabled=logPage>=pages;next.onclick=()=>{logPage++;renderActivityLog();};pag.appendChild(next);
+  }
+}
+
+function populateLogUserFilter(){
+  const sel=document.getElementById('log-filter-user'); if(!sel) return;
+  const logs=JSON.parse(localStorage.getItem(LOG_STORE_KEY)||'[]');
+  const users=[...new Set(logs.map(l=>l.user))];
+  sel.innerHTML='<option value="all">Tất cả người dùng</option>'+users.map(u=>`<option value="${u}">${u}</option>`).join('');
+}
+
+function clearActivityLog(){
+  showConfirm('Xóa nhật ký','Xóa toàn bộ nhật ký thao tác? Không thể phục hồi.',()=>{
+    localStorage.removeItem(LOG_STORE_KEY);
+    renderActivityLog();
+    showNotif('✅ Đã xóa nhật ký','info');
+  });
+}
+
+function exportActivityLog(){
+  const logs=JSON.parse(localStorage.getItem(LOG_STORE_KEY)||'[]');
+  if(!logs.length){ showNotif('Chưa có nhật ký để xuất','err'); return; }
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet([['Thời gian','Người dùng','Họ tên','Vai trò','Thao tác','Chi tiết'],...logs.map(l=>[l.ts,l.user,l.name||'',l.role||'',l.action,l.detail||''])]);
+  XLSX.utils.book_append_sheet(wb,ws,'Nhat_Ky');
+  XLSX.writeFile(wb,`KSNK_NhatKy_${new Date().toLocaleDateString('vi-VN').replace(/\//g,'-')}.xlsx`);
+  showNotif('📊 Đã xuất nhật ký Excel','ok');
+}
+
+// ── Đồng bộ danh sách Users lên GSheet ───────────────────────
+async function syncUsersToSheet(){
+  if(!S.serviceAccount||!S.config.spreadsheetId||!navigator.onLine) return;
+  try{
+    const users=loadUsers();
+    const rows=[['CMND/CCCD','Họ tên','Vai trò','Khoa','Trạng thái','Tạo lúc'],...users.map(u=>[u.username,u.name,u.role,u.khoa,u.active?'Hoạt động':'Vô hiệu',u.createdAt])];
+    // Kiểm tra sheet tồn tại
+    const info=await gFetch('GET','');
+    if(!info) return;
+    const exists=info.sheets.some(s=>s.properties.title==='Nguoi_Dung');
+    if(!exists) await gFetch('POST',':batchUpdate',{requests:[{addSheet:{properties:{title:'Nguoi_Dung'}}}]});
+    await gFetch('PUT',`/values/Nguoi_Dung!A1?valueInputOption=USER_ENTERED`,{values:rows});
+  }catch(e){}
+}
+
+// ── Patch go() để guard admin pages ───────────────────────────
+const _origGo = go;
+window.go = function(p){
+  const adminPages=['admin','gsheets','users','actlog'];
+  if(adminPages.includes(p) && currentUser?.role!=='admin'){
+    showNotif('🔒 Chỉ Quản trị viên mới có thể truy cập trang này','err');
+    return;
+  }
+  _origGo(p);
+  // Render page-specific data
+  if(p==='users'){ renderUserList(); renderPendingRequests(); }
+  if(p==='actlog'){ populateLogUserFilter(); renderActivityLog(); }
+};
+
+// ── Patch saveForm() & saveC4() & saveNKBV() để ghi log ───────
+const _origSaveForm = saveForm;
+window.saveForm = function(key){
+  _origSaveForm(key);
+  // Gắn operator vào record vừa lưu
+  if(currentUser && S.records.length){
+    const last = S.records[S.records.length-1];
+    if(!last.operator){ last.operator = currentUser.username; last.operatorName = currentUser.name; save(); }
+  }
+  addLog(`Lưu phiếu: ${FC[key]?.label||key}`);
+};
+const _origSaveC4 = saveC4;
+window.saveC4 = function(cid){
+  _origSaveC4(cid);
+  if(currentUser && S.c4records.length){
+    const last = S.c4records[S.c4records.length-1];
+    if(!last.operator){ last.operator = currentUser.username; last.operatorName = currentUser.name; save(); }
+  }
+  addLog(`Lưu đánh giá C4: ${C4[cid]?.code||cid}`);
+};
+const _origDoSync = doSync;
+window.doSync = async function(){
+  addLog('Đồng bộ dữ liệu lên Google Sheets');
+  return _origDoSync();
+};
+
+// Patch saveNKBV để ghi log
+const _origSaveNKBV = saveNKBV;
+window.saveNKBV = function(){
+  _origSaveNKBV();
+  if(currentUser && S.nkbvRecords.length){
+    const last = S.nkbvRecords[S.nkbvRecords.length-1];
+    if(!last.operator){ last.operator = currentUser.username; last.operatorName = currentUser.name; save(); }
+  }
+  addLog('Ghi nhận ca NKBV');
+};
+
+// ── Patch init để chạy Auth trước ────────────────────────────
+const _origDOMReady = document._ksnkInit;
+
+// Overwrite DOMContentLoaded init to inject auth
+document.addEventListener('DOMContentLoaded', ()=>{
+  // Auth init AFTER main init (runs after existing DOMContentLoaded)
+  setTimeout(authInit, 50);
+});
 
 // v7: cache invalidation – _dashCache cleared inside renderDashboard directly
 
