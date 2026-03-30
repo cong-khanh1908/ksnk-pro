@@ -2279,7 +2279,7 @@ let S = {
   nkbvDenominators:{}, // Mẫu số tính tỷ lệ NKBV
   config:{
     bv:'Bệnh viện Phụ sản Tiền Giang',
-    so:'Sở Y tế Tỉnh Tiền Giang',
+    so:'Sở Y tế Tỉnh Đồng Tháp',
     kk:'Khoa Kiểm soát Nhiễm khuẩn',
     spreadsheetId:'',
     autoSync:true,
@@ -2699,7 +2699,7 @@ function genReport(){
   const now=new Date();
   document.getElementById('repSo').textContent=S.config.so;
   document.getElementById('repBV').textContent=S.config.bv;
-  document.getElementById('repNgay').textContent=`Tiền Giang, ngày ${now.getDate()} tháng ${now.getMonth()+1} năm ${now.getFullYear()}`;
+  document.getElementById('repNgay').textContent=`Đông Tháp, ngày ${now.getDate()} tháng ${now.getMonth()+1} năm ${now.getFullYear()}`;
   document.getElementById('repKy').textContent=`Tại các Khoa / Phòng — Từ ngày ${f||'…'} đến ngày ${t||'…'}`;
   const keys=['rt','tb','td','tm'],klb={rt:'Rửa tay',tb:'Thay băng vết mổ',td:'Truyền dịch',tm:'Tiêm thuốc'};
   let html=`<p style="margin-bottom:10px"><b>I. Tổng quan kết quả giám sát:</b></p>
