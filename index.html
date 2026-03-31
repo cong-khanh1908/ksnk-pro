@@ -551,7 +551,6 @@ body.is-admin .admin-only-flex{display:flex!important}
   <button class="nav" onclick="go('dl')" data-p="dl"><span class="nav-ic">🗂️</span>Dữ liệu đã nhập<span class="nav-badge" id="pendBadge" style="display:none">0</span></button>
   <div class="sb-sec">Hệ thống</div>
   <button class="nav admin-only" onclick="go('admin')" data-p="admin"><span class="nav-ic">⚙️</span>Quản trị / Cấu hình</button>
-  <button class="nav admin-only" onclick="go('rptpl')" data-p="rptpl"><span class="nav-ic">📝</span>Mẫu Báo cáo (Admin)</button>
   <button class="nav admin-only" onclick="go('gsheets')" data-p="gsheets"><span class="nav-ic">☁️</span>Kết nối Google Sheets</button>
   <button class="nav admin-only" onclick="go('users')" data-p="users"><span class="nav-ic">👥</span>Quản lý người dùng</button>
   <button class="nav admin-only" onclick="go('actlog')" data-p="actlog"><span class="nav-ic">📋</span>Nhật ký thao tác</button>
@@ -850,7 +849,7 @@ body.is-admin .admin-only-flex{display:flex!important}
   <div id="repDoc" style="display:none">
     <div class="card" id="repMain" style="font-size:13.5px;line-height:1.9">
       <div style="display:grid;grid-template-columns:1fr 1fr;margin-bottom:12px;font-size:13px;gap:8px">
-        <div><b id="repSo"></b><br><b id="repBV"></b><br><span style="font-size:12px;color:var(--text-3)">Số:&nbsp;&nbsp;&nbsp;&nbsp;/BC-KSNK</span></div>
+        <div><b id="repSo"></b><br><b id="repBV"></b><br><span style="font-size:12px;color:var(--text-3)">Số:&nbsp;&nbsp;&nbsp;&nbsp;/BC-BVPSTG</span></div>
         <div style="text-align:right"><b>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</b><br><span style="font-style:italic">Độc lập – Tự do – Hạnh phúc</span><br><span id="repNgay" style="font-size:12px;color:var(--text-3)"></span></div>
       </div>
       <div style="text-align:center;margin:20px 0 14px">
@@ -1007,138 +1006,6 @@ body.is-admin .admin-only-flex{display:flex!important}
       <p>• <b>TT 20/2021/TT-BYT-BTNMT</b> – Quản lý chất thải y tế trong phạm vi khuôn viên cơ sở y tế</p>
       <p>• <b>Luật KCB số 40/2009/QH12</b> Điều 50, 51 – Kiểm định chất lượng bệnh viện</p>
       <p>• <b>QCVN 28:2010/BTNMT</b> – Quy chuẩn kỹ thuật quốc gia về nước thải y tế</p>
-    </div>
-  </div>
-</div>
-
-<!-- ══ MẪU BÁO CÁO (ADMIN) ══ -->
-<div class="pg" id="pg-rptpl">
-  <div class="tip-box" style="margin-bottom:14px;background:linear-gradient(90deg,rgba(21,101,192,.08),var(--teal-l));border-color:var(--teal);color:var(--navy)">
-    <b>👑</b>
-    <div><b>Quản lý Mẫu Báo cáo:</b> Admin thiết lập mẫu báo cáo một lần — tất cả người dùng khi xuất báo cáo sẽ dùng mẫu này tự động. Hỗ trợ chỉnh sửa trực tiếp <b>hoặc</b> upload file Word (.docx) làm mẫu nền.</div>
-  </div>
-
-  <!-- TABS -->
-  <div class="tabs" id="rptplTabs">
-    <button class="tab on" onclick="swRptplTab('header',this)">🏥 Tiêu đề & Header</button>
-    <button class="tab" onclick="swRptplTab('fields',this)">📋 Trường thông tin</button>
-    <button class="tab" onclick="swRptplTab('footer',this)">✍️ Ký tên & Footer</button>
-    <button class="tab" onclick="swRptplTab('upload',this)">📤 Upload mẫu Word</button>
-    <button class="tab" onclick="swRptplTab('preview',this)">👁️ Xem trước</button>
-  </div>
-
-  <!-- TAB: HEADER -->
-  <div id="rptpl-header" class="card">
-    <div class="card-hd"><div class="card-title">🏥 Thông tin Tiêu đề Báo cáo</div>
-      <button class="btn btn-p btn-sm" onclick="saveRptTemplate()">💾 Lưu & Phát hành</button>
-    </div>
-    <div class="fg">
-      <div class="fgp"><label class="fl">Tên Bộ / Sở chủ quản</label><input type="text" class="fc" id="tpl-bo" placeholder="SỞ Y TẾ ĐỒNG THÁP"></div>
-      <div class="fgp"><label class="fl">Tên Bệnh viện / Đơn vị</label><input type="text" class="fc" id="tpl-bv" placeholder="BỆNH VIỆN ĐA KHOA ĐỒNG THÁP"></div>
-      <div class="fgp"><label class="fl">Khoa / Phòng ban lập báo cáo</label><input type="text" class="fc" id="tpl-khoa" placeholder="KHOA KIỂM SOÁT NHIỄM KHUẨN"></div>
-      <div class="fgp"><label class="fl">Địa danh ký (VD: Đồng Tháp, Đà Nẵng...)</label><input type="text" class="fc" id="tpl-diadanh" placeholder="Đồng Tháp"></div>
-    </div>
-    <div class="fg" style="margin-top:12px">
-      <div class="fgp"><label class="fl">Tiêu đề chính báo cáo</label><input type="text" class="fc" id="tpl-tieude" placeholder="BÁO CÁO KẾT QUẢ GIÁM SÁT TUÂN THỦ QUY TRÌNH KIỂM SOÁT NHIỄM KHUẨN"></div>
-      <div class="fgp"><label class="fl">Tham chiếu văn bản pháp lý</label><input type="text" class="fc" id="tpl-phapluat" placeholder="QĐ 6858/QĐ-BYT; TT 16/2018/TT-BYT; TT 18/2009/TT-BYT"></div>
-    </div>
-    <div class="fgp" style="margin-top:12px"><label class="fl">Logo/Ký hiệu đầu trang (tùy chọn — URL hình)</label><input type="text" class="fc" id="tpl-logo" placeholder="https://... (để trống nếu không dùng)"></div>
-    <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-2);border-radius:var(--r-sm);border:1px solid var(--border-2);margin-top:12px">
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;flex:1">
-        <input type="checkbox" id="tpl-show-header-line" style="width:18px;height:18px;accent-color:var(--blue)" checked>
-        <div><div style="font-weight:600;font-size:13px">Hiển thị dòng "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"</div><div style="font-size:11.5px;color:var(--text-3)">Bắt buộc với báo cáo hành chính nhà nước</div></div>
-      </label>
-    </div>
-  </div>
-
-  <!-- TAB: FIELDS -->
-  <div id="rptpl-fields" class="card" style="display:none">
-    <div class="card-hd"><div class="card-title">📋 Cấu hình các trường trong báo cáo</div>
-      <button class="btn btn-p btn-sm" onclick="saveRptTemplate()">💾 Lưu & Phát hành</button>
-    </div>
-    <div class="tip-box" style="margin-bottom:12px"><b>💡</b><span>Bật/tắt từng trường để điều chỉnh nội dung báo cáo tự động. Những trường bật sẽ luôn xuất hiện khi người dùng tạo báo cáo.</span></div>
-    <div style="display:grid;gap:8px" id="rptpl-field-list">
-      <!-- Rendered by JS -->
-    </div>
-    <div style="margin-top:16px">
-      <div class="sec-label" style="margin-bottom:10px">Nội dung mẫu phần Nhận xét chung (có thể chỉnh sửa khi tạo báo cáo)</div>
-      <textarea class="fc" id="tpl-nx-default" placeholder="Trong kỳ báo cáo, Khoa KSNK đã thực hiện giám sát định kỳ tại các khoa lâm sàng và cận lâm sàng. Kết quả..." style="min-height:90px;resize:vertical"></textarea>
-    </div>
-    <div style="margin-top:12px">
-      <div class="sec-label" style="margin-bottom:10px">Nội dung mẫu phần Kiến nghị/Giải pháp</div>
-      <textarea class="fc" id="tpl-kn-default" placeholder="1. Tiếp tục duy trì và nâng cao tỷ lệ tuân thủ...\n2. Tăng cường giám sát tại các khoa có tỷ lệ thấp..." style="min-height:80px;resize:vertical"></textarea>
-    </div>
-  </div>
-
-  <!-- TAB: FOOTER / KÝ TÊN -->
-  <div id="rptpl-footer" class="card" style="display:none">
-    <div class="card-hd"><div class="card-title">✍️ Cấu hình Ký tên & Footer</div>
-      <button class="btn btn-p btn-sm" onclick="saveRptTemplate()">💾 Lưu & Phát hành</button>
-    </div>
-    <div class="tip-box" style="margin-bottom:12px"><b>💡</b><span>Cấu hình tối đa 3 vị trí ký tên. Để trống nếu không dùng.</span></div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
-      <div class="card" style="padding:14px;border:1.5px solid var(--border)">
-        <div class="sec-label" style="margin-bottom:10px">Vị trí ký 1 (Người lập báo cáo)</div>
-        <div class="fgp" style="margin-bottom:8px"><label class="fl">Chức danh</label><input type="text" class="fc" id="tpl-sign1-title" placeholder="NGƯỜI LẬP BÁO CÁO"></div>
-        <div class="fgp"><label class="fl">Ghi chú dưới (VD: Ký và ghi rõ họ tên)</label><input type="text" class="fc" id="tpl-sign1-note" placeholder="(Ký và ghi rõ họ tên)"></div>
-      </div>
-      <div class="card" style="padding:14px;border:1.5px solid var(--border)">
-        <div class="sec-label" style="margin-bottom:10px">Vị trí ký 2 (Lãnh đạo khoa)</div>
-        <div class="fgp" style="margin-bottom:8px"><label class="fl">Chức danh</label><input type="text" class="fc" id="tpl-sign2-title" placeholder="LÃNH ĐẠO KHOA KSNK"></div>
-        <div class="fgp"><label class="fl">Ghi chú dưới</label><input type="text" class="fc" id="tpl-sign2-note" placeholder="(Ký và ghi rõ họ tên)"></div>
-      </div>
-      <div class="card" style="padding:14px;border:1.5px solid var(--border)">
-        <div class="sec-label" style="margin-bottom:10px">Vị trí ký 3 (Phê duyệt)</div>
-        <div class="fgp" style="margin-bottom:8px"><label class="fl">Chức danh</label><input type="text" class="fc" id="tpl-sign3-title" placeholder="BAN GIÁM ĐỐC"></div>
-        <div class="fgp"><label class="fl">Ghi chú dưới</label><input type="text" class="fc" id="tpl-sign3-note" placeholder="(Ký và ghi rõ họ tên)"></div>
-      </div>
-    </div>
-    <div class="fg" style="margin-top:16px">
-      <div class="fgp"><label class="fl">Nội dung footer dưới cùng (căn cứ pháp lý...)</label>
-        <textarea class="fc" id="tpl-footer-text" style="min-height:60px;resize:vertical" placeholder="Căn cứ: QĐ 6858/QĐ-BYT ngày 18/11/2016 | TT 16/2018/TT-BYT | TT 18/2009/TT-BYT"></textarea>
-      </div>
-    </div>
-  </div>
-
-  <!-- TAB: UPLOAD WORD -->
-  <div id="rptpl-upload" class="card" style="display:none">
-    <div class="card-hd"><div class="card-title">📤 Upload Mẫu Word (.docx)</div></div>
-    <div class="tip-box" style="margin-bottom:14px"><b>📋</b>
-      <div><b>Cách dùng:</b> Upload file Word mẫu báo cáo của bệnh viện. Hệ thống sẽ trích xuất thông tin tiêu đề/footer từ mẫu và tự động điền vào các trường cấu hình. Dữ liệu giám sát thực tế sẽ được chèn vào phần thân báo cáo khi xuất.</div>
-    </div>
-    <div class="tip-warn" style="margin-bottom:14px"><b>⚠️</b><span>Chức năng này trích xuất thông tin text từ file .docx để điền vào mẫu. File gốc không được lưu trong hệ thống (vì lý do bảo mật và dung lượng). Chỉ các thông tin text được nhận diện sẽ được lưu.</span></div>
-    <div class="json-drop" id="wordDropZone" onclick="document.getElementById('wordTemplateFile').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleWordTemplateDrop(event)" style="margin-bottom:16px">
-      <div style="font-size:36px;margin-bottom:8px" id="wordDropIcon">📄</div>
-      <div style="font-size:13px;color:var(--text-2)" id="wordDropTxt"><b>Nhấn để chọn file Word</b> hoặc kéo thả<br><span style="font-size:11px;color:var(--text-3)">Chấp nhận: .docx (tối đa 5MB)</span></div>
-      <input type="file" id="wordTemplateFile" accept=".docx" style="display:none" onchange="handleWordTemplateFile(this)">
-    </div>
-    <div id="wordExtractResult" style="display:none;background:var(--green-l);border:1px solid rgba(46,125,50,.2);border-radius:var(--r-sm);padding:14px;margin-bottom:14px">
-      <div style="font-weight:700;color:var(--green);margin-bottom:8px">✅ Đã trích xuất thông tin từ file Word</div>
-      <div id="wordExtractContent" style="font-size:12.5px;line-height:1.8;color:var(--text-2)"></div>
-      <div class="bg" style="margin-top:10px">
-        <button class="btn btn-p btn-sm" onclick="applyExtractedTemplate()">✅ Áp dụng vào mẫu</button>
-        <button class="btn btn-o btn-sm" onclick="document.getElementById('wordExtractResult').style.display='none'">✕ Hủy</button>
-      </div>
-    </div>
-    <div class="tip-box" style="margin-bottom:0"><b>📝</b>
-      <div><b>Tải mẫu Word mặc định:</b> Bạn có thể tải mẫu Word chuẩn của KSNK Pro v7 về máy, chỉnh sửa theo đặc thù bệnh viện, rồi upload lại.
-        <button class="btn btn-o btn-sm" style="margin-top:6px" onclick="downloadDefaultWordTemplate()">📥 Tải mẫu Word mặc định</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- TAB: PREVIEW -->
-  <div id="rptpl-preview" style="display:none">
-    <div class="card">
-      <div class="card-hd"><div class="card-title">👁️ Xem trước Tiêu đề Báo cáo</div>
-        <div class="bg">
-          <button class="btn btn-p btn-sm" onclick="saveRptTemplate()">💾 Lưu & Phát hành</button>
-          <button class="btn btn-o btn-sm" onclick="renderRptPreview()">🔄 Làm mới</button>
-        </div>
-      </div>
-      <div id="rptpl-preview-content" style="border:1px solid var(--border-2);border-radius:var(--r-sm);padding:20px;background:#fff;font-family:'Times New Roman',serif;font-size:13px;line-height:1.8">
-        <!-- Rendered by JS -->
-      </div>
     </div>
   </div>
 </div>
@@ -1639,12 +1506,11 @@ body.is-admin .admin-only-flex{display:flex!important}
 <div class="pg" id="pg-hdsd">
   <div class="help-hero">
     <h1 style="font-family:'Lexend Deca',sans-serif;font-weight:800;font-size:18px;margin-bottom:6px">📖 Hướng dẫn sử dụng KSNK Pro v7</h1>
-    <p style="font-size:12.5px;opacity:.85">Tài liệu hướng dẫn đầy đủ · Phiên bản 7.0 · Cập nhật 2026 · Bấm vào từng mục để xem chi tiết</p>
+    <p style="font-size:12.5px;opacity:.85">Tài liệu hướng dẫn đầy đủ · Bấm vào từng mục để xem chi tiết</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
       <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:3px 10px;font-size:11px">QĐ 6858/QĐ-BYT</span>
       <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:3px 10px;font-size:11px">TT 16/2018/TT-BYT</span>
-      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:3px 10px;font-size:11px">Hệ thống đa người dùng</span>
-      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:3px 10px;font-size:11px">Mẫu báo cáo tùy chỉnh</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:3px 10px;font-size:11px">Phiên bản 7.0 · 2025</span>
     </div>
   </div>
 
@@ -1653,19 +1519,19 @@ body.is-admin .admin-only-flex{display:flex!important}
     <div class="card-hd"><div class="card-title">🗂️ Mục lục nhanh</div></div>
     <div class="help-toc">
       <button class="help-toc-btn" onclick="helpScrollTo('hs-start')"><span class="help-toc-ic">🚀</span>Bắt đầu nhanh</button>
-      <button class="help-toc-btn" onclick="helpScrollTo('hs-users')"><span class="help-toc-ic">👥</span>Đăng nhập & Tài khoản</button>
       <button class="help-toc-btn" onclick="helpScrollTo('hs-bangkiem')"><span class="help-toc-ic">📋</span>Bảng kiểm giám sát</button>
       <button class="help-toc-btn" onclick="helpScrollTo('hs-c4')"><span class="help-toc-ic">🏛️</span>Đánh giá tiêu chí C4</button>
       <button class="help-toc-btn" onclick="helpScrollTo('hs-nkbv')"><span class="help-toc-ic">🦠</span>Ghi nhận NKBV</button>
       <button class="help-toc-btn" onclick="helpScrollTo('hs-baocao')"><span class="help-toc-ic">📊</span>Báo cáo & Xuất dữ liệu</button>
-      <button class="help-toc-btn" onclick="helpScrollTo('hs-rptpl')"><span class="help-toc-ic">📝</span>Mẫu báo cáo (Admin)</button>
       <button class="help-toc-btn" onclick="helpScrollTo('hs-gsheets')"><span class="help-toc-ic">☁️</span>Đồng bộ Google Sheets</button>
       <button class="help-toc-btn" onclick="helpScrollTo('hs-admin')"><span class="help-toc-ic">⚙️</span>Quản trị & Cấu hình</button>
       <button class="help-toc-btn" onclick="helpScrollTo('hs-backup')"><span class="help-toc-ic">💾</span>Sao lưu & Khôi phục</button>
       <button class="help-toc-btn" onclick="helpScrollTo('hs-mobile')"><span class="help-toc-ic">📱</span>Dùng trên điện thoại</button>
       <button class="help-toc-btn" onclick="helpScrollTo('hs-faq')"><span class="help-toc-ic">❓</span>Câu hỏi thường gặp</button>
+      <button class="help-toc-btn" onclick="helpScrollTo('hs-cautruc')"><span class="help-toc-ic">🗂️</span>Cấu trúc dữ liệu</button>
+      <button class="help-toc-btn" onclick="helpScrollTo('hs-phapluat')"><span class="help-toc-ic">⚖️</span>Căn cứ pháp lý</button>
     </div>
-    <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">
+    <div style="display:flex;gap:8px;margin-top:4px">
       <button class="btn btn-o btn-sm" onclick="document.querySelectorAll('.help-section').forEach(s=>s.classList.add('open'))">📂 Mở tất cả</button>
       <button class="btn btn-o btn-sm" onclick="document.querySelectorAll('.help-section').forEach(s=>s.classList.remove('open'))">📁 Đóng tất cả</button>
       <button class="btn btn-o btn-sm" onclick="window.print()">🖨️ In hướng dẫn</button>
@@ -1673,54 +1539,51 @@ body.is-admin .admin-only-flex{display:flex!important}
   </div>
 
   <!-- 1. Bắt đầu nhanh -->
-  <div class="help-section open" id="hs-start">
+  <div class="help-section" id="hs-start">
     <div class="help-section-hd" onclick="toggleHelp(this)">
       <span class="help-section-ic">🚀</span>
       <span class="help-section-title">1. Bắt đầu nhanh (Quick Start – 5 phút)</span>
       <span class="help-section-arrow">▼</span>
     </div>
     <div class="help-section-body">
-      <div class="help-tip"><span>💡</span><span>KSNK Pro v7 chạy hoàn toàn trên trình duyệt web — không cần cài đặt, không cần internet liên tục. Chỉ cần mở file HTML là dùng được ngay trên mọi thiết bị!</span></div>
-      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-body"><div class="help-step-title">Đăng nhập vào hệ thống</div><div class="help-step-desc">Trang đầu tiên là màn hình đăng nhập. Nhập <b>tên đăng nhập</b> (số CMND/CCCD hoặc "admin") và <b>mật khẩu</b> → Bấm <b>Đăng nhập</b>. Tài khoản do Admin cấp. Mật khẩu mặc định: <b>bvps@123</b>.</div></div></div>
-      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body"><div class="help-step-title">Cấu hình hệ thống (Admin làm 1 lần)</div><div class="help-step-desc">Admin vào <b>Quản trị / Cấu hình</b> → Nhập tên BV, Sở YT, Khoa KSNK → Thêm danh sách khoa phòng → Bấm <b>"Lưu & Phát hành"</b>. Cấu hình này sẽ tự động áp dụng cho tất cả tài khoản.</div></div></div>
-      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body"><div class="help-step-title">Nhập phiếu giám sát đầu tiên</div><div class="help-step-desc">Chọn loại bảng kiểm từ menu trái hoặc nút "Nhập liệu nhanh" → Điền thông tin người giám sát, chọn khoa, ngày giờ → Tích chọn kết quả từng tiêu chí → Bấm <b>Lưu phiếu</b>. Hệ thống tự tính tỷ lệ tuân thủ ngay.</div></div></div>
-      <div class="help-step"><div class="help-step-num">4</div><div class="help-step-body"><div class="help-step-title">Xem Bảng điều khiển (Dashboard)</div><div class="help-step-desc">Bảng điều khiển hiển thị tổng số phiếu, tỷ lệ tuân thủ trung bình, số ca NKBV và điểm C4. Biểu đồ cập nhật tự động theo dữ liệu đã nhập.</div></div></div>
-      <div class="help-step"><div class="help-step-num">5</div><div class="help-step-body"><div class="help-step-title">Xuất báo cáo định kỳ</div><div class="help-step-desc">Vào <b>Tạo & Xuất báo cáo</b> → Chọn khoảng thời gian → Bấm <b>Tạo báo cáo</b> → Xuất Excel, PDF hoặc Word. Tiêu đề và mẫu báo cáo theo cấu hình Admin đã thiết lập.</div></div></div>
-      <div class="help-warn"><span>⚠️</span><span>Dữ liệu lưu trong bộ nhớ trình duyệt (localStorage). Xóa cache trình duyệt hoặc dùng chế độ ẩn danh sẽ mất dữ liệu! Hãy thường xuyên xuất backup JSON hoặc kết nối Google Sheets để sao lưu tự động.</span></div>
+      <div class="help-tip"><span>💡</span><span>KSNK Pro v7 chạy hoàn toàn trên trình duyệt. Không cần cài đặt, không cần internet để nhập liệu. Chỉ cần mở file HTML là dùng được ngay!</span></div>
+      <div class="help-step">
+        <div class="help-step-num">1</div>
+        <div class="help-step-body">
+          <div class="help-step-title">Cấu hình thông tin đơn vị</div>
+          <div class="help-step-desc">Vào menu <b>Quản trị / Cấu hình</b> → Nhập tên bệnh viện, sở y tế, khoa KSNK → Thêm danh sách khoa/phòng của đơn vị → Bấm <b>Lưu cấu hình</b>. Chỉ cần làm một lần.</div>
+        </div>
+      </div>
+      <div class="help-step">
+        <div class="help-step-num">2</div>
+        <div class="help-step-body">
+          <div class="help-step-title">Nhập phiếu giám sát đầu tiên</div>
+          <div class="help-step-desc">Chọn loại bảng kiểm từ menu bên trái hoặc nút "Nhập liệu nhanh" trên Bảng điều khiển → Điền thông tin người thực hiện, khoa, ngày giờ → Tích chọn các tiêu chí quan sát → Bấm <b>Lưu phiếu giám sát</b>.</div>
+        </div>
+      </div>
+      <div class="help-step">
+        <div class="help-step-num">3</div>
+        <div class="help-step-body">
+          <div class="help-step-title">Xem kết quả trên Bảng điều khiển</div>
+          <div class="help-step-desc">Vào <b>Bảng điều khiển</b> để xem tổng quan: tỷ lệ tuân thủ, số phiếu hôm nay, biểu đồ so sánh các loại bảng kiểm, điểm C4 trung bình và số ca NKBV.</div>
+        </div>
+      </div>
+      <div class="help-step">
+        <div class="help-step-num">4</div>
+        <div class="help-step-body">
+          <div class="help-step-title">Xuất báo cáo định kỳ</div>
+          <div class="help-step-desc">Vào <b>Tạo & Xuất báo cáo</b> → Chọn khoảng thời gian → Bấm <b>Tạo báo cáo</b> → Sau đó bấm <b>Xuất Excel</b>, <b>Xuất PDF</b> hoặc <b>Xuất Word</b> để tải về máy.</div>
+        </div>
+      </div>
+      <div class="help-warn"><span>⚠️</span><span>Dữ liệu lưu trong bộ nhớ trình duyệt (localStorage). Xóa cache trình duyệt sẽ mất dữ liệu! Hãy thường xuyên xuất backup JSON hoặc kết nối Google Sheets để sao lưu tự động.</span></div>
     </div>
   </div>
 
-  <!-- 2. Đăng nhập & Tài khoản -->
-  <div class="help-section" id="hs-users">
-    <div class="help-section-hd" onclick="toggleHelp(this)">
-      <span class="help-section-ic">👥</span>
-      <span class="help-section-title">2. Đăng nhập & Quản lý tài khoản</span>
-      <span class="help-section-arrow">▼</span>
-    </div>
-    <div class="help-section-body">
-      <div class="help-tip"><span>💡</span><span>KSNK Pro v7 có hệ thống <b>đa người dùng</b> với 3 cấp vai trò. Admin cấu hình một lần — mọi tài khoản khác tự động nhận cấu hình khi đăng nhập.</span></div>
-      <table class="help-table">
-        <thead><tr><th>Vai trò</th><th>Quyền hạn</th><th>Trang được truy cập</th></tr></thead>
-        <tbody>
-          <tr><td>👑 <b>Admin</b></td><td>Toàn quyền hệ thống</td><td>Tất cả trang + Quản trị + GSheets + Mẫu BC + Nhật ký</td></tr>
-          <tr><td>🔍 <b>Giám sát viên</b></td><td>Nhập liệu + xem báo cáo</td><td>Tất cả trang nhập liệu và báo cáo</td></tr>
-          <tr><td>👤 <b>Người dùng</b></td><td>Nhập liệu cơ bản</td><td>Bảng kiểm, C4, NKBV, Dashboard</td></tr>
-        </tbody>
-      </table>
-      <p style="font-size:13px;font-weight:700;margin:14px 0 8px">Quy trình đăng nhập lần đầu</p>
-      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-body"><div class="help-step-title">Admin tạo tài khoản</div><div class="help-step-desc">Admin vào <b>Quản lý người dùng</b> → Bấm <b>+ Thêm người dùng</b> → Nhập họ tên, số CMND/CCCD (làm tên đăng nhập), chọn khoa và vai trò → Bấm Tạo. Mật khẩu mặc định: <b>bvps@123</b>. Hoặc dùng <b>Nhập hàng loạt</b> từ file Excel mẫu.</div></div></div>
-      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body"><div class="help-step-title">Người dùng đăng nhập và đổi mật khẩu</div><div class="help-step-desc">Đăng nhập bằng số CMND/CCCD + mật khẩu mặc định → Hệ thống sẽ nhắc đổi mật khẩu mới. Bấm vào avatar góc trên phải → <b>Đổi mật khẩu</b>.</div></div></div>
-      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body"><div class="help-step-title">Cấu hình tự động được tải</div><div class="help-step-desc">Ngay sau đăng nhập, hệ thống tự động tải cấu hình bệnh viện, danh sách khoa phòng và kết nối Google Sheets do Admin đã cài đặt. Không cần thao tác cấu hình thêm.</div></div></div>
-      <p style="font-size:13px;font-weight:700;margin:14px 0 8px">Yêu cầu cấp tài khoản (tự phục vụ)</p>
-      <div class="help-step"><div class="help-step-num">📩</div><div class="help-step-body"><div class="help-step-title">Gửi yêu cầu cấp tài khoản</div><div class="help-step-desc">Tại màn hình đăng nhập → Bấm <b>Yêu cầu cấp / reset tài khoản</b> → Điền thông tin → Gửi yêu cầu. Admin sẽ nhận được yêu cầu trong trang <b>Quản lý người dùng → Yêu cầu chờ xử lý</b>.</div></div></div>
-    </div>
-  </div>
-
-  <!-- 3. Bảng kiểm -->
+  <!-- 2. Bảng kiểm -->
   <div class="help-section" id="hs-bangkiem">
     <div class="help-section-hd" onclick="toggleHelp(this)">
       <span class="help-section-ic">📋</span>
-      <span class="help-section-title">3. Nhập phiếu Bảng kiểm Giám sát (4 loại)</span>
+      <span class="help-section-title">2. Nhập phiếu Bảng kiểm Giám sát (4 loại)</span>
       <span class="help-section-arrow">▼</span>
     </div>
     <div class="help-section-body">
@@ -1728,201 +1591,173 @@ body.is-admin .admin-only-flex{display:flex!important}
       <table class="help-table">
         <thead><tr><th>Biểu tượng</th><th>Loại bảng kiểm</th><th>Số tiêu chí</th><th>Đặc điểm</th></tr></thead>
         <tbody>
-          <tr><td>🖐️</td><td><b>Giám sát Vệ sinh tay</b></td><td>8 tiêu chí</td><td>Ghi nhận Chỉ định & Động tác theo WHO 5 moments. Có thể thêm nhiều chỉ định trong 1 phiếu.</td></tr>
-          <tr><td>🩹</td><td><b>Thay băng vết mổ</b></td><td>11 tiêu chí</td><td>Có mã vết mổ/mã NB để theo dõi xuyên suốt.</td></tr>
-          <tr><td>💧</td><td><b>Giám sát Truyền dịch</b></td><td>12 tiêu chí</td><td>Theo dõi kỹ thuật đặt kim, sát trùng, cố định.</td></tr>
-          <tr><td>💉</td><td><b>Giám sát Tiêm thuốc</b></td><td>12 tiêu chí</td><td>Bao gồm kiểm tra thuốc, kỹ thuật tiêm và xử lý sau tiêm.</td></tr>
+          <tr><td>🖐️</td><td><b>Giám sát Vệ sinh tay</b></td><td>8 tiêu chí</td><td>Có thêm mục ghi nhận Chỉ định & Động tác rửa tay (WHO 5 moments)</td></tr>
+          <tr><td>🩹</td><td><b>Thay băng vết mổ</b></td><td>11 tiêu chí</td><td>Có mã vết mổ để theo dõi xuyên suốt</td></tr>
+          <tr><td>💧</td><td><b>Giám sát Truyền dịch</b></td><td>12 tiêu chí</td><td>Có mã truyền dịch, theo dõi kỹ thuật đặt kim</td></tr>
+          <tr><td>💉</td><td><b>Giám sát Tiêm thuốc</b></td><td>12 tiêu chí</td><td>Bao gồm kiểm tra thuốc, kỹ thuật tiêm và xử lý sau tiêm</td></tr>
         </tbody>
       </table>
-      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-body"><div class="help-step-title">Điền thông tin người giám sát</div><div class="help-step-desc">Chọn loại nhân viên thực hiện giám sát, chọn khoa/phòng từ danh sách (do Admin cấu hình), ngày giờ quan sát (mặc định là hiện tại). Người giám sát KSNK điền tên vào ô tương ứng.</div></div></div>
-      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body"><div class="help-step-title">Ghi nhận kết quả từng tiêu chí</div><div class="help-step-desc">Với mỗi tiêu chí, bấm <span class="help-badge help-badge-green">Có</span> nếu tuân thủ đúng, hoặc <span class="help-badge help-badge-red">Không</span> nếu không tuân thủ. Cần chọn một trong hai cho mỗi tiêu chí trước khi lưu.</div></div></div>
-      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body"><div class="help-step-title">Đặc biệt Rửa tay: Thêm Chỉ định quan sát</div><div class="help-step-desc">Bấm <b>+ Thêm chỉ định</b> → Chọn thời điểm WHO (5 moments) và động tác thực hiện. Có thể thêm nhiều chỉ định trong một phiếu để ghi nhận đầy đủ lần quan sát.</div></div></div>
-      <div class="help-step"><div class="help-step-num">4</div><div class="help-step-body"><div class="help-step-title">Lưu phiếu</div><div class="help-step-desc">Bấm <b>Lưu phiếu giám sát</b>. Hệ thống tự động tính tỷ lệ tuân thủ (%) và lưu vào dữ liệu. Nếu đã cài đặt "Đồng bộ ngay khi lưu", phiếu sẽ tự động lên Google Sheets.</div></div></div>
-      <div class="help-tip"><span>💡</span><span><b>Đọc kết quả:</b> ≥80% = ✅ Đạt | 60–79% = ⚠️ Cần cải thiện | &lt;60% = ❌ Chưa đạt. Kết quả hiển thị ngay sau khi lưu và cập nhật trên Dashboard.</span></div>
+      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-body"><div class="help-step-title">Điền thông tin người quan sát</div><div class="help-step-desc">Nhập tên người thực hiện giám sát, chọn khoa/phòng từ danh sách, chọn ngày giờ quan sát (mặc định là hiện tại).</div></div></div>
+      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body"><div class="help-step-title">Ghi nhận kết quả từng tiêu chí</div><div class="help-step-desc">Với mỗi tiêu chí, bấm <span class="help-badge help-badge-green">Có</span> nếu quan sát thấy tuân thủ đúng, hoặc <span class="help-badge help-badge-red">Không</span> nếu không tuân thủ. Mỗi tiêu chí phải chọn một trong hai.</div></div></div>
+      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body"><div class="help-step-title">Đặc biệt với Rửa tay: Thêm Chỉ định quan sát</div><div class="help-step-desc">Bấm <b>+ Thêm chỉ định</b> để ghi nhận từng lần rửa tay quan sát được: chọn thời điểm WHO (5 moments) và động tác thực hiện. Có thể thêm nhiều chỉ định trong một phiếu.</div></div></div>
+      <div class="help-step"><div class="help-step-num">4</div><div class="help-step-body"><div class="help-step-title">Lưu phiếu</div><div class="help-step-desc">Bấm <b>Lưu phiếu giám sát</b>. Hệ thống tự động tính tỷ lệ tuân thủ (%) và hiển thị thông báo kết quả. Dữ liệu được lưu ngay vào bộ nhớ máy.</div></div></div>
+      <div class="help-tip"><span>💡</span><span><b>Cách đọc kết quả:</b> ≥80% = Đạt (xanh), 60–79% = Cần cải thiện (vàng), &lt;60% = Chưa đạt (đỏ).</span></div>
     </div>
   </div>
 
-  <!-- 4. Đánh giá C4 -->
+  <!-- 3. Đánh giá C4 -->
   <div class="help-section" id="hs-c4">
     <div class="help-section-hd" onclick="toggleHelp(this)">
       <span class="help-section-ic">🏛️</span>
-      <span class="help-section-title">4. Tự đánh giá Tiêu chí C4 (QĐ 6858/QĐ-BYT)</span>
+      <span class="help-section-title">3. Tự đánh giá Tiêu chí C4 (QĐ 6858/QĐ-BYT)</span>
       <span class="help-section-arrow">▼</span>
     </div>
     <div class="help-section-body">
-      <p style="font-size:12.5px;color:var(--text-2);margin-bottom:12px">Chương C4 theo <b>QĐ 6858/QĐ-BYT ngày 18/11/2016</b> gồm 6 tiêu chí đánh giá từ <b>Mức 1 (thấp nhất)</b> đến <b>Mức 5 (xuất sắc)</b>:</p>
+      <p style="font-size:12.5px;color:var(--text-2);margin-bottom:12px">Chương C4 theo <b>Quyết định 6858/QĐ-BYT ngày 18/11/2016</b> gồm 6 tiêu chí đánh giá từ <b>Mức 1 (thấp nhất)</b> đến <b>Mức 5 (xuất sắc)</b>:</p>
       <table class="help-table">
         <thead><tr><th>Tiêu chí</th><th>Nội dung</th><th>Căn cứ pháp lý</th></tr></thead>
         <tbody>
           <tr><td><b>C4.1</b></td><td>Thiết lập hệ thống KSNK</td><td>TT 16/2018 Điều 17-18</td></tr>
           <tr><td><b>C4.2</b></td><td>Xây dựng quy trình KSNK</td><td>TT 16/2018 Điều 5, 19</td></tr>
           <tr><td><b>C4.3</b></td><td>Triển khai vệ sinh tay</td><td>TT 16/2018 Điều 6; WHO</td></tr>
-          <tr><td><b>C4.4</b></td><td>Giám sát KSNK & NKBV</td><td>TT 16/2018 Điều 4, 7, 20</td></tr>
-          <tr><td><b>C4.5</b></td><td>Quản lý chất thải rắn y tế</td><td>TT 20/2021/TT-BYT-BTNMT</td></tr>
-          <tr><td><b>C4.6</b></td><td>Quản lý chất thải lỏng y tế</td><td>QCVN 28:2010/BTNMT</td></tr>
+          <tr><td><b>C4.4</b></td><td>Giám sát KSNK & NKBV</td><td>TT 16/2018 Điều 7</td></tr>
+          <tr><td><b>C4.5</b></td><td>Quản lý chất thải rắn</td><td>TT 20/2021/TT-BYT-BTNMT</td></tr>
+          <tr><td><b>C4.6</b></td><td>Quản lý chất thải lỏng</td><td>QCVN 28:2010/BTNMT</td></tr>
         </tbody>
       </table>
-      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-body"><div class="help-step-title">Chọn tiêu chí cần đánh giá</div><div class="help-step-desc">Vào menu <b>Tiêu chí C4</b> bên trái → Chọn C4.1 đến C4.6. Mỗi tiêu chí có trang riêng với đầy đủ mô tả từng mức.</div></div></div>
-      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body"><div class="help-step-title">Đọc kỹ từng mức và tích chọn</div><div class="help-step-desc"><b>⚠️ Lưu ý quan trọng:</b> Mức 1 (đỏ) là <b>âm tính / nghiêm trọng</b> — nếu có bất kỳ hạng mục Mức 1 xảy ra, bệnh viện bị xếp Mức 1 bất kể các mức khác. Từ Mức 2–5, đánh dấu tất cả hạng mục đã thực hiện đầy đủ.</div></div></div>
-      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body"><div class="help-step-title">Bấm "Tính điểm & Lưu đánh giá"</div><div class="help-step-desc">Hệ thống tự tính mức đạt được (1–5/5). Kết quả được lưu vào lịch sử và hiển thị trên Dashboard với màu sắc tương ứng. Mức ≥3 = Đạt; Mức 4–5 = Tốt và Xuất sắc.</div></div></div>
-      <div class="help-tip"><span>💡</span><span>Sau khi đánh giá tất cả 6 tiêu chí, vào <b>Thống kê so sánh → Tab Điểm C4</b> để xem biểu đồ radar tổng hợp — rất hữu ích cho báo cáo Hội đồng Chất lượng bệnh viện.</span></div>
-      <div class="help-warn"><span>⚠️</span><span>Đánh giá C4 nên thực hiện <b>ít nhất 4 lần/năm</b> và trước mỗi đợt kiểm tra chất lượng bệnh viện.</span></div>
+      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-body"><div class="help-step-title">Chọn tiêu chí cần đánh giá</div><div class="help-step-desc">Vào menu Tiêu chí C4 → Chọn C4.1 đến C4.6. Mỗi tiêu chí là một trang riêng biệt.</div></div></div>
+      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body"><div class="help-step-title">Đọc kỹ từng mức và tích chọn</div><div class="help-step-desc"><b>Lưu ý quan trọng:</b> Mức 1 (màu đỏ) là <b>âm tính</b> — nếu có bất kỳ hạng mục nào ở Mức 1 xảy ra, bệnh viện bị xếp Mức 1 (không đạt), bất kể các mức khác. Với Mức 2–5, tích chọn tất cả hạng mục đã thực hiện đầy đủ.</div></div></div>
+      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body"><div class="help-step-title">Bấm "Tính điểm & Lưu"</div><div class="help-step-desc">Hệ thống tự động tính mức đạt được (1–5/5) và lưu vào lịch sử. Kết quả hiển thị ngay với màu sắc tương ứng (đỏ→tím) và nhận xét đánh giá.</div></div></div>
+      <div class="help-tip"><span>💡</span><span>Sau khi đánh giá tất cả 6 tiêu chí, vào <b>Thống kê so sánh</b> để xem biểu đồ radar tổng hợp điểm C4 — rất hữu ích cho báo cáo Hội đồng Chất lượng.</span></div>
+      <div class="help-warn"><span>⚠️</span><span>Đánh giá tiêu chí C4 nên thực hiện định kỳ <b>ít nhất 4 lần/năm</b> theo quy định và trước mỗi đợt kiểm tra chất lượng bệnh viện.</span></div>
     </div>
   </div>
 
-  <!-- 5. NKBV -->
+  <!-- 4. NKBV -->
   <div class="help-section" id="hs-nkbv">
     <div class="help-section-hd" onclick="toggleHelp(this)">
       <span class="help-section-ic">🦠</span>
-      <span class="help-section-title">5. Ghi nhận ca Nhiễm khuẩn Bệnh viện (NKBV) & Vi sinh</span>
+      <span class="help-section-title">4. Ghi nhận ca Nhiễm khuẩn Bệnh viện (NKBV)</span>
       <span class="help-section-arrow">▼</span>
     </div>
     <div class="help-section-body">
-      <p style="font-size:12.5px;color:var(--text-2);margin-bottom:12px">Module NKBV hỗ trợ ghi nhận theo <b>phân loại chuẩn quốc tế CDC/NHSN 2022</b>:</p>
+      <p style="font-size:12.5px;color:var(--text-2);margin-bottom:12px">Module NKBV hỗ trợ ghi nhận các loại nhiễm khuẩn bệnh viện theo <b>phân loại chuẩn quốc tế CDC/WHO</b>:</p>
       <table class="help-table">
         <thead><tr><th>Loại NKBV</th><th>Tên đầy đủ</th><th>Yếu tố nguy cơ chính</th></tr></thead>
         <tbody>
           <tr><td><b>NKVM</b></td><td>Nhiễm khuẩn vết mổ (SSI)</td><td>Phẫu thuật, vệ sinh da, thời gian mổ</td></tr>
           <tr><td><b>CLABSI</b></td><td>NK huyết liên quan catheter TM trung tâm</td><td>CVC, thời gian lưu catheter</td></tr>
-          <tr><td><b>CAUTI</b></td><td>NK tiết niệu liên quan sonde</td><td>Sonde niệu đạo, thời gian lưu</td></tr>
+          <tr><td><b>CAUTI</b></td><td>NK tiết niệu liên quan catheter</td><td>Sonde niệu đạo, thời gian lưu sonde</td></tr>
           <tr><td><b>VAP</b></td><td>Viêm phổi liên quan thở máy</td><td>Nội khí quản, thở máy xâm lấn</td></tr>
+          <tr><td><b>Khác</b></td><td>Các loại NKBV khác</td><td>Tùy từng ca</td></tr>
         </tbody>
       </table>
-      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-body"><div class="help-step-title">Điền thông tin hành chính ca NKBV</div><div class="help-step-desc">Chọn Khoa, Loại NKBV, Ngày nhập viện, Ngày phát hiện → Hệ thống tự tính số ngày từ NV đến phát hiện (≥2 ngày = NKBV, &lt;2 ngày cần xem xét NK cộng đồng).</div></div></div>
-      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body"><div class="help-step-title">Chọn yếu tố nguy cơ</div><div class="help-step-desc">Tích chọn các yếu tố nguy cơ. Một số tự động được tích theo loại NKBV (VD: CAUTI → tự tích "Có sonde tiểu"). Ghi nhận kết quả cấy vi khuẩn, tên vi khuẩn, tình trạng đề kháng KS.</div></div></div>
-      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body"><div class="help-step-title">Ghi nhận Vi sinh môi trường</div><div class="help-step-desc">Vào <b>Vi sinh môi trường</b> → Nhập kết quả xét nghiệm vi sinh bề mặt, không khí, nước, dụng cụ y tế, bàn tay NVYT. Đây là yêu cầu bắt buộc theo C4.4 — giám sát vi sinh định kỳ ≥6 tháng/lần với phòng mổ, ICU, NICU.</div></div></div>
-      <div class="help-step"><div class="help-step-num">4</div><div class="help-step-body"><div class="help-step-title">Xem Báo cáo & Xu hướng NKBV</div><div class="help-step-desc">Vào <b>Báo cáo & Xu hướng NKBV</b> → Nhập mẫu số (tổng NB ra viện, ngày-thiết bị) → Hệ thống vẽ biểu đồ xu hướng, phân bố theo khoa, loại vi khuẩn và tính mật độ mới mắc (per 1000 device-days).</div></div></div>
+      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-body"><div class="help-step-title">Điền thông tin hành chính</div><div class="help-step-desc">Nhập: Khoa phòng, loại NKBV, ngày nhập viện, ngày phát hiện, mã bệnh nhân (tùy chọn), tuổi, giới tính, chẩn đoán nhập viện.</div></div></div>
+      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body"><div class="help-step-title">Chọn yếu tố nguy cơ</div><div class="help-step-desc">Tích chọn các yếu tố nguy cơ liên quan. Một số yếu tố sẽ được tự động tích theo loại NKBV chọn (VD: chọn CAUTI → tự tích "Có sonde tiểu").</div></div></div>
+      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body"><div class="help-step-title">Nhập kết quả vi sinh (nếu có)</div><div class="help-step-desc">Chọn kết quả cấy (Âm tính/Dương tính/Chờ kết quả), nhập tên vi khuẩn phân lập, tình trạng đề kháng kháng sinh (MDR/XDR/PDR), tình trạng xác nhận ca bệnh.</div></div></div>
+      <div class="help-step"><div class="help-step-num">4</div><div class="help-step-body"><div class="help-step-title">Lưu và theo dõi</div><div class="help-step-desc">Bấm <b>Lưu ca NKBV</b>. Ca bệnh được lưu vào danh sách và tự động cập nhật vào báo cáo NKBV năm. Vào <b>Báo cáo & Xu hướng NKBV</b> để xem phân tích tổng hợp.</div></div></div>
+      <div class="help-tip"><span>💡</span><span>Số ngày từ nhập viện đến phát hiện NKBV được tính tự động. Ca NKBV có xác nhận chính thức được đếm riêng trong thống kê.</span></div>
     </div>
   </div>
 
-  <!-- 6. Báo cáo -->
+  <!-- 5. Báo cáo -->
   <div class="help-section" id="hs-baocao">
     <div class="help-section-hd" onclick="toggleHelp(this)">
       <span class="help-section-ic">📊</span>
-      <span class="help-section-title">6. Tạo Báo cáo & Xuất dữ liệu</span>
+      <span class="help-section-title">5. Tạo Báo cáo & Xuất dữ liệu</span>
       <span class="help-section-arrow">▼</span>
     </div>
     <div class="help-section-body">
-      <p style="font-size:12.5px;color:var(--text-2);margin-bottom:12px">Phần mềm hỗ trợ xuất nhiều định dạng báo cáo:</p>
+      <p style="font-size:12.5px;color:var(--text-2);margin-bottom:12px">Phần mềm hỗ trợ xuất nhiều định dạng báo cáo phục vụ các mục đích khác nhau:</p>
       <table class="help-table">
         <thead><tr><th>Định dạng</th><th>Mục đích</th><th>Ghi chú</th></tr></thead>
         <tbody>
-          <tr><td>📊 <b>Excel (.xlsx)</b></td><td>Phân tích số liệu, lưu trữ dài hạn</td><td>Đầy đủ dữ liệu chi tiết từng phiếu, nhiều sheet</td></tr>
+          <tr><td>📊 <b>Excel (.xlsx)</b></td><td>Phân tích số liệu, lưu trữ dài hạn</td><td>Đầy đủ dữ liệu chi tiết từng phiếu</td></tr>
           <tr><td>📄 <b>PDF</b></td><td>In ấn, trình ký, lưu hồ sơ</td><td>Cần tạo báo cáo trước khi xuất PDF</td></tr>
-          <tr><td>📝 <b>Word (.doc)</b></td><td>Chỉnh sửa, bổ sung nội dung</td><td>Dùng được với MS Word/Google Docs</td></tr>
+          <tr><td>📝 <b>Word (.doc)</b></td><td>Chỉnh sửa, bổ sung thêm nội dung</td><td>Mở được bằng MS Word/Google Docs</td></tr>
           <tr><td>💾 <b>JSON</b></td><td>Backup toàn bộ dữ liệu hệ thống</td><td>Dùng để khôi phục khi cần</td></tr>
         </tbody>
       </table>
-      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-body"><div class="help-step-title">Chọn khoảng thời gian báo cáo</div><div class="help-step-desc">Vào <b>Tạo & Xuất báo cáo</b> → Dùng nút chọn nhanh: Tháng này, Tháng trước, Quý 1–4, Cả năm; hoặc chọn từ ngày / đến ngày tùy ý.</div></div></div>
-      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body"><div class="help-step-title">Lọc theo loại bảng kiểm và khoa</div><div class="help-step-desc">Chọn "Tất cả" hoặc lọc theo loại bảng kiểm cụ thể (Rửa tay, Thay băng...) và khoa/phòng cần báo cáo.</div></div></div>
-      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body"><div class="help-step-title">Nhập nhận xét và thông tin ký tên</div><div class="help-step-desc">Điền các phần nhận xét (Chung, Ưu điểm, Tồn tại, Kiến nghị) và tên người ký. <b>Lưu ý:</b> Nếu Admin đã thiết lập mẫu nhận xét mặc định, các ô sẽ được điền sẵn — có thể chỉnh sửa thêm.</div></div></div>
-      <div class="help-step"><div class="help-step-num">4</div><div class="help-step-body"><div class="help-step-title">Tạo và xuất báo cáo</div><div class="help-step-desc">Bấm <b>Tạo báo cáo</b> → Xem trước nội dung → Chọn định dạng xuất. <b>Tiêu đề báo cáo, ký tên, footer</b> tự động dùng mẫu Admin đã cấu hình trong <b>Mẫu Báo cáo (Admin)</b>.</div></div></div>
+      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-body"><div class="help-step-title">Chọn khoảng thời gian báo cáo</div><div class="help-step-desc">Vào <b>Tạo & Xuất báo cáo</b> → Chọn từ ngày / đến ngày hoặc dùng các nút chọn nhanh: Tháng này, Tháng trước, Quý 1-4, Cả năm.</div></div></div>
+      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body"><div class="help-step-title">Lọc theo loại bảng kiểm và khoa</div><div class="help-step-desc">Chọn "Tất cả" hoặc lọc theo loại bảng kiểm cụ thể và khoa/phòng cần báo cáo.</div></div></div>
+      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body"><div class="help-step-title">Nhập nhận xét và ký tên</div><div class="help-step-desc">Điền vào các ô: Nhận xét chung, Ưu điểm, Tồn tại/Hạn chế, Kiến nghị/Giải pháp. Nhập tên người ký. Các nội dung này sẽ xuất hiện trong báo cáo.</div></div></div>
+      <div class="help-step"><div class="help-step-num">4</div><div class="help-step-body"><div class="help-step-title">Tạo và xuất báo cáo</div><div class="help-step-desc">Bấm <b>Tạo báo cáo</b> → Xem trước nội dung → Chọn định dạng xuất phù hợp. Báo cáo Excel (<b>Dữ liệu đã nhập → Xuất Excel</b>) xuất toàn bộ dữ liệu không phụ thuộc vào bộ lọc.</div></div></div>
     </div>
   </div>
 
-  <!-- 7. Mẫu báo cáo Admin -->
-  <div class="help-section" id="hs-rptpl">
-    <div class="help-section-hd" onclick="toggleHelp(this)">
-      <span class="help-section-ic">📝</span>
-      <span class="help-section-title">7. Mẫu Báo cáo — Admin thiết lập</span>
-      <span class="help-section-arrow">▼</span>
-    </div>
-    <div class="help-section-body">
-      <div class="help-tip"><span>💡</span><span>Đây là tính năng mới của v7. Admin cấu hình mẫu báo cáo <b>một lần</b> — tất cả người dùng khi xuất báo cáo sẽ tự động dùng mẫu này. Không cần chỉnh sửa tiêu đề báo cáo mỗi lần.</span></div>
-      <table class="help-table">
-        <thead><tr><th>Tab</th><th>Chức năng</th></tr></thead>
-        <tbody>
-          <tr><td>🏥 Tiêu đề & Header</td><td>Tên Bộ/Sở, Bệnh viện, Khoa, tiêu đề chính, căn cứ pháp lý, logo</td></tr>
-          <tr><td>📋 Trường thông tin</td><td>Bật/tắt từng phần trong báo cáo (tổng quan, chi tiết C4, NKBV...), nội dung mẫu nhận xét mặc định</td></tr>
-          <tr><td>✍️ Ký tên & Footer</td><td>Cấu hình 3 vị trí ký tên, chức danh, dòng căn cứ pháp lý cuối trang</td></tr>
-          <tr><td>📤 Upload mẫu Word</td><td>Upload file Word mẫu của bệnh viện — hệ thống trích xuất và điền tự động vào các trường</td></tr>
-          <tr><td>👁️ Xem trước</td><td>Preview tiêu đề và cấu trúc báo cáo theo cấu hình hiện tại</td></tr>
-        </tbody>
-      </table>
-      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-body"><div class="help-step-title">Admin vào trang Mẫu Báo cáo</div><div class="help-step-desc">Sidebar → <b>Mẫu Báo cáo (Admin)</b>. Trang này chỉ hiện với tài khoản Admin.</div></div></div>
-      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body"><div class="help-step-title">Điền thông tin tiêu đề</div><div class="help-step-desc">Tab <b>Tiêu đề & Header</b> → Điền tên Bộ/Sở, Bệnh viện, Khoa, địa danh ký, tiêu đề báo cáo. Tích chọn "Hiển thị dòng CHXHCN" nếu là báo cáo hành chính.</div></div></div>
-      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body"><div class="help-step-title">Cấu hình ký tên và nội dung mẫu</div><div class="help-step-desc">Tab <b>Trường thông tin</b> → Bật/tắt các phần cần xuất. Tab <b>Ký tên & Footer</b> → Điền chức danh 3 vị trí ký. Có thể để trống nếu không cần.</div></div></div>
-      <div class="help-step"><div class="help-step-num">4</div><div class="help-step-body"><div class="help-step-title">Upload mẫu Word có sẵn (tùy chọn)</div><div class="help-step-desc">Tab <b>Upload mẫu Word</b> → Kéo thả hoặc chọn file .docx mẫu của bệnh viện → Hệ thống tự trích xuất tên BV, Khoa, tiêu đề → Bấm <b>Áp dụng vào mẫu</b>. Hoặc bấm <b>Tải mẫu Word mặc định</b> về chỉnh sửa rồi upload lại.</div></div></div>
-      <div class="help-step"><div class="help-step-num">5</div><div class="help-step-body"><div class="help-step-title">Lưu & Phát hành</div><div class="help-step-desc">Bấm <b>💾 Lưu & Phát hành</b> ở bất kỳ tab nào → Mẫu được lưu và phát hành cho tất cả người dùng ngay lập tức. Tab <b>Xem trước</b> để kiểm tra kết quả trước khi lưu.</div></div></div>
-    </div>
-  </div>
-
-  <!-- 8. Google Sheets -->
+  <!-- 6. Google Sheets -->
   <div class="help-section" id="hs-gsheets">
     <div class="help-section-hd" onclick="toggleHelp(this)">
       <span class="help-section-ic">☁️</span>
-      <span class="help-section-title">8. Kết nối & Đồng bộ Google Sheets (Admin)</span>
+      <span class="help-section-title">6. Kết nối & Đồng bộ Google Sheets</span>
       <span class="help-section-arrow">▼</span>
     </div>
     <div class="help-section-body">
-      <div class="help-tip"><span>💡</span><span>Admin cấu hình kết nối GSheets <b>một lần</b>. Tất cả người dùng sẽ tự động được đồng bộ mà không cần upload lại SA Key hay nhập Spreadsheet ID. Không bắt buộc — phần mềm hoạt động đầy đủ khi offline.</span></div>
-      <p style="font-size:13px;font-weight:700;margin:12px 0 8px">Bước 1: Tạo Service Account (1 lần, tại máy Admin)</p>
-      <div class="help-code">1. Vào https://console.cloud.google.com → Tạo project mới
-2. APIs & Services → Library → Bật "Google Sheets API"
-3. IAM & Admin → Service Accounts → Create Service Account
-4. Tạo Key → Loại JSON → Tải file JSON về máy Admin</div>
-      <p style="font-size:13px;font-weight:700;margin:12px 0 8px">Bước 2: Tạo Google Sheets & cấp quyền</p>
+      <div class="help-tip"><span>💡</span><span>Tính năng này dùng để sao lưu dữ liệu lên cloud và cho phép lãnh đạo bệnh viện xem số liệu từ xa qua Google Sheets. Không bắt buộc — phần mềm hoạt động đầy đủ khi offline.</span></div>
+      <p style="font-size:13px;font-weight:700;margin:12px 0 8px">Bước 1: Tạo Service Account (thực hiện 1 lần)</p>
+      <div class="help-code">1. Vào https://console.cloud.google.com
+2. Tạo project mới → Bật API "Google Sheets API"
+3. Vào IAM & Admin → Service Accounts → Tạo mới
+4. Tạo Key → Chọn JSON → Tải file JSON về máy</div>
+      <p style="font-size:13px;font-weight:700;margin:12px 0 8px">Bước 2: Tạo Google Sheets và chia sẻ</p>
       <div class="help-code">1. Tạo Google Sheets mới tại sheets.google.com
 2. Copy ID từ URL: .../spreadsheets/d/[ID]/edit
-3. Bấm "Chia sẻ" → Nhập email của Service Account (client_email trong JSON)
+3. Bấm Chia sẻ → Nhập email của Service Account
 4. Cấp quyền "Người chỉnh sửa" (Editor)</div>
-      <p style="font-size:13px;font-weight:700;margin:12px 0 8px">Bước 3: Cấu hình trong phần mềm (Admin)</p>
-      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-body"><div class="help-step-title">Nạp Service Account Key</div><div class="help-step-desc">Vào <b>Kết nối Google Sheets</b> → Kéo thả hoặc bấm chọn file JSON → Phần mềm xác nhận "Đã nạp thành công". SA Key được chia sẻ tự động cho tất cả người dùng (được mã hóa nhẹ).</div></div></div>
-      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body"><div class="help-step-title">Nhập Spreadsheet ID và lưu</div><div class="help-step-desc">Dán ID từ URL Google Sheets vào ô Spreadsheet ID → Cấu hình tùy chọn đồng bộ (tự động / thủ công) → Bấm <b>"Lưu & Phát hành cho tất cả"</b>. Cấu hình GSheets này sẽ được phân phối tự động.</div></div></div>
-      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body"><div class="help-step-title">Tạo cấu trúc Sheet và kiểm tra</div><div class="help-step-desc">Bấm <b>Tạo cấu trúc Sheet</b> (chỉ cần 1 lần đầu) → <b>Kiểm tra kết nối</b> → Nếu thành công bấm <b>Đồng bộ ngay</b>. Kết quả kiểm tra hiện trong ô log bên dưới.</div></div></div>
-      <div class="help-warn"><span>⚠️</span><span>File JSON Service Account là thông tin bảo mật. Không chia sẻ với người khác ngoài phần mềm. SA Key được lưu mã hóa nhẹ trong localStorage và không đưa vào file backup JSON thông thường.</span></div>
+      <p style="font-size:13px;font-weight:700;margin:12px 0 8px">Bước 3: Cấu hình trong phần mềm</p>
+      <div class="help-step"><div class="help-step-num">1</div><div class="help-step-body"><div class="help-step-title">Nạp Service Account Key</div><div class="help-step-desc">Vào <b>Kết nối Google Sheets</b> → Kéo thả hoặc chọn file JSON key → Phần mềm xác nhận "Đã nạp thành công".</div></div></div>
+      <div class="help-step"><div class="help-step-num">2</div><div class="help-step-body"><div class="help-step-title">Nhập Spreadsheet ID</div><div class="help-step-desc">Dán ID từ URL Google Sheets vào ô Spreadsheet ID → Bấm Lưu cấu hình.</div></div></div>
+      <div class="help-step"><div class="help-step-num">3</div><div class="help-step-body"><div class="help-step-title">Tạo cấu trúc Sheet và kiểm tra</div><div class="help-step-desc">Bấm <b>Tạo cấu trúc Sheet</b> (chỉ cần làm lần đầu) → Bấm <b>Kiểm tra kết nối</b> → Nếu thành công, bấm <b>Đồng bộ ngay</b>.</div></div></div>
+      <div class="help-warn"><span>⚠️</span><span>File JSON Service Account là thông tin bảo mật. Không chia sẻ với người khác. Phần mềm lưu file key tách biệt (ksnk_sa_key) và không đưa vào backup JSON thông thường.</span></div>
     </div>
   </div>
 
-  <!-- 9. Quản trị -->
+  <!-- 7. Admin -->
   <div class="help-section" id="hs-admin">
     <div class="help-section-hd" onclick="toggleHelp(this)">
       <span class="help-section-ic">⚙️</span>
-      <span class="help-section-title">9. Quản trị & Cấu hình hệ thống (Admin)</span>
+      <span class="help-section-title">7. Quản trị & Cấu hình hệ thống</span>
       <span class="help-section-arrow">▼</span>
     </div>
     <div class="help-section-body">
-      <div class="help-tip"><span>💡</span><span>Trang Quản trị chỉ Admin mới truy cập được. Mọi thay đổi cấu hình ở đây sẽ được <b>tự động phát hành cho tất cả người dùng</b> — không cần thao tác gì thêm trên từng thiết bị.</span></div>
       <table class="help-table">
-        <thead><tr><th>Chức năng</th><th>Mô tả</th><th>Ghi chú</th></tr></thead>
+        <thead><tr><th>Chức năng</th><th>Mô tả</th><th>Lưu ý</th></tr></thead>
         <tbody>
-          <tr><td>🏥 Thông tin đơn vị</td><td>Tên BV, Sở YT, Khoa KSNK — hiện trên báo cáo và Dashboard</td><td>Phát hành ngay khi lưu</td></tr>
-          <tr><td>🏢 Danh mục khoa/phòng</td><td>Thêm/xóa khoa — hiện trong dropdown chọn khoa ở tất cả form</td><td>Phát hành ngay khi thêm/xóa</td></tr>
-          <tr><td>⚙️ Xuất/Tải cấu hình</td><td>Xuất file JSON cấu hình để dự phòng hoặc nhân rộng sang BV khác</td><td>Khi tải vào BV khác sẽ phát hành ngay</td></tr>
-          <tr><td>📊 Tóm tắt dữ liệu</td><td>Số phiếu giám sát theo từng loại bảng kiểm</td><td>Chỉ đọc</td></tr>
-          <tr><td>👥 Quản lý người dùng</td><td>Tạo/sửa/xóa tài khoản, reset mật khẩu, nhập hàng loạt</td><td>Nhật ký ghi nhận mọi thay đổi</td></tr>
-          <tr><td>📋 Nhật ký thao tác</td><td>Lịch sử đăng nhập, lưu phiếu, đồng bộ của tất cả user</td><td>Tối đa 2000 dòng, xuất Excel</td></tr>
-          <tr><td>🗑️ Xóa toàn bộ dữ liệu</td><td>Xóa toàn bộ phiếu giám sát và đánh giá C4</td><td>Không thể hoàn tác — backup trước!</td></tr>
+          <tr><td>🏥 Tên BV / Đơn vị</td><td>Tên xuất hiện trong báo cáo, dashboard</td><td>Thay đổi áp dụng ngay</td></tr>
+          <tr><td>🏢 Khoa / Phòng</td><td>Danh sách khoa phòng trong dropdown</td><td>Có thể thêm/xóa từng khoa</td></tr>
+          <tr><td>📊 Thống kê tổng quan</td><td>Số phiếu theo từng loại bảng kiểm</td><td>Chỉ đọc</td></tr>
+          <tr><td>🗑️ Xóa toàn bộ</td><td>Xóa tất cả phiếu giám sát và đánh giá C4</td><td>Không thể hoàn tác!</td></tr>
+          <tr><td>🔄 Reset sync</td><td>Đánh dấu tất cả phiếu chờ đồng bộ lại</td><td>Dùng khi Sheet bị lỗi</td></tr>
         </tbody>
       </table>
+      <div class="help-warn"><span>⚠️</span><span>Chức năng <b>Xóa toàn bộ</b> sẽ xóa vĩnh viễn tất cả dữ liệu trong máy. Hãy xuất backup JSON trước khi thực hiện!</span></div>
     </div>
   </div>
 
-  <!-- 10. Backup -->
+  <!-- 8. Backup -->
   <div class="help-section" id="hs-backup">
     <div class="help-section-hd" onclick="toggleHelp(this)">
       <span class="help-section-ic">💾</span>
-      <span class="help-section-title">10. Sao lưu & Khôi phục dữ liệu</span>
+      <span class="help-section-title">8. Sao lưu & Khôi phục dữ liệu</span>
       <span class="help-section-arrow">▼</span>
     </div>
     <div class="help-section-body">
-      <div class="help-tip"><span>💡</span><span>Khuyến nghị: Xuất backup JSON <b>ít nhất 1 lần/tuần</b> và lưu ở 2 nơi (máy tính + USB hoặc Google Drive). Kết nối Google Sheets là phương thức sao lưu tự động tốt nhất.</span></div>
-      <div class="help-step"><div class="help-step-num">↑</div><div class="help-step-body"><div class="help-step-title">Xuất backup (Export JSON)</div><div class="help-step-desc">Vào <b>Dữ liệu đã nhập</b> → Bấm <b>Xuất Backup JSON</b>. File JSON được tải về máy, chứa toàn bộ phiếu giám sát, đánh giá C4, ca NKBV, vi sinh và cấu hình hệ thống (không chứa SA Key).</div></div></div>
-      <div class="help-step"><div class="help-step-num">↓</div><div class="help-step-body"><div class="help-step-title">Khôi phục (Import JSON)</div><div class="help-step-desc">Vào <b>Quản trị / Cấu hình</b> → Bấm <b>Import Backup</b> → Chọn file JSON đã lưu. <b>Cảnh báo:</b> Dữ liệu hiện tại sẽ bị ghi đè hoàn toàn.</div></div></div>
-      <div class="help-step"><div class="help-step-num">⚙️</div><div class="help-step-body"><div class="help-step-title">Xuất/Tải cấu hình hệ thống</div><div class="help-step-desc">Vào <b>Quản trị → Cấu hình hệ thống → Xuất cấu hình</b> để lưu file cấu hình riêng biệt (tên BV, khoa phòng, cài đặt GSheets, danh sách user). Dùng để nhân rộng nhanh sang bệnh viện khác.</div></div></div>
-      <div class="help-step"><div class="help-step-num">☁</div><div class="help-step-body"><div class="help-step-title">Sao lưu tự động qua Google Sheets</div><div class="help-step-desc">Khi Admin đã kết nối Google Sheets, dữ liệu từ tất cả thiết bị được đồng bộ lên cloud theo chu kỳ cấu hình (mặc định 10 phút). Đây là phương thức sao lưu an toàn và tự động nhất.</div></div></div>
+      <div class="help-tip"><span>💡</span><span>Khuyến nghị: Xuất backup JSON <b>ít nhất 1 lần/tuần</b> và lưu ở 2 nơi (máy tính + USB hoặc Google Drive).</span></div>
+      <div class="help-step"><div class="help-step-num">↑</div><div class="help-step-body"><div class="help-step-title">Xuất backup (Export JSON)</div><div class="help-step-desc">Vào <b>Dữ liệu đã nhập</b> → Bấm <b>Xuất Backup JSON</b>. File JSON được tải về máy tính, chứa toàn bộ phiếu giám sát, đánh giá C4, ca NKBV, vi sinh và cấu hình hệ thống.</div></div></div>
+      <div class="help-step"><div class="help-step-num">↓</div><div class="help-step-body"><div class="help-step-title">Khôi phục (Import JSON)</div><div class="help-step-desc">Vào <b>Quản trị / Cấu hình</b> → Bấm <b>Import Backup</b> → Chọn file JSON đã lưu. <b>Lưu ý:</b> Dữ liệu hiện tại sẽ bị ghi đè hoàn toàn bởi dữ liệu trong file backup.</div></div></div>
+      <div class="help-step"><div class="help-step-num">☁</div><div class="help-step-body"><div class="help-step-title">Sao lưu tự động qua Google Sheets</div><div class="help-step-desc">Khi kết nối Google Sheets, dữ liệu được đồng bộ lên cloud tự động theo chu kỳ cấu hình (mặc định 10 phút). Đây là phương thức sao lưu an toàn nhất.</div></div></div>
     </div>
   </div>
 
-  <!-- 11. Mobile -->
+  <!-- 9. Mobile -->
   <div class="help-section" id="hs-mobile">
     <div class="help-section-hd" onclick="toggleHelp(this)">
       <span class="help-section-ic">📱</span>
-      <span class="help-section-title">11. Sử dụng trên Điện thoại / Máy tính bảng</span>
+      <span class="help-section-title">9. Sử dụng trên Điện thoại / Máy tính bảng</span>
       <span class="help-section-arrow">▼</span>
     </div>
     <div class="help-section-body">
-      <div class="help-tip"><span>💡</span><span>KSNK Pro v7 được thiết kế <b>Mobile-First</b> — hoạt động tốt nhất trên Chrome Mobile (Android) và Safari (iOS). Không cần cài đặt app — chỉ cần mở file HTML trên trình duyệt là dùng được!</span></div>
+      <div class="help-tip"><span>💡</span><span>KSNK Pro v7 được thiết kế Mobile-First — hoạt động tốt nhất trên Chrome Mobile (Android) và Safari (iOS). Khuyến nghị dùng điện thoại màn hình ≥5.5".</span></div>
       <table class="help-table">
         <thead><tr><th>Trình duyệt</th><th>Hỗ trợ</th><th>Ghi chú</th></tr></thead>
         <tbody>
@@ -1933,9 +1768,60 @@ body.is-admin .admin-only-flex{display:flex!important}
           <tr><td>UC Browser / Cốc Cốc</td><td>⚠️ Hạn chế</td><td>Có thể gặp lỗi localStorage</td></tr>
         </tbody>
       </table>
-      <div class="help-step"><div class="help-step-num">📌</div><div class="help-step-body"><div class="help-step-title">Ghim vào màn hình chính (Homescreen)</div><div class="help-step-desc"><b>Android/Chrome:</b> Menu (⋮) → Thêm vào màn hình chính. <b>iPhone/Safari:</b> Nút Chia sẻ (↑) → Thêm vào Màn hình chính. Sau đó mở dùng như app bình thường (có thể dùng offline)!</div></div></div>
-      <div class="help-step"><div class="help-step-num">🔐</div><div class="help-step-body"><div class="help-step-title">Đăng nhập trên mobile — không cần cấu hình lại</div><div class="help-step-desc">Mở file HTML → Đăng nhập bằng tài khoản → Phần mềm tự động tải cấu hình bệnh viện, danh sách khoa và cài đặt GSheets từ Admin. Không cần upload SA Key hay nhập Spreadsheet ID trên điện thoại.</div></div></div>
-      <div class="help-step"><div class="help-step-num">☰</div><div class="help-step-body"><div class="help-step-title">Điều hướng trên màn hình nhỏ</div><div class="help-step-desc">Dùng <b>thanh điều hướng phía dưới</b> (Bottom Navigation) để chuyển nhanh giữa: Dashboard, Rửa tay, NKBV, Báo cáo, Hướng dẫn. Bấm ☰ Menu để mở sidebar đầy đủ.</div></div></div>
+      <div class="help-step"><div class="help-step-num">📌</div><div class="help-step-body"><div class="help-step-title">Ghim vào màn hình chính (Homescreen)</div><div class="help-step-desc"><b>Android/Chrome:</b> Menu (⋮) → Thêm vào màn hình chính. <b>iPhone/Safari:</b> Nút Chia sẻ (↑) → Thêm vào Màn hình chính. Sau đó dùng như app bình thường!</div></div></div>
+      <div class="help-step"><div class="help-step-num">📶</div><div class="help-step-body"><div class="help-step-title">Sử dụng khi không có internet</div><div class="help-step-desc">Mở file HTML một lần khi có internet để trình duyệt cache các tài nguyên. Sau đó có thể dùng hoàn toàn offline. Khi có internet trở lại, dữ liệu sẽ tự đồng bộ nếu đã cấu hình Google Sheets.</div></div></div>
+      <div class="help-step"><div class="help-step-num">☰</div><div class="help-step-body"><div class="help-step-title">Điều hướng trên màn hình nhỏ</div><div class="help-step-desc">Dùng thanh điều hướng phía dưới (Bottom Navigation) để chuyển nhanh giữa các trang chính. Bấm nút ☰ Menu để mở sidebar đầy đủ với tất cả chức năng.</div></div></div>
+    </div>
+  </div>
+
+  <!-- 10. Cấu trúc dữ liệu -->
+  <div class="help-section" id="hs-cautruc">
+    <div class="help-section-hd" onclick="toggleHelp(this)">
+      <span class="help-section-ic">🗂️</span>
+      <span class="help-section-title">10. Cấu trúc dữ liệu & Bảo mật thông tin</span>
+      <span class="help-section-arrow">▼</span>
+    </div>
+    <div class="help-section-body">
+      <p style="font-size:12.5px;color:var(--text-2);margin-bottom:10px">KSNK Pro v7 lưu dữ liệu trong <b>localStorage</b> của trình duyệt với các thư viện bản quyền mở:</p>
+      <table class="help-table">
+        <thead><tr><th>Thư viện</th><th>Phiên bản</th><th>Giấy phép</th><th>Chức năng</th></tr></thead>
+        <tbody>
+          <tr><td>Chart.js</td><td>v4.4.1</td><td>MIT</td><td>Biểu đồ phân tích</td></tr>
+          <tr><td>SheetJS (xlsx)</td><td>v0.18.5</td><td>Apache 2.0</td><td>Xuất file Excel</td></tr>
+          <tr><td>html2pdf.js</td><td>v0.10.1</td><td>MIT</td><td>Xuất file PDF</td></tr>
+          <tr><td>Google Fonts</td><td>Latest</td><td>SIL OFL 1.1</td><td>Font chữ UI</td></tr>
+        </tbody>
+      </table>
+      <div class="security-grid">
+        <div class="security-item">🔒 Không chứa thông tin định danh cá nhân bệnh nhân</div>
+        <div class="security-item">🔒 SA Key lưu tách biệt, không trong backup</div>
+        <div class="security-item">🔒 Không gửi dữ liệu ra ngoài ngoài Google Sheets</div>
+        <div class="security-item">🔒 Chạy offline hoàn toàn khi không có internet</div>
+      </div>
+      <div class="data-stats" id="hdsd-stats"></div>
+    </div>
+  </div>
+
+  <!-- 11. Pháp lý -->
+  <div class="help-section" id="hs-phapluat">
+    <div class="help-section-hd" onclick="toggleHelp(this)">
+      <span class="help-section-ic">⚖️</span>
+      <span class="help-section-title">11. Căn cứ pháp lý & Tiêu chuẩn tham chiếu</span>
+      <span class="help-section-arrow">▼</span>
+    </div>
+    <div class="help-section-body">
+      <table class="help-table">
+        <thead><tr><th>Văn bản</th><th>Nội dung</th><th>Áp dụng cho</th></tr></thead>
+        <tbody>
+          <tr><td><b>QĐ 6858/QĐ-BYT</b><br>18/11/2016</td><td>Bộ tiêu chí Chất lượng Bệnh viện Việt Nam – Chương C4 (6 tiêu chí)</td><td>Đánh giá C4.1–C4.6</td></tr>
+          <tr><td><b>TT 16/2018/TT-BYT</b></td><td>Kiểm soát nhiễm khuẩn trong cơ sở khám bệnh, chữa bệnh</td><td>Bảng kiểm, quy trình KSNK</td></tr>
+          <tr><td><b>TT 18/2009/TT-BYT</b></td><td>Hướng dẫn tổ chức thực hiện công tác kiểm soát nhiễm khuẩn</td><td>Tổ chức KSNK (C4.1, C4.2)</td></tr>
+          <tr><td><b>TT 20/2021/TT-BYT-BTNMT</b></td><td>Quy định quản lý, xử lý chất thải y tế</td><td>C4.5, C4.6</td></tr>
+          <tr><td><b>QCVN 28:2010/BTNMT</b></td><td>Quy chuẩn kỹ thuật quốc gia về nước thải y tế</td><td>C4.6</td></tr>
+          <tr><td><b>WHO Hand Hygiene</b><br>Guidelines 2009</td><td>5 thời điểm vệ sinh tay (My 5 Moments) – WHO</td><td>Bảng kiểm Rửa tay (C4.3)</td></tr>
+          <tr><td><b>CDC/NHSN 2022</b></td><td>Định nghĩa và phân loại NKBV (NKVM, CLABSI, CAUTI, VAP)</td><td>Module Ghi nhận NKBV (C4.4)</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
@@ -1949,99 +1835,36 @@ body.is-admin .admin-only-flex{display:flex!important}
     <div class="help-section-body">
       <div class="help-faq" id="faq1">
         <div class="help-faq-q" onclick="toggleFaq('faq1')">Tôi có thể dùng phần mềm trên nhiều điện thoại cùng lúc không? <span>+</span></div>
-        <div class="help-faq-a">Có. Mỗi thiết bị lưu dữ liệu riêng trong trình duyệt của nó. Để tổng hợp vào 1 nơi, Admin kết nối Google Sheets — tất cả thiết bị sẽ đồng bộ lên cùng 1 Sheet. Cấu hình bệnh viện, khoa phòng và GSheets chỉ cần Admin thiết lập 1 lần — các thiết bị khác tự tải về khi đăng nhập.</div>
+        <div class="help-faq-a">Có, nhưng mỗi thiết bị sẽ có dữ liệu riêng (lưu trong localStorage của từng trình duyệt). Để tổng hợp dữ liệu từ nhiều thiết bị, hãy kết nối Google Sheets — dữ liệu từ tất cả thiết bị sẽ được gửi lên cùng một Sheet. Hoặc xuất JSON từ từng thiết bị và import vào máy chủ.</div>
       </div>
       <div class="help-faq" id="faq2">
-        <div class="help-faq-q" onclick="toggleFaq('faq2')">Nhân viên mới dùng trên điện thoại có phải cài đặt lại không? <span>+</span></div>
-        <div class="help-faq-a">Không. Chỉ cần: (1) Admin cấp tài khoản, (2) Nhân viên mở file HTML trên điện thoại và đăng nhập. Toàn bộ cấu hình bệnh viện, danh sách khoa, kết nối GSheets sẽ tự động được tải về — không cần thao tác cấu hình thêm.</div>
+        <div class="help-faq-q" onclick="toggleFaq('faq2')">Dữ liệu có bị mất khi cập nhật file phần mềm mới không? <span>+</span></div>
+        <div class="help-faq-a">Không bị mất, miễn là dùng cùng trình duyệt trên cùng máy tính. Dữ liệu lưu trong localStorage với tên khóa 'ksnk_v7', độc lập với file HTML. Tuy nhiên, nếu xóa cache trình duyệt hoặc dùng trình duyệt ở chế độ ẩn danh (Incognito) thì dữ liệu sẽ bị mất.</div>
       </div>
       <div class="help-faq" id="faq3">
-        <div class="help-faq-q" onclick="toggleFaq('faq3')">Làm sao tùy chỉnh tiêu đề báo cáo theo đặc thù bệnh viện? <span>+</span></div>
-        <div class="help-faq-a">Admin vào <b>Mẫu Báo cáo (Admin)</b> → Tab Tiêu đề & Header → Điền tên Bộ/Sở, Bệnh viện, Khoa, địa danh ký, tiêu đề báo cáo, căn cứ pháp lý. Bấm Lưu & Phát hành. Từ đó mọi báo cáo xuất ra sẽ dùng mẫu này. Có thể upload file Word mẫu sẵn có của bệnh viện để tự động trích xuất thông tin.</div>
+        <div class="help-faq-q" onclick="toggleFaq('faq3')">Dung lượng lưu trữ tối đa là bao nhiêu? <span>+</span></div>
+        <div class="help-faq-a">Giới hạn localStorage của trình duyệt thường là 5–10MB tùy trình duyệt. Phần mềm sẽ hiển thị cảnh báo khi dữ liệu đạt ~85% giới hạn. Mỗi phiếu giám sát chiếm khoảng 1–2KB, nghĩa là có thể lưu khoảng 2.500–5.000 phiếu trước khi cần dọn dẹp. Khuyến nghị xuất backup và xóa dữ liệu cũ định kỳ mỗi năm.</div>
       </div>
       <div class="help-faq" id="faq4">
         <div class="help-faq-q" onclick="toggleFaq('faq4')">Phần mềm có hoạt động được khi không có internet không? <span>+</span></div>
-        <div class="help-faq-a">Có, hoàn toàn. Nhập liệu, xem báo cáo, tính toán và lưu trữ đều hoạt động offline. Chỉ đồng bộ Google Sheets mới cần internet. Phần mềm hiển thị thông báo "Ngoại tuyến" khi mất kết nối và tự đồng bộ lại khi có internet.</div>
+        <div class="help-faq-a">Có, hoàn toàn. Tất cả chức năng nhập liệu, xem báo cáo, tính toán và lưu trữ đều hoạt động offline. Chỉ có tính năng đồng bộ Google Sheets mới cần kết nối internet. Phần mềm tự động phát hiện khi mất kết nối và hiển thị thông báo "Ngoại tuyến".</div>
       </div>
       <div class="help-faq" id="faq5">
-        <div class="help-faq-q" onclick="toggleFaq('faq5')">Dữ liệu có bị mất khi cập nhật file phần mềm mới không? <span>+</span></div>
-        <div class="help-faq-a">Không, miễn là dùng cùng trình duyệt trên cùng máy. Dữ liệu lưu trong localStorage với key 'ksnk_v7', độc lập với file HTML. Cài đặt mới hơn (v7.1, v8...) vẫn đọc được dữ liệu cũ. Nhưng nếu xóa cache trình duyệt hoặc dùng trình duyệt ẩn danh thì dữ liệu sẽ mất.</div>
+        <div class="help-faq-q" onclick="toggleFaq('faq5')">Làm thế nào để chuyển dữ liệu sang máy tính khác? <span>+</span></div>
+        <div class="help-faq-a">Có 2 cách: (1) Xuất backup JSON từ máy cũ → Copy file JSON → Import vào phần mềm trên máy mới. (2) Kết nối Google Sheets — dữ liệu đã đồng bộ lên cloud, mở phần mềm trên máy mới và kết nối lại cùng Google Sheets.</div>
       </div>
       <div class="help-faq" id="faq6">
-        <div class="help-faq-q" onclick="toggleFaq('faq6')">Dung lượng lưu trữ tối đa là bao nhiêu? <span>+</span></div>
-        <div class="help-faq-a">Giới hạn localStorage thường là 5–10MB. Phần mềm cảnh báo khi dữ liệu đạt ~85% giới hạn. Mỗi phiếu giám sát chiếm ~1–2KB, tức khoảng 2.500–5.000 phiếu trước khi cần dọn dẹp. Khuyến nghị xuất backup và xóa dữ liệu cũ định kỳ mỗi năm.</div>
+        <div class="help-faq-q" onclick="toggleFaq('faq6')">Tôi có thể thêm khoa phòng mới mà không phải nhập lại dữ liệu cũ không? <span>+</span></div>
+        <div class="help-faq-a">Có. Vào Quản trị / Cấu hình → Nhập tên khoa mới → Thêm khoa. Khoa mới sẽ xuất hiện trong tất cả dropdown chọn khoa. Dữ liệu cũ gắn với khoa cũ không bị ảnh hưởng.</div>
       </div>
       <div class="help-faq" id="faq7">
-        <div class="help-faq-q" onclick="toggleFaq('faq7')">Sao tôi thấy lỗi "Token" khi đồng bộ Google Sheets? <span>+</span></div>
-        <div class="help-faq-a">Nguyên nhân thường gặp: (1) File JSON SA Key hết hạn hoặc bị thu hồi → Tạo key mới từ Google Cloud Console. (2) Google Sheets chưa được chia sẻ với email Service Account → Kiểm tra quyền Chia sẻ. (3) Google Sheets API chưa được bật → Vào Google Cloud Console → APIs → Enable Sheets API.</div>
+        <div class="help-faq-q" onclick="toggleFaq('faq7')">Biểu đồ không hiển thị đúng trên điện thoại cũ, phải làm sao? <span>+</span></div>
+        <div class="help-faq-a">Thử: (1) Cập nhật trình duyệt Chrome lên phiên bản mới nhất. (2) Xoay điện thoại nằm ngang để xem biểu đồ tốt hơn. (3) Dùng máy tính để xem biểu đồ phức tạp. (4) Nếu dùng UC Browser hoặc trình duyệt cũ, chuyển sang Chrome hoặc Firefox.</div>
       </div>
       <div class="help-faq" id="faq8">
-        <div class="help-faq-q" onclick="toggleFaq('faq8')">Làm thế nào để nhân rộng phần mềm sang bệnh viện khác? <span>+</span></div>
-        <div class="help-faq-a">Chỉ cần: (1) Copy file HTML sang bệnh viện mới. (2) Admin mới đăng nhập, vào <b>Quản trị → Cấu hình hệ thống → Xuất cấu hình</b> từ BV gốc. (3) Tại BV mới, Admin <b>Tải cấu hình</b> → Hệ thống tự điền thông tin BV mới và danh sách user. Chỉnh sửa tên BV phù hợp rồi Lưu & Phát hành là xong.</div>
+        <div class="help-faq-q" onclick="toggleFaq('faq8')">Sao tôi thấy thông báo "Lỗi token" khi đồng bộ Google Sheets? <span>+</span></div>
+        <div class="help-faq-a">Nguyên nhân thường gặp: (1) File JSON Service Account đã hết hạn hoặc bị thu hồi → Tạo key mới từ Google Cloud Console. (2) Google Sheets chưa được chia sẻ với email của Service Account → Kiểm tra lại quyền Chia sẻ. (3) Google Sheets API chưa được bật trong project → Vào Google Cloud Console → APIs → Enable Sheets API.</div>
       </div>
-    </div>
-  </div>
-
-  <!-- 13. Cấu trúc dữ liệu -->
-  <div class="help-section" id="hs-cautruc">
-    <div class="help-section-hd" onclick="toggleHelp(this)">
-      <span class="help-section-ic">🗂️</span>
-      <span class="help-section-title">13. Cấu trúc dữ liệu & Bảo mật thông tin</span>
-      <span class="help-section-arrow">▼</span>
-    </div>
-    <div class="help-section-body">
-      <p style="font-size:12.5px;color:var(--text-2);margin-bottom:10px">KSNK Pro v7 lưu dữ liệu trong <b>localStorage</b> của trình duyệt với các key sau:</p>
-      <table class="help-table">
-        <thead><tr><th>Key localStorage</th><th>Nội dung</th><th>Phạm vi</th></tr></thead>
-        <tbody>
-          <tr><td><code>ksnk_v7</code></td><td>Dữ liệu chính: phiếu giám sát, C4, NKBV, vi sinh, cấu hình</td><td>Local thiết bị</td></tr>
-          <tr><td><code>ksnk_shared_cfg_v7</code></td><td>Cấu hình chia sẻ: tên BV, khoa phòng — Admin ghi, mọi user đọc</td><td>Chia sẻ toàn hệ thống</td></tr>
-          <tr><td><code>ksnk_shared_gs_v7</code></td><td>Cấu hình GSheets chia sẻ: SpreadsheetID, autoSync</td><td>Chia sẻ toàn hệ thống</td></tr>
-          <tr><td><code>ksnk_shared_sa_v7</code></td><td>SA Key (mã hóa btoa) — Admin ghi, mọi user dùng để sync</td><td>Chia sẻ toàn hệ thống</td></tr>
-          <tr><td><code>ksnk_shared_rpt_v7</code></td><td>Mẫu báo cáo chia sẻ — Admin cấu hình, xuất báo cáo dùng</td><td>Chia sẻ toàn hệ thống</td></tr>
-          <tr><td><code>ksnk_users_v7</code></td><td>Danh sách tài khoản (mật khẩu đã hash)</td><td>Local thiết bị Admin</td></tr>
-          <tr><td><code>ksnk_session_v7</code></td><td>Session đăng nhập hiện tại (sessionStorage)</td><td>Tab trình duyệt</td></tr>
-        </tbody>
-      </table>
-      <table class="help-table" style="margin-top:12px">
-        <thead><tr><th>Thư viện</th><th>Phiên bản</th><th>Giấy phép</th><th>Chức năng</th></tr></thead>
-        <tbody>
-          <tr><td>Chart.js</td><td>v4.4.1</td><td>MIT</td><td>Biểu đồ phân tích</td></tr>
-          <tr><td>SheetJS (xlsx)</td><td>v0.18.5</td><td>Apache 2.0</td><td>Xuất file Excel</td></tr>
-          <tr><td>html2pdf.js</td><td>v0.10.1</td><td>MIT</td><td>Xuất file PDF</td></tr>
-          <tr><td>Google Fonts</td><td>Latest</td><td>SIL OFL 1.1</td><td>Font chữ UI</td></tr>
-        </tbody>
-      </table>
-      <div class="security-grid" style="margin-top:10px">
-        <div class="security-item">🔒 Không chứa thông tin định danh cá nhân bệnh nhân</div>
-        <div class="security-item">🔒 SA Key mã hóa btoa khi lưu shared</div>
-        <div class="security-item">🔒 Mật khẩu người dùng hash btoa+salt</div>
-        <div class="security-item">🔒 Không gửi dữ liệu ra ngoài ngoài Google Sheets đã cấu hình</div>
-      </div>
-      <div class="data-stats" id="hdsd-stats"></div>
-    </div>
-  </div>
-
-  <!-- 14. Pháp lý -->
-  <div class="help-section" id="hs-phapluat">
-    <div class="help-section-hd" onclick="toggleHelp(this)">
-      <span class="help-section-ic">⚖️</span>
-      <span class="help-section-title">14. Căn cứ pháp lý & Tiêu chuẩn tham chiếu</span>
-      <span class="help-section-arrow">▼</span>
-    </div>
-    <div class="help-section-body">
-      <table class="help-table">
-        <thead><tr><th>Văn bản</th><th>Nội dung</th><th>Áp dụng cho</th></tr></thead>
-        <tbody>
-          <tr><td><b>QĐ 6858/QĐ-BYT</b><br>18/11/2016</td><td>Bộ tiêu chí Chất lượng Bệnh viện Việt Nam – Chương C4 (6 tiêu chí C4.1–C4.6)</td><td>Đánh giá C4.1–C4.6</td></tr>
-          <tr><td><b>TT 16/2018/TT-BYT</b></td><td>Kiểm soát nhiễm khuẩn trong cơ sở khám bệnh, chữa bệnh</td><td>Bảng kiểm, quy trình KSNK</td></tr>
-          <tr><td><b>TT 18/2009/TT-BYT</b></td><td>Hướng dẫn tổ chức thực hiện công tác kiểm soát nhiễm khuẩn</td><td>Tổ chức KSNK (C4.1, C4.2)</td></tr>
-          <tr><td><b>TT 20/2021/TT-BYT-BTNMT</b></td><td>Quy định quản lý, xử lý chất thải y tế</td><td>C4.5, C4.6</td></tr>
-          <tr><td><b>QCVN 28:2010/BTNMT</b></td><td>Quy chuẩn kỹ thuật quốc gia về nước thải y tế</td><td>C4.6</td></tr>
-          <tr><td><b>WHO Hand Hygiene</b><br>Guidelines 2009</td><td>5 thời điểm vệ sinh tay (My 5 Moments) – WHO</td><td>Bảng kiểm Rửa tay (C4.3)</td></tr>
-          <tr><td><b>CDC/NHSN 2022</b></td><td>Định nghĩa và phân loại NKBV (NKVM, CLABSI, CAUTI, VAP)</td><td>Module Ghi nhận NKBV (C4.4)</td></tr>
-        </tbody>
-      </table>
     </div>
   </div>
 
@@ -2049,16 +1872,14 @@ body.is-admin .admin-only-flex{display:flex!important}
   <div class="card" style="text-align:center;padding:20px">
     <div style="font-size:32px;margin-bottom:8px">🏥</div>
     <div style="font-family:'Lexend Deca',sans-serif;font-weight:700;font-size:15px;color:var(--navy);margin-bottom:6px">KSNK Pro v7.0</div>
-    <div style="font-size:12px;color:var(--text-3);margin-bottom:10px">Hệ thống Giám sát Kiểm soát Nhiễm khuẩn Bệnh viện<br>Phát triển bởi: Khoa Kiểm soát Nhiễm khuẩn · Bệnh viện Đa khoa Đồng Tháp<br>Căn cứ: QĐ 6858/QĐ-BYT · TT 16/2018/TT-BYT · v7.0 · 2026</div>
+    <div style="font-size:12px;color:var(--text-3);margin-bottom:10px">Hệ thống Giám sát Kiểm soát Nhiễm khuẩn Bệnh viện<br>Phát triển bởi: Khoa Kiểm soát Nhiễm khuẩn<br>Căn cứ: QĐ 6858/QĐ-BYT · TT 16/2018/TT-BYT</div>
     <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
       <span class="badge bg-ok">MIT License</span>
-      <span class="badge bg-blue">Chạy offline hoàn toàn</span>
+      <span class="badge bg-blue">Chạy hoàn toàn offline</span>
       <span class="badge bg-purple">Miễn phí</span>
-      <span class="badge bg-muted">Đa người dùng</span>
     </div>
   </div>
 </div>
-
 <!-- ══ QUẢN LÝ NGƯỜI DÙNG (Admin only) ══ -->
 <div class="pg" id="pg-users">
   <!-- Toolbar -->
@@ -2458,7 +2279,7 @@ let S = {
   nkbvDenominators:{}, // Mẫu số tính tỷ lệ NKBV
   config:{
     bv:'Bệnh viện Phụ sản Tiền Giang',
-    so:'Sở Y tế Tỉnh Tiền Giang',
+    so:'Sở Y tế Tỉnh Đồng Tháp',
     kk:'Khoa Kiểm soát Nhiễm khuẩn',
     spreadsheetId:'',
     autoSync:true,
@@ -2878,7 +2699,7 @@ function genReport(){
   const now=new Date();
   document.getElementById('repSo').textContent=S.config.so;
   document.getElementById('repBV').textContent=S.config.bv;
-  document.getElementById('repNgay').textContent=`Tiền Giang, ngày ${now.getDate()} tháng ${now.getMonth()+1} năm ${now.getFullYear()}`;
+  document.getElementById('repNgay').textContent=`Đông Tháp, ngày ${now.getDate()} tháng ${now.getMonth()+1} năm ${now.getFullYear()}`;
   document.getElementById('repKy').textContent=`Tại các Khoa / Phòng — Từ ngày ${f||'…'} đến ngày ${t||'…'}`;
   const keys=['rt','tb','td','tm'],klb={rt:'Rửa tay',tb:'Thay băng vết mổ',td:'Truyền dịch',tm:'Tiêm thuốc'};
   let html=`<p style="margin-bottom:10px"><b>I. Tổng quan kết quả giám sát:</b></p>
@@ -5266,477 +5087,7 @@ function updateDlQuickStats(){
 }
 
 
-// ============================================================
-//  REPORT TEMPLATE MANAGER — KSNK Pro v7
-//  Admin configures once → all users get the template
-// ============================================================
-const RPT_TEMPLATE_KEY = 'ksnk_rpt_template_v7';
-const SHARED_RPT_KEY   = 'ksnk_shared_rpt_v7';
-
-// Default template structure
-const RPT_DEFAULT_TEMPLATE = {
-  bo:           'SỞ Y TẾ ĐỒNG THÁP',
-  bv:           'BỆNH VIỆN ĐA KHOA ĐỒNG THÁP',
-  khoa:         'KHOA KIỂM SOÁT NHIỄM KHUẨN',
-  diadanh:      'Đồng Tháp',
-  tieude:       'BÁO CÁO KẾT QUẢ GIÁM SÁT TUÂN THỦ QUY TRÌNH KIỂM SOÁT NHIỄM KHUẨN',
-  phapluat:     'QĐ 6858/QĐ-BYT ngày 18/11/2016; TT 16/2018/TT-BYT; TT 18/2009/TT-BYT',
-  logo:         '',
-  showHeader:   true,
-  sign1Title:   'NGƯỜI LẬP BÁO CÁO',
-  sign1Note:    '(Ký và ghi rõ họ tên)',
-  sign2Title:   'LÃNH ĐẠO KHOA KSNK',
-  sign2Note:    '(Ký và ghi rõ họ tên)',
-  sign3Title:   'BAN GIÁM ĐỐC',
-  sign3Note:    '(Ký và ghi rõ họ tên)',
-  footerText:   'Căn cứ: QĐ 6858/QĐ-BYT ngày 18/11/2016 | TT 16/2018/TT-BYT | TT 18/2009/TT-BYT',
-  nxDefault:    'Trong kỳ báo cáo, Khoa KSNK đã thực hiện giám sát định kỳ tại các khoa lâm sàng và cận lâm sàng theo đúng quy định của Thông tư 16/2018/TT-BYT.',
-  knDefault:    '1. Tiếp tục duy trì và nâng cao tỷ lệ tuân thủ quy trình KSNK.\n2. Tăng cường giám sát tại các khoa có tỷ lệ tuân thủ chưa đạt ≥80%.\n3. Cập nhật đào tạo nhân viên về kỹ thuật vệ sinh tay và quy trình vô khuẩn.',
-  fields: {
-    showSummary:    true,
-    showBangkiem:   true,
-    showC4:         true,
-    showNKBV:       true,
-    showViSinh:     false,
-    showNarrative:  true,
-    showSignature:  true,
-    showLegal:      true,
-  },
-  _savedBy: '',
-  _savedAt: ''
-};
-
-let _rptTemplate = null;
-
-function loadRptTemplate(){
-  try{
-    // Try shared first, then local
-    const raw = localStorage.getItem(SHARED_RPT_KEY) || localStorage.getItem(RPT_TEMPLATE_KEY);
-    if(raw) _rptTemplate = Object.assign({}, RPT_DEFAULT_TEMPLATE, JSON.parse(raw));
-    else _rptTemplate = Object.assign({}, RPT_DEFAULT_TEMPLATE);
-    // Sync bv/khoa from main config if template is default
-    if(!raw){
-      _rptTemplate.bv = S.config.bv || _rptTemplate.bv;
-      _rptTemplate.khoa = S.config.kk || _rptTemplate.khoa;
-      _rptTemplate.diadanh = S.config.bv ? S.config.bv.split(' ').slice(-2).join(' ') : _rptTemplate.diadanh;
-    }
-  }catch(e){ _rptTemplate = Object.assign({}, RPT_DEFAULT_TEMPLATE); }
-  return _rptTemplate;
-}
-
-function saveRptTemplate(){
-  if(currentUser?.role !== 'admin'){
-    showNotif('🔒 Chỉ Admin mới có thể lưu mẫu báo cáo','err'); return;
-  }
-  const t = getRptTemplateFromUI();
-  t._savedBy = currentUser.username;
-  t._savedAt = new Date().toISOString();
-  localStorage.setItem(RPT_TEMPLATE_KEY, JSON.stringify(t));
-  // Share to all users
-  localStorage.setItem(SHARED_RPT_KEY, JSON.stringify(t));
-  _rptTemplate = t;
-  addLog('Lưu mẫu báo cáo', `BV: ${t.bv}`);
-  showNotif('✅ Đã lưu mẫu báo cáo — Đã phát hành cho tất cả người dùng','ok');
-  renderRptPreview();
-}
-
-function getRptTemplateFromUI(){
-  return {
-    bo:         document.getElementById('tpl-bo')?.value || '',
-    bv:         document.getElementById('tpl-bv')?.value || '',
-    khoa:       document.getElementById('tpl-khoa')?.value || '',
-    diadanh:    document.getElementById('tpl-diadanh')?.value || '',
-    tieude:     document.getElementById('tpl-tieude')?.value || '',
-    phapluat:   document.getElementById('tpl-phapluat')?.value || '',
-    logo:       document.getElementById('tpl-logo')?.value || '',
-    showHeader: document.getElementById('tpl-show-header-line')?.checked !== false,
-    sign1Title: document.getElementById('tpl-sign1-title')?.value || '',
-    sign1Note:  document.getElementById('tpl-sign1-note')?.value || '',
-    sign2Title: document.getElementById('tpl-sign2-title')?.value || '',
-    sign2Note:  document.getElementById('tpl-sign2-note')?.value || '',
-    sign3Title: document.getElementById('tpl-sign3-title')?.value || '',
-    sign3Note:  document.getElementById('tpl-sign3-note')?.value || '',
-    footerText: document.getElementById('tpl-footer-text')?.value || '',
-    nxDefault:  document.getElementById('tpl-nx-default')?.value || '',
-    knDefault:  document.getElementById('tpl-kn-default')?.value || '',
-    fields: {
-      showSummary:   document.getElementById('tpl-f-summary')?.checked !== false,
-      showBangkiem:  document.getElementById('tpl-f-bangkiem')?.checked !== false,
-      showC4:        document.getElementById('tpl-f-c4')?.checked !== false,
-      showNKBV:      document.getElementById('tpl-f-nkbv')?.checked !== false,
-      showViSinh:    document.getElementById('tpl-f-visinh')?.checked || false,
-      showNarrative: document.getElementById('tpl-f-nhanxet')?.checked !== false,
-      showSignature: document.getElementById('tpl-f-kiten')?.checked !== false,
-      showLegal:     document.getElementById('tpl-f-legal')?.checked !== false,
-    }
-  };
-}
-
-function populateRptTemplateUI(){
-  const t = loadRptTemplate();
-  const set = (id, val) => { const el = document.getElementById(id); if(el) el.value = val||''; };
-  const setChk = (id, val) => { const el = document.getElementById(id); if(el) el.checked = val !== false; };
-  set('tpl-bo', t.bo); set('tpl-bv', t.bv); set('tpl-khoa', t.khoa);
-  set('tpl-diadanh', t.diadanh); set('tpl-tieude', t.tieude);
-  set('tpl-phapluat', t.phapluat); set('tpl-logo', t.logo);
-  setChk('tpl-show-header-line', t.showHeader);
-  set('tpl-sign1-title', t.sign1Title); set('tpl-sign1-note', t.sign1Note);
-  set('tpl-sign2-title', t.sign2Title); set('tpl-sign2-note', t.sign2Note);
-  set('tpl-sign3-title', t.sign3Title); set('tpl-sign3-note', t.sign3Note);
-  set('tpl-footer-text', t.footerText);
-  set('tpl-nx-default', t.nxDefault); set('tpl-kn-default', t.knDefault);
-  // Render fields list
-  renderRptFieldList(t.fields);
-}
-
-function renderRptFieldList(fields){
-  const el = document.getElementById('rptpl-field-list'); if(!el) return;
-  const fieldDefs = [
-    { key:'showSummary',   icon:'📊', label:'Tổng quan số phiếu & tỷ lệ tuân thủ', desc:'Bảng thống kê tổng số phiếu theo loại, tỷ lệ trung bình' },
-    { key:'showBangkiem',  icon:'📋', label:'Bảng chi tiết kết quả từng tiêu chí', desc:'Bảng từng tiêu chí: số quan sát, số tuân thủ, tỷ lệ %' },
-    { key:'showC4',        icon:'⭐', label:'Tóm tắt kết quả đánh giá Tiêu chí C4', desc:'Điểm tự đánh giá C4.1–C4.6 mức đạt được gần nhất' },
-    { key:'showNKBV',      icon:'🦠', label:'Tóm tắt ca Nhiễm khuẩn Bệnh viện', desc:'Số ca NKBV trong kỳ, phân loại theo type' },
-    { key:'showViSinh',    icon:'🔬', label:'Kết quả Vi sinh môi trường', desc:'Tóm tắt kết quả xét nghiệm vi sinh môi trường' },
-    { key:'showNarrative', icon:'✍️', label:'Phần Nhận xét, Đánh giá, Kiến nghị', desc:'Bốn khung nhận xét: Chung, Ưu điểm, Tồn tại, Kiến nghị' },
-    { key:'showSignature', icon:'✒️', label:'Phần Ký tên (3 vị trí)', desc:'Người lập, Lãnh đạo khoa, Ban giám đốc' },
-    { key:'showLegal',     icon:'⚖️', label:'Dòng căn cứ pháp lý cuối trang', desc:'Dòng tham chiếu QĐ 6858, TT 16/2018...' },
-  ];
-  el.innerHTML = fieldDefs.map(f => `
-    <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-2);border-radius:var(--r-sm);border:1px solid var(--border-2)">
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;flex:1">
-        <input type="checkbox" id="tpl-f-${f.key.replace('show','').toLowerCase()}" 
-               ${(fields && fields[f.key] !== false) ? 'checked' : ''}
-               style="width:18px;height:18px;accent-color:var(--blue)">
-        <div>
-          <div style="font-weight:600;font-size:13px">${f.icon} ${f.label}</div>
-          <div style="font-size:11.5px;color:var(--text-3)">${f.desc}</div>
-        </div>
-      </label>
-    </div>`).join('');
-}
-
-function swRptplTab(tab, btn){
-  ['header','fields','footer','upload','preview'].forEach(t => {
-    const el = document.getElementById('rptpl-'+t);
-    if(el) el.style.display = t===tab ? '' : 'none';
-  });
-  document.querySelectorAll('#rptplTabs .tab').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  if(tab === 'preview') renderRptPreview();
-}
-
-function renderRptPreview(){
-  const t = loadRptTemplate();
-  const el = document.getElementById('rptpl-preview-content'); if(!el) return;
-  const now = new Date();
-  el.innerHTML = `
-    <div style="text-align:center;margin-bottom:12px">
-      ${t.showHeader ? `<div style="font-weight:700;font-size:11pt">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
-      <div style="font-style:italic;font-size:10.5pt;text-decoration:underline">Độc lập – Tự do – Hạnh phúc</div>
-      <div style="border-bottom:1px solid #333;width:200px;margin:4px auto 8px"></div>` : ''}
-      ${t.logo ? `<img src="${t.logo}" style="height:40px;margin-bottom:6px"><br>` : ''}
-      <div style="font-weight:700;font-size:11pt">${t.bo}</div>
-      <div style="font-weight:700;font-size:10.5pt">${t.bv}</div>
-      <div style="font-size:10pt">${t.khoa}</div>
-    </div>
-    <div style="text-align:center;margin:16px 0 12px">
-      <div style="font-weight:700;font-size:12pt;text-transform:uppercase">${t.tieude}</div>
-      <div style="font-style:italic;font-size:10pt;margin-top:4px">Kỳ báo cáo: Tháng __/____  Tại: [Các khoa/phòng]</div>
-      <div style="font-size:9.5pt;color:#666;margin-top:2px">Căn cứ: ${t.phapluat}</div>
-    </div>
-    <div style="border-top:1px solid #999;margin:10px 0"></div>
-    <div style="font-weight:700;margin-bottom:6px;font-size:11pt">I. TỔNG QUAN KẾT QUẢ</div>
-    <p style="font-size:10.5pt;color:#555;font-style:italic">[Bảng tổng hợp số phiếu và tỷ lệ tuân thủ — tự động điền khi xuất]</p>
-    ${t.fields?.showNarrative !== false ? `
-    <div style="font-weight:700;margin:12px 0 6px;font-size:11pt">II. NHẬN XÉT CHUNG</div>
-    <p style="font-size:10.5pt">${t.nxDefault||'...'}</p>
-    <div style="font-weight:700;margin:12px 0 6px;font-size:11pt">IV. KIẾN NGHỊ / GIẢI PHÁP</div>
-    <p style="font-size:10.5pt">${(t.knDefault||'').replace(/\n/g,'<br>')}</p>` : ''}
-    ${t.fields?.showSignature !== false ? `
-    <div style="margin-top:24px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;text-align:center;font-size:10.5pt">
-      <div><b>${t.sign1Title}</b><br><em>${t.sign1Note}</em><br><br><br>.......................................</div>
-      <div><b>${t.sign2Title}</b><br><em>${t.sign2Note}</em><br><br><br>.......................................</div>
-      <div>
-        <div style="text-align:right;font-style:italic;margin-bottom:2px">${t.diadanh}, ngày ${now.getDate()} tháng ${now.getMonth()+1} năm ${now.getFullYear()}</div>
-        <b>${t.sign3Title}</b><br><em>${t.sign3Note}</em><br><br><br>.......................................
-      </div>
-    </div>` : ''}
-    ${t.fields?.showLegal !== false ? `<div style="margin-top:16px;border-top:1px dashed #ccc;padding-top:8px;font-size:9pt;color:#888;text-align:center">${t.footerText}</div>` : ''}
-  `;
-}
-
-// ── Trích xuất thông tin từ file Word ──────────────────────
-let _extractedTplData = null;
-
-function handleWordTemplateDrop(event){
-  event.preventDefault();
-  document.getElementById('wordDropZone').classList.remove('drag');
-  const f = event.dataTransfer.files[0];
-  if(f) processWordTemplate(f);
-}
-
-function handleWordTemplateFile(input){
-  const f = input.files[0]; if(!f) return;
-  processWordTemplate(f);
-  input.value = '';
-}
-
-function processWordTemplate(file){
-  if(!file.name.endsWith('.docx') && !file.name.endsWith('.doc')){
-    showNotif('❌ Chỉ chấp nhận file .docx','err'); return;
-  }
-  if(file.size > 5*1024*1024){ showNotif('❌ File quá lớn (tối đa 5MB)','err'); return; }
-  const reader = new FileReader();
-  reader.onload = e => {
-    try{
-      // Use mammoth-like approach: read docx as zip, extract document.xml text
-      const arrayBuf = e.target.result;
-      extractDocxText(arrayBuf, file.name);
-    }catch(err){ showNotif('❌ Lỗi đọc file Word: '+err.message,'err'); }
-  };
-  reader.readAsArrayBuffer(file);
-}
-
-async function extractDocxText(arrayBuf, fname){
-  try{
-    // Use JSZip via XLSX's internal zip, or fall back to manual extraction
-    // Since we have SheetJS available, use it to read the zip
-    const uint8 = new Uint8Array(arrayBuf);
-    const wb = XLSX.read(uint8, {type:'array'});
-    // Not a spreadsheet — try raw XML parsing via fetch/blob
-    throw new Error('not xlsx');
-  }catch(e){
-    // Fallback: extract text using FileReader + zip parsing via native browser
-    try{
-      const uint8 = new Uint8Array(arrayBuf);
-      // Try to find the document.xml by looking for XML content
-      const decoder = new TextDecoder('utf-8');
-      const rawText = decoder.decode(uint8);
-      
-      // Simple heuristic: find readable text patterns
-      const xmlMatch = rawText.match(/<w:t[^>]*>([^<]{3,})<\/w:t>/g) || [];
-      const texts = xmlMatch
-        .map(m => m.replace(/<[^>]+>/g,'').trim())
-        .filter(t => t.length > 2 && /[\wÀ-ỹ]/.test(t));
-      
-      if(texts.length < 3){
-        // Try simpler text extraction
-        const allText = rawText
-          .replace(/<[^>]+>/g,' ')
-          .replace(/\s+/g,' ')
-          .replace(/[^\x20-\x7EÀ-ỹ]/g,' ')
-          .trim();
-        const words = allText.split(/\s+/).filter(w=>w.length>2);
-        if(words.length < 5){ showNotif('⚠️ Không thể đọc nội dung file. Thử nhập tay ở tab Tiêu đề.','err'); return; }
-        showExtractedResult(words.join(' ').substring(0,500), fname);
-        return;
-      }
-      
-      const fullText = texts.join(' ');
-      
-      // Parse out key fields heuristically
-      _extractedTplData = parseDocxFields(texts, fullText);
-      showExtractedResult(fullText.substring(0,600), fname);
-    }catch(err2){
-      showNotif('❌ Không thể đọc file. Vui lòng dùng file .docx chuẩn.','err');
-    }
-  }
-}
-
-function parseDocxFields(textArr, fullText){
-  const result = {};
-  const upper = fullText.toUpperCase();
-  
-  // Try to find bệnh viện name
-  const bvMatch = textArr.find(t => /BỆNH VIỆN|BVDK|BVĐK|TRUNG TÂM Y TẾ/i.test(t));
-  if(bvMatch) result.bv = bvMatch.trim().toUpperCase();
-  
-  // Try to find sở y tế
-  const soMatch = textArr.find(t => /SỞ Y TẾ|BỘ Y TẾ|UBND|SỞ/i.test(t));
-  if(soMatch) result.bo = soMatch.trim().toUpperCase();
-  
-  // Khoa KSNK
-  const khoaMatch = textArr.find(t => /KSNK|KIỂM SOÁT NHIỄM KHUẨN|KHOA KSNK/i.test(t));
-  if(khoaMatch) result.khoa = khoaMatch.trim().toUpperCase();
-  
-  // Title
-  const titleMatch = textArr.find(t => /BÁO CÁO|GIÁM SÁT|KẾT QUẢ/i.test(t) && t.length > 20);
-  if(titleMatch) result.tieude = titleMatch.trim().toUpperCase();
-  
-  // Địa danh
-  const diaDanhPat = /Đồng Tháp|Hà Nội|Hồ Chí Minh|Đà Nẵng|Cần Thơ|An Giang|Long An|Tiền Giang|Vĩnh Long|Kiên Giang|Bến Tre|Trà Vinh|Sóc Trăng|Bạc Liêu|Cà Mau|Hậu Giang/i;
-  const ddMatch = textArr.find(t => diaDanhPat.test(t));
-  if(ddMatch){ const m = ddMatch.match(diaDanhPat); if(m) result.diadanh = m[0]; }
-  
-  return result;
-}
-
-function showExtractedResult(text, fname){
-  const el = document.getElementById('wordExtractResult');
-  const content = document.getElementById('wordExtractContent');
-  if(!el||!content) return;
-  
-  const extractedInfo = _extractedTplData || {};
-  content.innerHTML = `
-    <div style="margin-bottom:8px"><b>📄 File:</b> ${fname}</div>
-    ${Object.keys(extractedInfo).length > 0 
-      ? `<div style="margin-bottom:8px"><b>🔍 Thông tin nhận diện được:</b>
-          <ul style="margin:6px 0 0 16px">${Object.entries(extractedInfo).map(([k,v])=>`<li><b>${k}:</b> ${v}</li>`).join('')}</ul>
-        </div>`
-      : '<div style="color:var(--amber);margin-bottom:6px">⚠️ Không nhận diện được thông tin rõ ràng. Bạn có thể nhập tay.</div>'
-    }
-    <div><b>📝 Nội dung trích xuất (đầu):</b><br><code style="font-size:10px;background:var(--bg);padding:6px;border-radius:4px;display:block;margin-top:4px;white-space:pre-wrap;max-height:120px;overflow:auto">${text}</code></div>
-  `;
-  el.style.display = 'block';
-  document.getElementById('wordDropIcon').textContent = '✅';
-  document.getElementById('wordDropTxt').innerHTML = `<b style="color:var(--green)">Đã đọc file: ${fname}</b><br><span style="font-size:11px;color:var(--text-3)">Nhấn để thay thế</span>`;
-  document.getElementById('wordDropZone').classList.add('loaded');
-}
-
-function applyExtractedTemplate(){
-  if(!_extractedTplData || Object.keys(_extractedTplData).length === 0){
-    showNotif('⚠️ Không có thông tin để áp dụng. Vui lòng nhập tay.','err'); return;
-  }
-  const t = loadRptTemplate();
-  Object.assign(t, _extractedTplData);
-  // Update UI fields
-  Object.entries(_extractedTplData).forEach(([k,v])=>{
-    const el = document.getElementById(`tpl-${k}`); if(el) el.value = v;
-  });
-  showNotif('✅ Đã áp dụng thông tin từ file Word vào mẫu','ok');
-  document.getElementById('wordExtractResult').style.display = 'none';
-  _extractedTplData = null;
-}
-
-function downloadDefaultWordTemplate(){
-  // Create a simple HTML-based Word file with default template structure
-  const t = loadRptTemplate();
-  const wordHTML = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-<head><meta charset='utf-8'><style>
-body{font-family:'Times New Roman',serif;font-size:13pt;line-height:1.8;margin:2cm}
-.center{text-align:center}.bold{font-weight:bold}.italic{font-style:italic}
-table{border-collapse:collapse;width:100%}th{background:#0a2d4a;color:#fff;padding:6pt 8pt}td{padding:5pt 8pt;border:1pt solid #ccc}
-.signature{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1cm;text-align:center;margin-top:2cm}
-</style></head><body>
-<div class="center">
-<div class="bold">${t.bo}</div>
-<div class="bold">${t.bv}</div>
-<div>${t.khoa}</div>
-<br>
-<div class="bold">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
-<div class="bold italic" style="text-decoration:underline">Độc lập – Tự do – Hạnh phúc</div>
-<br>
-<div class="bold" style="font-size:14pt">${t.tieude}</div>
-<div class="italic">Kỳ báo cáo: Tháng ___/____</div>
-<div style="font-size:11pt">Căn cứ: ${t.phapluat}</div>
-</div>
-<hr>
-<p><b>I. TỔNG QUAN KẾT QUẢ GIÁM SÁT:</b></p>
-<p>[Bảng tổng hợp tự động điền khi xuất báo cáo]</p>
-<p><b>II. KẾT QUẢ CHI TIẾT TỪNG BẢNG KIỂM:</b></p>
-<p>[Chi tiết từng tiêu chí tự động điền]</p>
-<p><b>III. NHẬN XÉT CHUNG:</b></p>
-<p>${t.nxDefault}</p>
-<p><b>IV. ƯU ĐIỂM GHI NHẬN:</b></p>
-<p>...</p>
-<p><b>V. TỒN TẠI / HẠN CHẾ:</b></p>
-<p>...</p>
-<p><b>VI. KIẾN NGHỊ / GIẢI PHÁP:</b></p>
-<p>${(t.knDefault||'').replace(/\n/g,'<br>')}</p>
-<div class="signature">
-<div><b>${t.sign1Title}</b><br><i>${t.sign1Note}</i><br><br><br>.................................</div>
-<div><b>${t.sign2Title}</b><br><i>${t.sign2Note}</i><br><br><br>.................................</div>
-<div><div style="text-align:right;font-style:italic">${t.diadanh}, ngày ___ tháng ___ năm ____</div>
-<b>${t.sign3Title}</b><br><i>${t.sign3Note}</i><br><br><br>.................................</div>
-</div>
-<hr style="border-style:dashed">
-<p style="text-align:center;font-size:10pt;color:#666">${t.footerText}</p>
-</body></html>`;
-  const blob = new Blob(['\ufeff'+wordHTML],{type:'application/msword'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url;
-  a.download=`MauBaoCao_KSNK_Pro_${S.config.bv?.replace(/\s+/g,'_')||'BV'}.doc`;
-  a.click(); URL.revokeObjectURL(url);
-  showNotif('📥 Đã tải mẫu Word về máy','ok');
-  addLog('Tải mẫu Word báo cáo');
-}
-
-// ── Hook vào go() để init template page ───────────────────
-const _rptOrigGo = window.go;
-window.go = function(p){
-  _rptOrigGo(p);
-  if(p === 'rptpl'){
-    // Populate UI with current template
-    setTimeout(()=>{ populateRptTemplateUI(); renderRptPreview(); }, 50);
-  }
-};
-
-// ── Patch genReport() để dùng template ──────────────────────
-const _origGenReport = genReport;
-window.genReport = function(){
-  const t = loadRptTemplate();
-  // Inject template data into report header elements
-  const repSo = document.getElementById('repSo');
-  const repBV = document.getElementById('repBV');
-  if(repSo) repSo.innerHTML = `<b>${t.bo}</b><br><b>${t.bv}</b>`;
-  if(repBV) repBV.innerHTML = `${t.khoa}`;
-  // Patch the signature line to use template
-  _origGenReport();
-  // Override signature with template
-  const repSignName = document.getElementById('repSignName');
-  if(repSignName) repSignName.textContent = document.getElementById('rep-nguoi')?.value || '........................................';
-  // Add full 3-column signature if template has it
-  if(t.fields?.showSignature !== false){
-    const signEl = document.querySelector('#repMain div[style*="grid-template-columns:1fr 1fr 1fr"]');
-    if(signEl){
-      const now = new Date();
-      signEl.innerHTML = `
-        <div><b>${t.sign1Title}</b><div style="font-style:italic;font-size:11.5px;color:var(--text-3)">${t.sign1Note}</div><div style="margin-top:60px">${document.getElementById('rep-nguoi')?.value||'........................................'}</div></div>
-        <div><b>${t.sign2Title}</b><div style="font-style:italic;font-size:11.5px;color:var(--text-3)">${t.sign2Note}</div><div style="margin-top:60px">........................................</div></div>
-        <div><div style="text-align:right;font-style:italic;font-size:11.5px;margin-bottom:4px">${t.diadanh}, ngày ${now.getDate()} tháng ${now.getMonth()+1} năm ${now.getFullYear()}</div><b>${t.sign3Title}</b><div style="font-style:italic;font-size:11.5px;color:var(--text-3)">${t.sign3Note}</div><div style="margin-top:60px">........................................</div></div>
-      `;
-    }
-  }
-  // Inject default narrative if fields are empty
-  if(t.nxDefault && !document.getElementById('rep-nx')?.value){
-    const el = document.getElementById('rep-nx'); if(el) el.value = t.nxDefault;
-  }
-  if(t.knDefault && !document.getElementById('rep-kn')?.value){
-    const el = document.getElementById('rep-kn'); if(el) el.value = t.knDefault;
-  }
-};
-
-// Also add 'rptpl' to admin-only guard pages
-const _rptOrigGoGuard = window.go;
-// (guard already applied via _origGo chain above)
-
-// ── Load template vào loadAllSharedConfigs ───────────────────
-const _origLoadAllShared = loadAllSharedConfigs;
-window.loadAllSharedConfigs = function(){
-  _origLoadAllShared();
-  // Load shared report template
-  try{
-    const raw = localStorage.getItem(SHARED_RPT_KEY);
-    if(raw) _rptTemplate = Object.assign({}, RPT_DEFAULT_TEMPLATE, JSON.parse(raw));
-  }catch(e){}
-};
-
-// Make sure rptpl is in admin-only pages list
-const _adminPagesOrig = ['admin','gsheets','users','actlog'];
-// Patch the go() guard that was set earlier
-(function(){
-  const _lastGo = window.go;
-  window.go = function(p){
-    const allAdminPages = ['admin','gsheets','users','actlog','rptpl'];
-    if(allAdminPages.includes(p) && currentUser?.role !== 'admin'){
-      showNotif('🔒 Chỉ Quản trị viên mới có thể truy cập trang này','err');
-      return;
-    }
-    _lastGo(p);
-  };
-})();
-
-
+</script>
 
 <!-- BOTTOM NAV (mobile) -->
 <nav class="bnav" id="bnav">
