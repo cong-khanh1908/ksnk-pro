@@ -380,6 +380,18 @@ textarea.fc{min-height:90px;resize:vertical;line-height:1.7;font-size:14px}
 .admin-only{display:none}
 body.is-admin .admin-only{display:block}
 body.is-admin .admin-only-flex{display:flex!important}
+
+/* ── Role-based nav visibility ── */
+/* By default hide admin/supervisor nav items */
+.nav-admin-only   { display: none !important; }
+.nav-supervisor   { display: none !important; }
+/* Admin sees everything */
+body.is-admin .nav-admin-only { display: flex !important; }
+body.is-admin .nav-supervisor  { display: flex !important; }
+/* Supervisor sees supervisor-level items */
+body.is-supervisor .nav-supervisor { display: flex !important; }
+/* Role indicator pill in header area */
+.role-pill{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 9px;font-size:10.5px;font-weight:700;white-space:nowrap}
 .admin-required-overlay{background:var(--red-l);border:1.5px solid rgba(198,40,40,.2);border-radius:var(--r);padding:24px;text-align:center;color:var(--red)}
 /* Log page */
 .log-row{display:grid;grid-template-columns:130px 1fr auto;gap:8px;padding:9px 10px;border-bottom:1px solid var(--border-2);font-size:12px;align-items:start}
@@ -923,6 +935,7 @@ body.is-admin .admin-only-flex{display:flex!important}
         <button class="btn btn-o btn-sm" onclick="doSync()">☁️ Đồng bộ</button>
       </div>
     </div>
+    <div id="dlRoleNote" style="display:none;background:var(--blue-l);border:1px solid rgba(21,101,192,.15);border-radius:var(--r-xs);padding:8px 12px;font-size:12px;color:var(--blue);margin-bottom:10px"></div>
     <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="dt"><thead><tr><th>Mã phiếu</th><th>Loại</th><th>Khoa</th><th>Ngày giờ</th><th>Kết quả</th><th>Sync</th><th>Thao tác</th></tr></thead><tbody id="dlBody"></tbody></table></div>
     <div id="dlPagination" style="display:flex;justify-content:center;gap:6px;margin-top:12px;flex-wrap:wrap"></div>
   </div>
@@ -2127,33 +2140,43 @@ body.is-admin .admin-only-flex{display:flex!important}
 
 <!-- ADD USER MODAL -->
 <div class="mo" id="addUserMo">
-  <div class="md" style="max-width:440px">
+  <div class="md" style="max-width:500px">
     <div class="md-hd"><span class="md-title">👤 Thêm / Cấp tài khoản</span><button class="md-x" onclick="closeMo('addUserMo')">✕</button></div>
     <div class="md-body">
-      <div class="fgp" style="margin-bottom:10px">
-        <label class="fl fl-req">Họ và tên</label>
-        <input type="text" class="fc" id="au-name" placeholder="Nguyễn Văn A">
+      <!-- Thông tin cơ bản -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="fgp" style="grid-column:1/-1">
+          <label class="fl fl-req">Họ và tên</label>
+          <input type="text" class="fc" id="au-name" placeholder="Nguyễn Văn A">
+        </div>
+        <div class="fgp">
+          <label class="fl fl-req">Số CMND / CCCD</label>
+          <input type="text" class="fc" id="au-cmnd" placeholder="012345678901" inputmode="numeric">
+        </div>
+        <div class="fgp">
+          <label class="fl">Mật khẩu ban đầu</label>
+          <input type="text" class="fc" id="au-pass" value="bvps@123">
+        </div>
+        <div class="fgp">
+          <label class="fl">Khoa / Phòng</label>
+          <select class="fc" id="au-khoa"></select>
+        </div>
+        <div class="fgp">
+          <label class="fl">Chức danh</label>
+          <input type="text" class="fc" id="au-title" placeholder="Điều dưỡng, Bác sĩ...">
+        </div>
       </div>
-      <div class="fgp" style="margin-bottom:10px">
-        <label class="fl fl-req">Số CMND / CCCD (dùng làm tên đăng nhập)</label>
-        <input type="text" class="fc" id="au-cmnd" placeholder="012345678901" inputmode="numeric">
+
+      <!-- Chọn vai trò -->
+      <div class="sec-label" style="margin-bottom:8px">Vai trò & Phân quyền</div>
+      <div id="au-role-selector" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+        <!-- Rendered by JS -->
       </div>
-      <div class="fgp" style="margin-bottom:10px">
-        <label class="fl">Chức danh / Vị trí</label>
-        <select class="fc" id="au-role-val">
-          <option value="user">Người dùng thường</option>
-          <option value="supervisor">Giám sát viên</option>
-        </select>
-      </div>
-      <div class="fgp" style="margin-bottom:10px">
-        <label class="fl">Khoa / Phòng</label>
-        <select class="fc" id="au-khoa"></select>
-      </div>
-      <div class="fgp" style="margin-bottom:4px">
-        <label class="fl">Mật khẩu ban đầu</label>
-        <input type="text" class="fc" id="au-pass" value="bvps@123" placeholder="Mật khẩu ban đầu">
-      </div>
-      <div style="font-size:11.5px;color:var(--text-3);margin-top:4px">💡 Người dùng nên đổi mật khẩu sau lần đăng nhập đầu tiên.</div>
+
+      <!-- Mô tả quyền của vai trò đã chọn -->
+      <div id="au-role-desc" style="font-size:12px;color:var(--text-2);background:var(--bg-2);border-radius:var(--r-xs);padding:10px 12px;line-height:1.7;border:1px solid var(--border-2)"></div>
+
+      <div style="font-size:11.5px;color:var(--text-3);margin-top:8px">💡 Người dùng nên đổi mật khẩu sau lần đăng nhập đầu tiên.</div>
     </div>
     <div class="md-ft">
       <button class="btn btn-o" onclick="closeMo('addUserMo')">Hủy</button>
@@ -2776,7 +2799,22 @@ function renderDL(){
     ...S.records.map(r=>({...r, isC4:false})),
     ...S.c4records.map(r=>({...r, isC4:true, nguoi:r.nguoi||'–', pct:null}))
   ];
-  let R=allRecs.filter(r=>{
+
+  // ── Phân quyền: user chỉ thấy dữ liệu khoa mình ─────────────
+  const role = currentUser?.role || 'user';
+  const userKhoa = currentUser?.khoa || '';
+  const roleFilteredRecs = (role === 'user' && userKhoa)
+    ? allRecs.filter(r => r.khoa === userKhoa || r.operator === currentUser?.username)
+    : allRecs;
+
+  // Hiển thị thông báo nếu user bị lọc
+  const dlRoleNote = document.getElementById('dlRoleNote');
+  if(dlRoleNote){
+    dlRoleNote.style.display = (role==='user' && userKhoa) ? '' : 'none';
+    if(role==='user' && userKhoa) dlRoleNote.textContent = `🔒 Hiển thị dữ liệu khoa: ${userKhoa}`;
+  }
+
+  let R=roleFilteredRecs.filter(r=>{
     if(f!=='all'&&r.key!==f) return false;
     if(!r.isC4 && kh!=='all'&&r.khoa!==kh) return false;
     if(r.isC4 && kh!=='all'&&r.khoa!==kh) return false;
@@ -2796,6 +2834,8 @@ function renderDL(){
       const isC4=r.isC4;
       const lbl=isC4?(C4[r.key]?.code||r.key):(FC[r.key]?.label||r.key);
       const res=isC4?`<span class="badge bg-blue">Mức ${r.score}/5</span>`:(r.pct>=80?`<span class="badge bg-ok">${r.pct}%</span>`:r.pct>=60?`<span class="badge bg-warn">${r.pct}%</span>`:`<span class="badge bg-bad">${r.pct}%</span>`);
+      // user role: chỉ xem, không xóa
+      const canDelete = (role==='admin') || (role==='supervisor') || (r.operator===currentUser?.username);
       return `<tr>
         <td style="font-family:monospace;font-size:10px;color:var(--text-3)">${r.id}</td>
         <td>${lbl}</td><td>${r.khoa||'–'}</td>
@@ -2804,7 +2844,7 @@ function renderDL(){
         <td><span class="badge ${r.synced?'bg-ok':'bg-warn'}">${r.synced?'✓':'⏳'}</span></td>
         <td style="white-space:nowrap">
           <button class="btn btn-o btn-xs" onclick="${isC4?`viewC4Rec('${r.id}')`:`viewRec('${r.id}')`}">👁️</button>
-          <button class="btn btn-r btn-xs" onclick="delRecConfirm('${r.id}','${isC4?'c4':''}')">🗑️</button>
+          ${canDelete?`<button class="btn btn-r btn-xs" onclick="delRecConfirm('${r.id}','${isC4?'c4':''}')">🗑️</button>`:''}
         </td>
       </tr>`;
     }).join('');
@@ -3414,12 +3454,7 @@ function go(p){
   if(p==='nkbv_bc' && typeof buildNKBVCharts==='function') buildNKBVCharts();
   if(p==='hdsd') { setTimeout(updateHdsdStats, 50); }
   if(p==='rptpl'){
-    // Guard: only admin can access
-    if(currentUser?.role !== 'admin'){
-      showNotif('🔒 Tính năng này chỉ dành cho Admin','err');
-      go('dash'); return;
-    }
-    populateRptTemplateUI();
+    populateRptTemplateUI && populateRptTemplateUI();
   }
   if(p==='users')  renderUserList && renderUserList();
   if(p==='actlog') renderActLog && renderActLog();
@@ -4451,24 +4486,203 @@ function doLogin(){
   onLoginSuccess(true);
 }
 
+// ============================================================
+//  HỆ THỐNG PHÂN QUYỀN — KSNK Pro v7
+//  3 vai trò: admin | supervisor | user
+//  Quyền được cấu hình chi tiết theo từng trang/chức năng
+// ============================================================
+
+const ROLE_DEFS = {
+  admin: {
+    label: '👑 Quản trị viên',
+    color: 'var(--purple)',
+    bg: 'var(--purple-l)',
+    desc: 'Toàn quyền hệ thống: cấu hình, quản lý người dùng, kết nối Google Sheets, xem nhật ký'
+  },
+  supervisor: {
+    label: '🔍 Giám sát viên',
+    color: 'var(--blue)',
+    bg: 'var(--blue-l)',
+    desc: 'Nhập liệu tất cả loại phiếu, xem báo cáo đầy đủ, tạo và xuất báo cáo, quản lý NKBV'
+  },
+  user: {
+    label: '👤 Nhân viên',
+    color: 'var(--teal)',
+    bg: 'var(--teal-l)',
+    desc: 'Nhập phiếu bảng kiểm, xem kết quả của khoa mình, không truy cập cấu hình và quản lý'
+  }
+};
+
+// Ma trận phân quyền: { trang: [role được phép] }
+const PAGE_PERMISSIONS = {
+  // Tất cả đều truy cập được
+  dash:    ['admin','supervisor','user'],
+  hdsd:    ['admin','supervisor','user'],
+  // Nhập liệu bảng kiểm — tất cả
+  rt:      ['admin','supervisor','user'],
+  tb:      ['admin','supervisor','user'],
+  td:      ['admin','supervisor','user'],
+  tm:      ['admin','supervisor','user'],
+  // Tiêu chí C4 — supervisor và admin
+  c41:     ['admin','supervisor'],
+  c42:     ['admin','supervisor'],
+  c43:     ['admin','supervisor'],
+  c44:     ['admin','supervisor'],
+  c45:     ['admin','supervisor'],
+  c46:     ['admin','supervisor'],
+  // NKBV — supervisor và admin
+  nkbv:    ['admin','supervisor'],
+  visinh:  ['admin','supervisor'],
+  nkbv_bc: ['admin','supervisor'],
+  // Báo cáo & phân tích — supervisor và admin
+  bc:      ['admin','supervisor'],
+  tk:      ['admin','supervisor'],
+  // Dữ liệu đã nhập — supervisor và admin (user chỉ xem khoa mình — xử lý trong renderDL)
+  dl:      ['admin','supervisor','user'],
+  // Chỉ admin
+  admin:   ['admin'],
+  gsheets: ['admin'],
+  users:   ['admin'],
+  actlog:  ['admin'],
+  rptpl:   ['admin'],
+};
+
+// Sidebar nav items theo trang
+const NAV_ROLE_GROUPS = {
+  // Nhóm nav chỉ hiện với supervisor+admin
+  supervisor_only: ['c41','c42','c43','c44','c45','c46','nkbv','visinh','nkbv_bc','bc','tk'],
+  // Nhóm nav chỉ hiện với admin
+  admin_only: ['admin','gsheets','users','actlog','rptpl'],
+};
+
+/**
+ * Kiểm tra trang p có được phép với role hiện tại không
+ */
+function canAccessPage(p, role){
+  const perms = PAGE_PERMISSIONS[p];
+  if(!perms) return true; // Trang không trong danh sách → mặc định cho phép
+  return perms.includes(role || 'user');
+}
+
+/**
+ * Áp dụng phân quyền lên toàn bộ UI sau khi đăng nhập
+ */
+function applyRolePermissions(role){
+  role = role || 'user';
+
+  // ── 1. Sidebar nav visibility ────────────────────────────────
+  document.querySelectorAll('.nav[data-p]').forEach(btn => {
+    const p = btn.getAttribute('data-p');
+    const allowed = canAccessPage(p, role);
+    btn.style.display = allowed ? '' : 'none';
+  });
+
+  // ── 2. Sidebar section headers — ẩn nếu tất cả nav bên dưới bị ẩn
+  document.querySelectorAll('.sb-sec').forEach(sec => {
+    // Tìm các nav items tiếp theo (siblings) cho đến sb-sec kế tiếp
+    let next = sec.nextElementSibling;
+    let hasVisible = false;
+    while(next && !next.classList.contains('sb-sec')){
+      if(next.classList.contains('nav') && next.style.display !== 'none') hasVisible = true;
+      next = next.nextElementSibling;
+    }
+    sec.style.display = hasVisible ? '' : 'none';
+  });
+
+  // ── 3. Admin-only CSS class (backward compat) ────────────────
+  document.body.classList.toggle('is-admin', role === 'admin');
+
+  // ── 4. Bottom nav — ẩn/hiện theo role ───────────────────────
+  // (Bottom nav chỉ có các trang cơ bản nên để nguyên)
+
+  // ── 5. Thêm role badge vào sidebar footer ───────────────────
+  const sbFoot = document.getElementById('sbFooterUser');
+  if(sbFoot){
+    const rd = ROLE_DEFS[role] || ROLE_DEFS.user;
+    sbFoot.innerHTML = `<span style="display:flex;align-items:center;gap:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">
+      <span style="background:${rd.bg};color:${rd.color};border-radius:20px;padding:2px 7px;font-size:10px;font-weight:700;white-space:nowrap">${rd.label}</span>
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10.5px">${currentUser?.name||''}</span>
+    </span>`;
+  }
+
+  // ── 6. Header sync button — chỉ hiện với admin ──────────────
+  const syncBtn = document.getElementById('syncBtn');
+  if(syncBtn) syncBtn.style.display = (role==='admin' && S?.serviceAccount && S?.config?.spreadsheetId) ? 'flex' : 'none';
+}
+
+/**
+ * Guard tập trung: kiểm tra quyền trước khi chuyển trang
+ * Trả về true nếu được phép, false + hiện thông báo nếu không
+ */
+function checkPagePermission(p){
+  if(!currentUser){
+    showNotif('🔒 Vui lòng đăng nhập để sử dụng','err');
+    return false;
+  }
+  const role = currentUser.role || 'user';
+  if(!canAccessPage(p, role)){
+    const rd = ROLE_DEFS[role] || ROLE_DEFS.user;
+    showNotif(`🔒 ${rd.label} không có quyền truy cập trang này`, 'err');
+    return false;
+  }
+  return true;
+}
+
+// ── Ghi đè go() với guard tập trung ─────────────────────────
+(function(){
+  const _guardedGo = window.go || go;
+  window.go = function(p){
+    if(!checkPagePermission(p)) return;
+    _guardedGo(p);
+  };
+})();
+
 function onLoginSuccess(doLog){
   // Lưu session
   sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
   // Ẩn overlay
   document.getElementById('authOverlay').style.display='none';
-  // Gán class is-admin nếu là admin
-  document.body.classList.toggle('is-admin', currentUser.role==='admin');
+
+  // ── Reset về Dashboard sau mỗi lần đăng nhập ────────────────
+  // Đảm bảo không còn trang nào đang hiển thị trừ dash
+  document.querySelectorAll('.pg').forEach(x => x.classList.remove('on'));
+  document.querySelectorAll('.nav').forEach(x => x.classList.remove('on'));
+  document.querySelectorAll('.bnav-btn').forEach(x => x.classList.remove('on'));
+  const pgDash = document.getElementById('pg-dash');
+  if(pgDash) pgDash.classList.add('on');
+  const navDash = document.querySelector('[data-p="dash"]');
+  if(navDash) navDash.classList.add('on');
+  const bnavDash = document.querySelector('.bnav-btn[data-bnav="dash"]');
+  if(bnavDash) bnavDash.classList.add('on');
+  if(typeof S !== 'undefined') S.ui.page = 'dash';
+
+  // ── Gán class phân quyền ─────────────────────────────────────
+  const role = currentUser.role || 'user';
+  // Xóa hết class role cũ
+  document.body.classList.remove('is-admin','is-supervisor','is-user');
+  document.body.classList.add('is-admin');  // default false
+  document.body.classList.toggle('is-admin', role === 'admin');
+  document.body.classList.toggle('is-supervisor', role === 'supervisor');
+  document.body.classList.toggle('is-user', role === 'user');
+
+  // ── Áp dụng phân quyền sidebar nav ──────────────────────────
+  applyRolePermissions(role);
+
   // Cập nhật badge
   updateUserBadge();
-  if(doLog) addLog('Đăng nhập thành công', `Role: ${currentUser.role}, Khoa: ${currentUser.khoa}`);
+  if(doLog) addLog('Đăng nhập thành công', `Role: ${role}, Khoa: ${currentUser.khoa}`);
 
-  // ── Áp dụng shared config vào UI (quan trọng cho non-admin) ──
+  // ── Áp dụng shared config vào UI ────────────────────────────
   applySharedConfigToUI();
 
-  const greet = currentUser.role==='admin'
+  const roleLabel = {admin:'Quản trị viên', supervisor:'Giám sát viên', user:'Nhân viên'}[role] || role;
+  const greet = role === 'admin'
     ? `✅ Xin chào Admin! Mọi cấu hình bạn lưu sẽ áp dụng cho tất cả người dùng.`
-    : `✅ Xin chào, ${currentUser.name}! Cấu hình hệ thống đã được tải tự động.`;
+    : `✅ Xin chào ${roleLabel} ${currentUser.name}!`;
   showNotif(greet,'ok');
+
+  // Render dashboard sau khi login
+  renderDashboard && renderDashboard();
 }
 
 // ── Áp dụng shared config vào tất cả UI elements ─────────────
@@ -4517,8 +4731,30 @@ function doLogout(){
   addLog('Đăng xuất');
   sessionStorage.removeItem(SESSION_KEY);
   currentUser = null;
+
+  // ── Quan trọng: Reset toàn bộ trạng thái trang về dash ──────
+  // Xoá class 'on' khỏi TẤT CẢ trang và nav items
+  document.querySelectorAll('.pg').forEach(x => x.classList.remove('on'));
+  document.querySelectorAll('.nav').forEach(x => x.classList.remove('on'));
+  document.querySelectorAll('.bnav-btn').forEach(x => x.classList.remove('on'));
+  // Chuyển về dash page nhưng KHÔNG qua go() (vì chưa có currentUser)
+  const pgDash = document.getElementById('pg-dash');
+  const navDash = document.querySelector('[data-p="dash"]');
+  if(pgDash) pgDash.classList.add('on');
+  if(navDash) navDash.classList.add('on');
+  const bnavDash = document.querySelector('.bnav-btn[data-bnav="dash"]');
+  if(bnavDash) bnavDash.classList.add('on');
+
+  // Xoá admin class
   document.body.classList.remove('is-admin');
-  // Reset fields
+  // Ẩn user badge
+  const userBadgeBtn = document.getElementById('userBadgeBtn');
+  if(userBadgeBtn) userBadgeBtn.style.display='none';
+  // Ẩn sync button
+  const syncBtn = document.getElementById('syncBtn');
+  if(syncBtn) syncBtn.style.display='none';
+
+  // Reset login form
   document.getElementById('loginUser').value='';
   document.getElementById('loginPass').value='';
   document.getElementById('authErr').style.display='none';
@@ -4632,33 +4868,108 @@ function renderUserList(){
   </tbody></table></div>`;
 }
 
-function showAddUserModal(){
-  document.getElementById('au-name').value='';
-  document.getElementById('au-cmnd').value='';
-  document.getElementById('au-pass').value=DEFAULT_PASS;
+// ── Biến lưu role đang chọn trong modal thêm user ────────────
+let _auSelectedRole = 'user';
+
+function _renderRoleSelector(selectedRole){
+  _auSelectedRole = selectedRole || 'user';
+  const container = document.getElementById('au-role-selector');
+  const desc = document.getElementById('au-role-desc');
+  if(!container) return;
+  const roles = ['user','supervisor']; // admin không thể tạo thêm admin qua UI này
+  container.innerHTML = roles.map(r => {
+    const rd = ROLE_DEFS[r];
+    const isSelected = r === _auSelectedRole;
+    return `<button type="button" onclick="_selectRole('${r}')" style="
+      padding:12px 8px;border-radius:var(--r-sm);border:2px solid ${isSelected?rd.color:'var(--border)'};
+      background:${isSelected?rd.bg:'var(--card)'};cursor:pointer;text-align:center;
+      font-family:inherit;transition:all .15s;
+    ">
+      <div style="font-size:20px;margin-bottom:4px">${r==='user'?'👤':r==='supervisor'?'🔍':'👑'}</div>
+      <div style="font-size:11.5px;font-weight:700;color:${isSelected?rd.color:'var(--text-2)'}">${rd.label.replace(/[👑🔍👤]/u,'').trim()}</div>
+    </button>`;
+  }).join('');
+  const rd = ROLE_DEFS[_auSelectedRole] || ROLE_DEFS.user;
+  if(desc) desc.innerHTML = `<b style="color:${rd.color}">${rd.label}</b><br>${rd.desc}<br>
+    <div style="margin-top:6px;font-size:11px;color:var(--text-3)">
+      <b>Có thể truy cập:</b> ${Object.entries(PAGE_PERMISSIONS).filter(([p,roles])=>roles.includes(_auSelectedRole)).map(([p])=>p).join(', ')}
+    </div>`;
+}
+
+function _selectRole(r){
+  _renderRoleSelector(r);
+}
+
+function showAddUserModal(editUsername){
+  const isEdit = !!editUsername;
+  const existingUser = isEdit ? loadUsers().find(u=>u.username===editUsername) : null;
+
+  document.getElementById('au-name').value = existingUser?.name || '';
+  document.getElementById('au-cmnd').value = existingUser?.username || '';
+  document.getElementById('au-cmnd').disabled = isEdit; // Không đổi CMND khi edit
+  document.getElementById('au-pass').value = isEdit ? '' : DEFAULT_PASS;
+  document.getElementById('au-pass').placeholder = isEdit ? '(Để trống = giữ nguyên)' : 'bvps@123';
+  const titleEl = document.getElementById('au-title');
+  if(titleEl) titleEl.value = existingUser?.title || '';
+
   // Populate khoa select
-  const kSel=document.getElementById('au-khoa');
-  kSel.innerHTML='<option value="">— Chọn khoa —</option>'+S.config.khoas.map(k=>`<option>${k}</option>`).join('');
+  const kSel = document.getElementById('au-khoa');
+  kSel.innerHTML = '<option value="">— Chọn khoa —</option>' + S.config.khoas.map(k=>`<option>${k}</option>`).join('');
+  if(existingUser?.khoa) kSel.value = existingUser.khoa;
+
+  // Role selector
+  _renderRoleSelector(existingUser?.role || 'user');
+
+  // Modal title
+  const title = document.querySelector('#addUserMo .md-title');
+  if(title) title.textContent = isEdit ? `✏️ Chỉnh sửa: ${existingUser?.name}` : '👤 Thêm / Cấp tài khoản';
+
+  // Store editing username
+  document.getElementById('addUserMo').dataset.editUsername = editUsername || '';
   openMo('addUserMo');
 }
 
 function saveNewUser(){
-  const name=(document.getElementById('au-name').value||'').trim();
-  const cmnd=(document.getElementById('au-cmnd').value||'').trim();
-  const role=document.getElementById('au-role-val').value;
-  const khoa=document.getElementById('au-khoa').value;
-  const pass=document.getElementById('au-pass').value||DEFAULT_PASS;
-  if(!name||!cmnd){ showNotif('⚠️ Vui lòng nhập họ tên và CMND/CCCD','err'); return; }
-  const users=loadUsers();
-  if(users.find(u=>u.username===cmnd)){ showNotif('❌ Tài khoản đã tồn tại','err'); return; }
-  users.push({ username:cmnd, name, role, khoa, password:hashPass(pass), active:true, mustChangePass:true, createdAt:new Date().toISOString() });
-  saveUsers(users);
-  addLog(`Tạo tài khoản: ${name} (${cmnd})`, `Role: ${role}, Khoa: ${khoa}`);
+  const editUsername = document.getElementById('addUserMo').dataset.editUsername;
+  const isEdit = !!editUsername;
+
+  const name = (document.getElementById('au-name').value || '').trim();
+  const cmnd = isEdit ? editUsername : (document.getElementById('au-cmnd').value || '').trim();
+  const role = _auSelectedRole || 'user';
+  const khoa = document.getElementById('au-khoa').value;
+  const pass = (document.getElementById('au-pass').value || '').trim();
+  const title = (document.getElementById('au-title')?.value || '').trim();
+
+  if(!name || !cmnd){ showNotif('⚠️ Vui lòng nhập họ tên và CMND/CCCD','err'); return; }
+
+  const users = loadUsers();
+
+  if(isEdit){
+    const idx = users.findIndex(u => u.username === editUsername);
+    if(idx < 0){ showNotif('❌ Không tìm thấy tài khoản','err'); return; }
+    users[idx].name = name;
+    users[idx].role = role;
+    users[idx].khoa = khoa;
+    users[idx].title = title;
+    if(pass) { users[idx].password = hashPass(pass); users[idx].mustChangePass = true; }
+    saveUsers(users);
+    addLog(`Cập nhật tài khoản: ${name} (${cmnd})`, `Role: ${role}, Khoa: ${khoa}`);
+    showNotif(`✅ Đã cập nhật tài khoản ${name}`, 'ok');
+  } else {
+    if(users.find(u => u.username === cmnd)){ showNotif('❌ Tài khoản đã tồn tại','err'); return; }
+    users.push({
+      username: cmnd, name, role, khoa, title,
+      password: hashPass(pass || DEFAULT_PASS),
+      active: true, mustChangePass: true, createdAt: new Date().toISOString()
+    });
+    saveUsers(users);
+    addLog(`Tạo tài khoản: ${name} (${cmnd})`, `Role: ${role}, Khoa: ${khoa}`);
+    showNotif(`✅ Đã tạo tài khoản cho ${name}`, 'ok');
+  }
+
   closeMo('addUserMo');
-  renderUserList();
-  // Đồng bộ lên sheet nếu có thể
+  window.renderUserList();
   syncUsersToSheet();
-  showNotif(`✅ Đã tạo tài khoản cho ${name}`,'ok');
 }
 
 function resetUserPass(username){
@@ -4675,13 +4986,20 @@ function resetUserPass(username){
 function toggleUserActive(username){
   const users=loadUsers();
   const idx=users.findIndex(u=>u.username===username);
-  if(idx>=0){ users[idx].active=!users[idx].active; saveUsers(users); renderUserList(); addLog(`${users[idx].active?'Kích hoạt':'Vô hiệu hóa'} tài khoản: ${username}`); }
+  if(idx>=0){
+    users[idx].active=!users[idx].active;
+    saveUsers(users);
+    window.renderUserList();
+    addLog(`${users[idx].active?'Kích hoạt':'Vô hiệu hóa'} tài khoản: ${username}`);
+    syncUsersToSheet();
+  }
 }
 
 function deleteUser(username){
   showConfirm('Xóa tài khoản',`Xóa tài khoản <b>${username}</b>? Không thể phục hồi.`,()=>{
     const users=loadUsers().filter(u=>u.username!==username);
-    saveUsers(users); renderUserList();
+    saveUsers(users);
+    window.renderUserList();
     addLog(`Xóa tài khoản: ${username}`);
     showNotif(`✅ Đã xóa tài khoản ${username}`,'ok');
   });
@@ -4826,19 +5144,17 @@ async function syncUsersToSheet(){
   }catch(e){}
 }
 
-// ── Patch go() để guard admin pages ───────────────────────────
-const _origGo = go;
-window.go = function(p){
-  const adminPages=['admin','gsheets','users','actlog'];
-  if(adminPages.includes(p) && currentUser?.role!=='admin'){
-    showNotif('🔒 Chỉ Quản trị viên mới có thể truy cập trang này','err');
-    return;
-  }
-  _origGo(p);
-  // Render page-specific data
-  if(p==='users'){ renderUserList(); renderPendingRequests(); }
-  if(p==='actlog'){ populateLogUserFilter(); renderActivityLog(); }
-};
+// ── go() extension: page-specific renders after navigation ─────
+// (Permission guard is now centralized in checkPagePermission above)
+(function(){
+  const _prevGo = window.go;
+  window.go = function(p){
+    _prevGo(p);
+    // Page-specific renders after successful navigation
+    if(p==='users'){ typeof renderUserList==='function' && renderUserList(); typeof renderPendingRequests==='function' && renderPendingRequests(); }
+    if(p==='actlog'){ typeof populateLogUserFilter==='function' && populateLogUserFilter(); typeof renderActivityLog==='function' && renderActivityLog(); }
+  };
+})();
 
 // ── Patch saveForm() & saveC4() & saveNKBV() để ghi log ───────
 // Capture original doSync FIRST before any patches
@@ -5134,40 +5450,78 @@ window.saveCfg = function(){
   if(el && lce) el.textContent = '📦 Xuất lần cuối: ' + new Date(lce).toLocaleString('vi-VN');
 };
 
-// ── Improved renderUserList with search ───────────────────────
-// Override the previously defined renderUserList
+// ── renderUserList — phiên bản đầy đủ với phân quyền ─────────
 window.renderUserList = function(){
   const q = (document.getElementById('userSearch')?.value||'').toLowerCase();
-  let users = loadUsers();
-  if(q) users = users.filter(u =>
+  let allUsers = loadUsers();
+  let users = q ? allUsers.filter(u =>
     u.name?.toLowerCase().includes(q) ||
     u.username?.toLowerCase().includes(q) ||
-    u.khoa?.toLowerCase().includes(q)
-  );
+    u.khoa?.toLowerCase().includes(q) ||
+    u.role?.toLowerCase().includes(q)
+  ) : allUsers;
+
   const body = document.getElementById('userListBody');
   if(!body) return;
+
   if(!users.length){
-    body.innerHTML=`<div style="text-align:center;color:var(--text-3);padding:24px;font-size:13px">${q?'🔍 Không tìm thấy người dùng nào phù hợp':'Chưa có người dùng nào. Nhấn <b>Thêm người dùng</b> hoặc <b>Nhập hàng loạt</b>.'}</div>`;
+    body.innerHTML=`<div style="text-align:center;color:var(--text-3);padding:28px;font-size:13px">
+      ${q?`🔍 Không tìm thấy kết quả cho "<b>${q}</b>"`:'<span>Chưa có người dùng nào.<br>Nhấn <b>＋ Thêm người dùng</b> hoặc <b>📥 Nhập hàng loạt</b> để bắt đầu.</span>'}
+    </div>`;
     return;
   }
-  const roleLabels={admin:'👑 Admin',supervisor:'🔍 Giám sát',user:'👤 Người dùng'};
-  body.innerHTML=`<div style="overflow-x:auto"><table class="dt"><thead><tr>
-    <th>Họ tên</th><th>CMND/CCCD</th><th>Vai trò</th><th>Khoa/Phòng</th><th>Trạng thái</th><th>Thao tác</th>
-  </tr></thead><tbody>
-  ${users.map(u=>`<tr>
-    <td><b>${u.name}</b></td>
-    <td style="font-family:monospace;font-size:12px">${u.username}</td>
-    <td><span class="badge bg-blue">${roleLabels[u.role]||u.role}</span></td>
-    <td>${u.khoa||'—'}</td>
-    <td><span class="badge ${u.active?'bg-ok':'bg-bad'}">${u.active?'✅ Hoạt động':'🚫 Vô hiệu'}</span>
-      ${u.mustChangePass?'<span class="badge bg-warn" style="margin-left:4px;font-size:9px">Đổi MK</span>':''}</td>
-    <td style="white-space:nowrap">
-      <button class="btn btn-o btn-xs" onclick="resetUserPass('${u.username}')" title="Reset mật khẩu">🔑</button>
-      <button class="btn ${u.active?'btn-a':'btn-g'} btn-xs" onclick="toggleUserActive('${u.username}')" title="${u.active?'Vô hiệu hóa':'Kích hoạt'}">${u.active?'🚫':'✅'}</button>
-      <button class="btn btn-r btn-xs" onclick="deleteUser('${u.username}')" title="Xóa">🗑️</button>
-    </td>
-  </tr>`).join('')}
-  </tbody></table></div><div style="font-size:11.5px;color:var(--text-3);padding:8px 4px">Hiển thị ${users.length}/${loadUsers().length} người dùng</div>`;
+
+  const roleColors = {admin:'var(--purple)',supervisor:'var(--blue)',user:'var(--teal)'};
+  const roleBg = {admin:'var(--purple-l)',supervisor:'var(--blue-l)',user:'var(--teal-l)'};
+
+  body.innerHTML = `
+  <div style="overflow-x:auto">
+  <table class="dt">
+    <thead><tr>
+      <th>Họ tên / Chức danh</th><th>CMND/CCCD</th><th>Vai trò</th>
+      <th>Khoa/Phòng</th><th>Trạng thái</th><th style="text-align:center">Thao tác</th>
+    </tr></thead>
+    <tbody>
+    ${users.map(u => {
+      const rd = ROLE_DEFS[u.role] || ROLE_DEFS.user;
+      const pageCount = Object.entries(PAGE_PERMISSIONS).filter(([p,roles])=>roles.includes(u.role)).length;
+      return `<tr style="${!u.active?'opacity:.6':''}">
+        <td>
+          <div style="font-weight:600">${u.name}</div>
+          ${u.title?`<div style="font-size:11px;color:var(--text-3)">${u.title}</div>`:''}
+        </td>
+        <td style="font-family:monospace;font-size:12px;color:var(--text-2)">${u.username}</td>
+        <td>
+          <span style="display:inline-flex;align-items:center;gap:4px;background:${roleBg[u.role]||'var(--bg-2)'};color:${roleColors[u.role]||'var(--text-2)'};border-radius:20px;padding:3px 9px;font-size:11px;font-weight:700">${rd.label}</span>
+          <div style="font-size:10px;color:var(--text-3);margin-top:2px">${pageCount} trang được phép</div>
+        </td>
+        <td>${u.khoa||'<span style="color:var(--text-3)">—</span>'}</td>
+        <td>
+          <span class="badge ${u.active?'bg-ok':'bg-bad'}">${u.active?'✅ Hoạt động':'🚫 Vô hiệu'}</span>
+          ${u.mustChangePass?'<br><span class="badge bg-warn" style="font-size:9px;margin-top:3px">⚠️ Phải đổi MK</span>':''}
+        </td>
+        <td style="white-space:nowrap;text-align:center">
+          <button class="btn btn-o btn-xs" onclick="showAddUserModal('${u.username}')" title="Chỉnh sửa / đổi vai trò">✏️</button>
+          <button class="btn btn-o btn-xs" onclick="resetUserPass('${u.username}')" title="Reset mật khẩu về mặc định">🔑</button>
+          <button class="btn ${u.active?'btn-a':'btn-g'} btn-xs" onclick="toggleUserActive('${u.username}')" title="${u.active?'Vô hiệu hóa':'Kích hoạt'}">${u.active?'🚫':'✅'}</button>
+          <button class="btn btn-r btn-xs" onclick="deleteUser('${u.username}')" title="Xóa tài khoản">🗑️</button>
+        </td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 4px;font-size:11.5px;color:var(--text-3)">
+    <span>Hiển thị <b>${users.length}</b>/${allUsers.length} người dùng</span>
+    <span>
+      ${['admin','supervisor','user'].map(r=>{
+        const cnt = allUsers.filter(u=>u.role===r).length;
+        if(!cnt) return '';
+        const rd = ROLE_DEFS[r];
+        return `<span style="background:${roleBg[r]};color:${roleColors[r]};border-radius:12px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:4px">${rd.label} ×${cnt}</span>`;
+      }).join('')}
+    </span>
+  </div>`;
 };
 
 // Overwrite DOMContentLoaded init to inject auth + extra inits
@@ -5734,20 +6088,8 @@ window.loadAllSharedConfigs = function(){
   }catch(e){}
 };
 
-// Make sure rptpl is in admin-only pages list
-const _adminPagesOrig = ['admin','gsheets','users','actlog'];
-// Patch the go() guard that was set earlier
-(function(){
-  const _lastGo = window.go;
-  window.go = function(p){
-    const allAdminPages = ['admin','gsheets','users','actlog','rptpl'];
-    if(allAdminPages.includes(p) && currentUser?.role !== 'admin'){
-      showNotif('🔒 Chỉ Quản trị viên mới có thể truy cập trang này','err');
-      return;
-    }
-    _lastGo(p);
-  };
-})();
+// PAGE_PERMISSIONS matrix above covers all admin/supervisor pages including 'rptpl'.
+// No additional guard needed here — checkPagePermission() handles all cases.
 
 </script>
 
