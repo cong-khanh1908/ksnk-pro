@@ -1247,6 +1247,59 @@ body.is-supervisor .nav-supervisor { display: flex !important; }
       <div class="sc g"><div class="sc-l">✅ Lần sync cuối</div><div class="sc-n" id="syncStatLast" style="font-size:12px;margin-top:6px">–</div></div>
     </div>
   </div>
+
+  <!-- NHUNG CAU HINH VAO FILE -->
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-title">🔧 Nhúng cấu hình vào file — Tự động đồng bộ đa thiết bị</div>
+    </div>
+    <div class="tip-box" style="margin-bottom:14px;background:linear-gradient(90deg,var(--teal-l),var(--green-l));border-color:var(--teal)">
+      <b>💡</b>
+      <div>
+        <b>Đây là cách triển khai đúng cho môi trường nhiều thiết bị:</b>
+        Admin nhúng SA Key + Sheet ID vào file HTML một lần duy nhất, rồi phân phát cho tất cả máy.
+        Từ đó, mỗi lần người dùng mở file — hệ thống <b>tự động kéo danh sách tài khoản từ GSheets</b>
+        trước khi hiện form đăng nhập, không cần admin can thiệp.
+      </div>
+    </div>
+    <div style="background:var(--bg-2);border-radius:var(--r-sm);border:1.5px solid var(--border);padding:16px;margin-bottom:14px">
+      <div style="font-weight:700;color:var(--navy);font-size:13px;margin-bottom:12px">📋 Các bước thực hiện:</div>
+      <div style="display:grid;gap:10px;font-size:13px;color:var(--text-2)">
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700;flex-shrink:0">1</div>
+          <div>Mở file <b>KSNK_Pro_*.html</b> bằng <b>Notepad, VS Code</b> hoặc bất kỳ text editor nào</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700;flex-shrink:0">2</div>
+          <div>Tìm kiếm <b>Ctrl+F</b> chuỗi: <code style="background:var(--bg);padding:2px 7px;border-radius:4px;font-size:12px;border:1px solid var(--border)">const EMBEDDED_SA_KEY = ``;</code></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700;flex-shrink:0">3</div>
+          <div>Paste <b>toàn bộ nội dung file Service Account JSON</b> vào giữa hai dấu backtick (<code>`</code>)</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700;flex-shrink:0">4</div>
+          <div>Tìm tiếp: <code style="background:var(--bg);padding:2px 7px;border-radius:4px;font-size:12px;border:1px solid var(--border)">const EMBEDDED_SHEET_ID = ``;</code> — điền ID Google Spreadsheet vào giữa backtick</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700;flex-shrink:0">5</div>
+          <div><b>Lưu file</b> và phân phát cho tất cả người dùng (USB, email, mạng nội bộ, Google Drive...)</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700;flex-shrink:0">✓</div>
+          <div style="color:var(--green)"><b>Xong!</b> Người dùng mở file → thấy màn hình "Đang kết nối..." → hệ thống tự kéo tài khoản về → vào form đăng nhập. Admin không cần làm thêm gì.</div>
+        </div>
+      </div>
+    </div>
+    <div class="tip-box" style="background:var(--amber-l);border-color:rgba(230,81,0,.3);margin-bottom:14px">
+      <b>⚠️</b>
+      <div><b>Lưu ý bảo mật:</b> File HTML sau khi nhúng SA Key chứa thông tin xác thực. Chỉ phân phát trong mạng nội bộ hoặc kênh bảo mật. Nếu cần đổi SA Key, cập nhật file và phân phát lại.</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-o" onclick="showEmbedStatus()">🔍 Kiểm tra trạng thái nhúng</button>
+    </div>
+    <div id="embedStatusResult" style="display:none;margin-top:12px"></div>
+  </div>
 </div>
 
 <!-- ══ NKBV: GHI NHẬN CA NHIỄM KHUẨN BỆNH VIỆN ══ -->
@@ -2090,14 +2143,14 @@ body.is-supervisor .nav-supervisor { display: flex !important; }
     <div class="tip-box">
       <b>💡</b><span>Tên đăng nhập = <b>Số CMND/CCCD</b>, mật khẩu mặc định <b>bvps@123</b>. Dùng <b>"Nhập hàng loạt"</b> để tạo nhiều tài khoản cùng lúc từ file Excel.</span>
     </div>
-    <div class="tip-warn" style="margin-top:8px">
-      <b>📱</b>
+    <div class="tip-box" style="margin-top:8px;background:linear-gradient(90deg,var(--green-l),rgba(21,101,192,.04));border-color:var(--green)">
+      <b>✅</b>
       <div>
-        <b>Quan trọng — Đồng bộ đa thiết bị:</b> Danh sách tài khoản lưu trong bộ nhớ trình duyệt của từng thiết bị. 
-        Khi tạo tài khoản trên máy Admin, các thiết bị khác <b>chưa tự động có</b> danh sách này.
-        <br>Giải pháp: <b>(1)</b> Kết nối Google Sheets → mỗi lần tạo/sửa tài khoản sẽ tự đẩy lên Sheet.
-        <b>(2)</b> Trên thiết bị mới, sau khi cấu hình GS, bấm <b>☁️ Đồng bộ GSheets</b> để kéo danh sách về.
-        Không có GS: xuất Excel → gửi file → import trên thiết bị kia.
+        <b>Đồng bộ đa thiết bị — Hoạt động tự động:</b>
+        Khi file đã được nhúng <b>SA Key + Sheet ID</b> (xem mục <i>Kết nối Google Sheets → Nhúng cấu hình vào file</i>),
+        mọi thiết bị mở file đều <b>tự động kéo danh sách tài khoản từ Google Sheets ngay lúc khởi động</b> —
+        trước cả khi hiện form đăng nhập. Admin chỉ cần tạo/sửa tài khoản trên máy Admin,
+        các máy khác tự nhận ra <b>mà không cần cấu hình thêm</b>.
       </div>
     </div>
     <!-- Search bar -->
@@ -4234,6 +4287,49 @@ const ADMIN_USER      = 'admin';
 const ADMIN_PASS_KEY  = 'ksnk_admin_pass';
 
 // ============================================================
+//  EMBEDDED CONFIG — Admin nhúng SA Key + Sheet ID vào file
+//  trước khi phân phát. Các thiết bị nhận file sẽ tự kết nối.
+//  ──────────────────────────────────────────────────────────
+//  HƯỚNG DẪN CHO ADMIN:
+//  1. Mở file HTML bằng Notepad hoặc VS Code
+//  2. Tìm EMBEDDED_SA_KEY → paste nội dung JSON Service Account
+//     vào giữa hai dấu backtick
+//  3. Tìm EMBEDDED_SHEET_ID → điền ID Google Spreadsheet
+//  4. Lưu và phân phát file — người dùng chỉ cần mở và đăng nhập
+// ============================================================
+
+// ❶ Paste nội dung Service Account JSON vào đây (giữa backtick):
+const EMBEDDED_SA_KEY = ``;
+
+// ❷ Điền Spreadsheet ID vào đây (giữa backtick):
+const EMBEDDED_SHEET_ID = ``;
+
+// Áp dụng embedded config vào runtime ngay khi load
+(function applyEmbeddedConfig(){
+  try{
+    if(typeof EMBEDDED_SA_KEY !== 'undefined' && EMBEDDED_SA_KEY && EMBEDDED_SA_KEY.trim()){
+      const sa = JSON.parse(EMBEDDED_SA_KEY.trim());
+      if(sa && sa.client_email && sa.private_key){
+        S.serviceAccount = sa;
+        localStorage.setItem('ksnk_sa_key', JSON.stringify(sa));
+        try{
+          const enc = btoa(unescape(encodeURIComponent(JSON.stringify(sa))));
+          localStorage.setItem('ksnk_shared_sa_v7', enc);
+        }catch(e){}
+      }
+    }
+    if(typeof EMBEDDED_SHEET_ID !== 'undefined' && EMBEDDED_SHEET_ID && EMBEDDED_SHEET_ID.trim()){
+      S.config.spreadsheetId = EMBEDDED_SHEET_ID.trim();
+      try{
+        const gs = JSON.parse(localStorage.getItem('ksnk_shared_gs_v7')||'{}');
+        gs.spreadsheetId = EMBEDDED_SHEET_ID.trim();
+        localStorage.setItem('ksnk_shared_gs_v7', JSON.stringify(gs));
+      }catch(e){}
+    }
+  }catch(e){ console.warn('applyEmbeddedConfig:', e); }
+})();
+
+// ============================================================
 //  SHARED CONFIG — Admin cấu hình 1 lần, mọi user tự load
 //  Key lưu trong localStorage với prefix đặc biệt
 //  SA Key (nhạy cảm) chỉ lưu ở admin device
@@ -4425,10 +4521,10 @@ async function syncLogToSheet(recentLogs){
 }
 
 // ── Auth Init ─────────────────────────────────────────────────
-function authInit(){
+async function authInit(){
   // Load shared configs trước (cho mọi user kể cả khi chưa đăng nhập)
   loadAllSharedConfigs();
-  
+
   // Kiểm tra session còn hiệu lực
   try{
     const sess = JSON.parse(sessionStorage.getItem(SESSION_KEY));
@@ -4438,8 +4534,48 @@ function authInit(){
       return;
     }
   }catch(e){}
-  // Hiển thị overlay đăng nhập
+
+  // Tự động kéo danh sách tài khoản từ GSheets trước khi đăng nhập.
+  // Điều kiện: có SA Key + Sheet ID (embedded vào file hoặc đã cấu hình trước).
+  // Người dùng không cần làm gì thêm — Admin chỉ cần phân phát đúng file.
+  const hasGS = !!(S.serviceAccount && S.config.spreadsheetId);
+  if(hasGS && navigator.onLine){
+    _showAuthLoading('🔄 Đang kết nối hệ thống...');
+    try{
+      const result = await pullUsersFromSheet();
+      if(result){
+        _showAuthLoading('✅ Đồng bộ tài khoản thành công');
+        await new Promise(r => setTimeout(r, 700));
+      }
+    }catch(e){}
+    _hideAuthLoading();
+  }
+
+  // Hiển thị form đăng nhập
   document.getElementById('authOverlay').style.display = 'flex';
+}
+
+// ── Loading screen helpers ────────────────────────────────────
+function _showAuthLoading(msg){
+  let el = document.getElementById('_authLoadingOverlay');
+  if(!el){
+    el = document.createElement('div');
+    el.id = '_authLoadingOverlay';
+    el.style.cssText = 'position:fixed;inset:0;background:linear-gradient(135deg,#0a2d4a,#0e3d62);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;color:#fff;gap:16px;font-size:15px;font-weight:500;letter-spacing:.02em';
+    el.innerHTML = '<div style="font-size:44px">🏥</div>'
+      + '<div id="_authLoadingText" style="opacity:.9"></div>'
+      + '<div style="width:200px;height:3px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden">'
+      + '<div style="height:100%;background:#4ade80;border-radius:2px;animation:_ldbar 2s ease-in-out infinite"></div></div>'
+      + '<style>@keyframes _ldbar{0%{width:0%}70%{width:100%}100%{width:100%}}</style>';
+    document.body.appendChild(el);
+  }
+  const t = document.getElementById('_authLoadingText');
+  if(t) t.textContent = msg;
+  el.style.display = 'flex';
+}
+function _hideAuthLoading(){
+  const el = document.getElementById('_authLoadingOverlay');
+  if(el) el.style.display = 'none';
 }
 
 function toggleDefaultInfo(){
@@ -4465,7 +4601,7 @@ function showRequestPanel(){
 }
 
 // ── Đăng nhập ─────────────────────────────────────────────────
-function doLogin(){
+async function doLogin(){
   const u = (document.getElementById('loginUser').value||'').trim();
   const p = document.getElementById('loginPass').value;
   const errEl = document.getElementById('authErr');
@@ -4476,7 +4612,7 @@ function doLogin(){
     errEl.style.display='block'; return;
   }
 
-  // Kiểm tra admin
+  // Kiểm tra admin (luôn local, không qua GSheets)
   if(u.toLowerCase() === ADMIN_USER){
     if(hashPass(p) === loadAdminPass()){
       currentUser = { username:'admin', name:'Quản trị viên', role:'admin', khoa:'Hệ thống' };
@@ -4490,9 +4626,28 @@ function doLogin(){
     }
   }
 
-  // Kiểm tra người dùng thường
-  const users = loadUsers();
-  const found = users.find(x => x.username === u);
+  // ── Kiểm tra người dùng thường ──────────────────────────────
+  // Bước 1: Thử local trước (nhanh, hoạt động offline)
+  let users = loadUsers();
+  let found  = users.find(x => x.username === u);
+
+  // Bước 2: Nếu không tìm thấy + có kết nối GSheets + có Internet
+  //         → Tự động fetch từ GSheets rồi thử lại.
+  //         Xử lý trường hợp thiết bị mới hoặc authInit() bị offline.
+  if(!found && S.serviceAccount && S.config.spreadsheetId && navigator.onLine){
+    const btn = document.querySelector('#authLoginCard .btn-p');
+    const origHTML = btn ? btn.innerHTML : '';
+    if(btn){ btn.innerHTML = '🔄 Đang xác thực...'; btn.disabled = true; }
+    try{
+      const result = await pullUsersFromSheet();
+      if(result){
+        users = loadUsers();
+        found  = users.find(x => x.username === u);
+      }
+    }catch(e){}
+    if(btn){ btn.innerHTML = origHTML; btn.disabled = false; }
+  }
+
   if(!found){
     errEl.textContent='❌ Tài khoản không tồn tại hoặc chưa được cấp.';
     errEl.style.display='block';
@@ -6202,6 +6357,33 @@ window.loadAllSharedConfigs = function(){
 
 // PAGE_PERMISSIONS matrix above covers all admin/supervisor pages including 'rptpl'.
 // No additional guard needed here — checkPagePermission() handles all cases.
+
+
+// ── Embedded Config Status Helper ────────────────────────────
+function showEmbedStatus(){
+  const el = document.getElementById('embedStatusResult');
+  if(!el) return;
+  const hasSA = !!(typeof EMBEDDED_SA_KEY !== 'undefined' && EMBEDDED_SA_KEY && EMBEDDED_SA_KEY.trim());
+  const hasID = !!(typeof EMBEDDED_SHEET_ID !== 'undefined' && EMBEDDED_SHEET_ID && EMBEDDED_SHEET_ID.trim());
+  const hasRuntime = !!(S.serviceAccount && S.config.spreadsheetId);
+  const saEmail = S.serviceAccount ? S.serviceAccount.client_email : '';
+  const sheetId = S.config.spreadsheetId || '';
+  let html = '<div style="font-size:13px;display:grid;gap:8px;padding:12px;background:var(--bg-2);border-radius:var(--r-sm);border:1px solid var(--border)">';
+  html += '<div>' + (hasSA ? '&#x2705;' : '&#x274C;') + ' <b>EMBEDDED_SA_KEY:</b> '
+    + (hasSA ? 'Da nhung &mdash; <code style="font-size:11px">' + saEmail + '</code>' : '<span style="color:var(--amber)">Chua nhung (de trong)</span>') + '</div>';
+  html += '<div>' + (hasID ? '&#x2705;' : '&#x274C;') + ' <b>EMBEDDED_SHEET_ID:</b> '
+    + (hasID ? '<code style="font-size:11px">' + sheetId + '</code>' : '<span style="color:var(--amber)">Chua nhung (de trong)</span>') + '</div>';
+  html += '<div>' + (hasRuntime ? '&#x2705;' : '&#x26A0;') + ' <b>Ket noi hien tai:</b> '
+    + (hasRuntime ? 'Co SA Key + Sheet ID (san sang tu dong bo)' : 'Chua co &mdash; thiet bi nay se khong tu dong bo khi khoi dong') + '</div>';
+  if(!hasSA || !hasID){
+    html += '<div style="background:var(--amber-l);border-radius:5px;padding:8px;color:var(--amber);margin-top:4px">Huong dan: Mo file HTML bang text editor, tim EMBEDDED_SA_KEY va EMBEDDED_SHEET_ID, dien vao va phan phat lai.</div>';
+  } else {
+    html += '<div style="background:var(--green-l);border-radius:5px;padding:8px;color:var(--green);margin-top:4px">File nay da duoc nhung cau hinh day du &mdash; san sang phan phat cho tat ca thiet bi!</div>';
+  }
+  html += '</div>';
+  el.innerHTML = html;
+  el.style.display = 'block';
+}
 
 </script>
 
