@@ -1257,9 +1257,12 @@ body.is-supervisor .nav-supervisor { display: flex !important; }
       <b>💡</b>
       <div>
         <b>Đây là cách triển khai đúng cho môi trường nhiều thiết bị:</b>
-        Admin nhúng SA Key + Sheet ID vào file HTML một lần duy nhất, rồi phân phát cho tất cả máy.
-        Từ đó, mỗi lần người dùng mở file — hệ thống <b>tự động kéo danh sách tài khoản từ GSheets</b>
-        trước khi hiện form đăng nhập, không cần admin can thiệp.
+        Admin nhúng cấu hình vào file HTML một lần duy nhất, rồi phân phát cho tất cả máy.
+        Từ đó, mỗi lần người dùng mở file — hệ thống <b>tự động kéo danh sách tài khoản</b>
+        trước khi hiện form đăng nhập, không cần admin can thiệp.<br><br>
+        <b>Có 2 phương thức nhúng:</b><br>
+        <b>① SA Key</b> (file phân phát nội bộ): nhúng Service Account JSON + Sheet ID. Đầy đủ tính năng, đồng bộ 2 chiều.<br>
+        <b>② GAS URL</b> (GitHub Pages / web công khai): nhúng URL Google Apps Script. Không lộ SA Key. Chỉ đọc danh sách user.
       </div>
     </div>
     <div style="background:var(--bg-2);border-radius:var(--r-sm);border:1.5px solid var(--border);padding:16px;margin-bottom:14px">
@@ -1291,6 +1294,44 @@ body.is-supervisor .nav-supervisor { display: flex !important; }
         </div>
       </div>
     </div>
+
+    <div style="background:var(--bg-2);border-radius:var(--r-sm);border:1.5px solid var(--blue-l);padding:16px;margin-bottom:14px">
+      <div style="font-weight:700;color:var(--blue);font-size:13px;margin-bottom:10px">🌐 Phương án ② — Google Apps Script URL (cho GitHub Pages)</div>
+      <div style="font-size:12.5px;color:var(--text-2);margin-bottom:10px">
+        Nếu file đặt trên GitHub Pages hoặc chia sẻ công khai (không thể nhúng SA Key),
+        dùng Google Apps Script làm trung gian. Script đọc sheet Nguoi_Dung và trả về JSON.
+      </div>
+      <div style="font-size:12px;color:var(--text-2);background:var(--bg);border-radius:6px;padding:12px;font-family:monospace;line-height:1.8;border:1px solid var(--border);margin-bottom:10px">
+        <b>// Tạo file Apps Script mới (script.google.com), paste code sau:</b><br>
+        function doGet(e) {<br>
+        &nbsp;&nbsp;const action = e?.parameter?.action;<br>
+        &nbsp;&nbsp;if(action === 'getUsers') {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;const ss = SpreadsheetApp.openById('<b>[SHEET_ID]</b>');<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;const sh = ss.getSheetByName('Nguoi_Dung');<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;if(!sh) return ContentService.createTextOutput(JSON.stringify({users:[]})).setMimeType(ContentService.MimeType.JSON);<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;const rows = sh.getDataRange().getValues();<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;const h = rows[0]; const data = rows.slice(1);<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;const ci=h.indexOf('CMND/CCCD'),ni=h.indexOf('Họ tên'),ri=h.indexOf('Vai trò'),ki=h.indexOf('Khoa'),si=h.indexOf('Trạng thái'),pi=h.indexOf('Password_Hash');<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;const users = data.filter(r=>r[ci]).map(r=>({username:String(r[ci]),name:String(r[ni]||''),role:String(r[ri]||'user'),khoa:String(r[ki]||''),active:String(r[si]||'').includes('Hoạt'),password:pi>=0?String(r[pi]||''):''}));<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;return ContentService.createTextOutput(JSON.stringify({users})).setMimeType(ContentService.MimeType.JSON);<br>
+        &nbsp;&nbsp;}<br>
+        &nbsp;&nbsp;return ContentService.createTextOutput('{}').setMimeType(ContentService.MimeType.JSON);<br>
+        }
+      </div>
+      <div style="font-size:12.5px;color:var(--text-2);margin-bottom:10px">Sau khi tạo: <b>Deploy → New deployment → Web app → Execute as: Me → Who has access: Anyone → Deploy</b> → Copy URL.</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <label class="fl">GAS Web App URL</label>
+          <input type="text" class="fc" id="gasUrlInput" placeholder="https://script.google.com/macros/s/.../exec" style="margin-top:4px">
+        </div>
+        <div style="margin-top:18px">
+          <button class="btn btn-p" onclick="saveGASUrl()">💾 Lưu GAS URL</button>
+          <button class="btn btn-o" style="margin-left:6px" onclick="testGASUrl()">🔌 Test</button>
+        </div>
+      </div>
+      <div id="gasTestResult" style="display:none;margin-top:8px;font-size:12.5px"></div>
+    </div>
+
     <div class="tip-box" style="background:var(--amber-l);border-color:rgba(230,81,0,.3);margin-bottom:14px">
       <b>⚠️</b>
       <div><b>Lưu ý bảo mật:</b> File HTML sau khi nhúng SA Key chứa thông tin xác thực. Chỉ phân phát trong mạng nội bộ hoặc kênh bảo mật. Nếu cần đổi SA Key, cập nhật file và phân phát lại.</div>
@@ -4299,10 +4340,18 @@ const ADMIN_PASS_KEY  = 'ksnk_admin_pass';
 // ============================================================
 
 // ❶ Paste nội dung Service Account JSON vào đây (giữa backtick):
+//    (Dùng cho file phân phát nội bộ — KHÔNG dùng nếu deploy lên GitHub Pages công khai)
 const EMBEDDED_SA_KEY = ``;
 
 // ❷ Điền Spreadsheet ID vào đây (giữa backtick):
 const EMBEDDED_SHEET_ID = ``;
+
+// ❸ [PHƯƠNG ÁN THAY THẾ — dành cho GitHub Pages / file chia sẻ công khai]
+//    Điền URL Google Apps Script Web App vào đây.
+//    Apps Script đóng vai trò "proxy" — đọc danh sách user từ Sheet và trả về JSON.
+//    Không cần SA Key, không lộ thông tin xác thực trong file HTML.
+//    Xem hướng dẫn tạo Apps Script trong phần Kết nối GSheets → Nhúng cấu hình.
+const EMBEDDED_GAS_URL = ``;
 
 // Áp dụng embedded config vào runtime ngay khi load
 (function applyEmbeddedConfig(){
@@ -4326,8 +4375,67 @@ const EMBEDDED_SHEET_ID = ``;
         localStorage.setItem('ksnk_shared_gs_v7', JSON.stringify(gs));
       }catch(e){}
     }
+    // Lưu GAS URL vào localStorage để các hàm khác dùng được
+    if(typeof EMBEDDED_GAS_URL !== 'undefined' && EMBEDDED_GAS_URL && EMBEDDED_GAS_URL.trim()){
+      localStorage.setItem('ksnk_gas_url', EMBEDDED_GAS_URL.trim());
+    }
   }catch(e){ console.warn('applyEmbeddedConfig:', e); }
 })();
+
+// ── Lấy danh sách user qua Google Apps Script (không cần SA Key) ──
+// Dùng khi EMBEDDED_GAS_URL được điền — phù hợp cho GitHub Pages / web public.
+async function pullUsersViaGAS(){
+  const gasUrl = (typeof EMBEDDED_GAS_URL !== 'undefined' && EMBEDDED_GAS_URL && EMBEDDED_GAS_URL.trim())
+    ? EMBEDDED_GAS_URL.trim()
+    : localStorage.getItem('ksnk_gas_url');
+  if(!gasUrl) return false;
+  try{
+    const res = await fetch(gasUrl + '?action=getUsers', { method: 'GET' });
+    if(!res.ok) return false;
+    const data = await res.json();
+    if(!data || !Array.isArray(data.users)) return false;
+
+    const localUsers = loadUsers();
+    const localPassMap = {};
+    localUsers.forEach(u => { localPassMap[u.username] = u.password; });
+
+    const newUsers = data.users.map(u => ({
+      username: String(u.username||'').trim(),
+      name:     String(u.name||'').trim(),
+      role:     String(u.role||'user').trim(),
+      khoa:     String(u.khoa||'').trim(),
+      active:   u.active !== false && String(u.active||'').toLowerCase() !== 'false',
+      password: localPassMap[u.username] || u.password || hashPass(DEFAULT_PASS),
+      mustChangePass: localUsers.find(l=>l.username===u.username)?.mustChangePass ?? true,
+      createdAt: localUsers.find(l=>l.username===u.username)?.createdAt || new Date().toISOString(),
+      _fromSheet: true
+    })).filter(u => u.username);
+
+    if(newUsers.length === 0) return false; // Không ghi đè nếu sheet rỗng
+    const removed = localUsers.filter(u => !newUsers.find(n => n.username === u.username)).length;
+    saveUsers(newUsers);
+    addLog('Dong bo user qua GAS', 'Tong: ' + newUsers.length + ', Xoa: ' + removed);
+    return { total: newUsers.length, removed };
+  }catch(e){
+    console.warn('pullUsersViaGAS error:', e);
+    return false;
+  }
+}
+
+// ── Hàm tổng hợp: kéo user bằng bất kỳ phương thức nào có sẵn ──
+async function pullUsersAuto(){
+  // Ưu tiên 1: SA Key (đầy đủ tính năng)
+  if(S.serviceAccount && S.config.spreadsheetId){
+    return await pullUsersFromSheet();
+  }
+  // Ưu tiên 2: GAS URL (không cần SA Key, phù hợp GitHub Pages)
+  const gasUrl = (typeof EMBEDDED_GAS_URL !== 'undefined' && EMBEDDED_GAS_URL && EMBEDDED_GAS_URL.trim())
+    ? EMBEDDED_GAS_URL.trim() : localStorage.getItem('ksnk_gas_url');
+  if(gasUrl){
+    return await pullUsersViaGAS();
+  }
+  return false;
+}
 
 // ============================================================
 //  SHARED CONFIG — Admin cấu hình 1 lần, mọi user tự load
@@ -4535,16 +4643,18 @@ async function authInit(){
     }
   }catch(e){}
 
-  // Tự động kéo danh sách tài khoản từ GSheets trước khi đăng nhập.
-  // Điều kiện: có SA Key + Sheet ID (embedded vào file hoặc đã cấu hình trước).
-  // Người dùng không cần làm gì thêm — Admin chỉ cần phân phát đúng file.
-  const hasGS = !!(S.serviceAccount && S.config.spreadsheetId);
-  if(hasGS && navigator.onLine){
+  // Tự động kéo danh sách tài khoản trước khi đăng nhập.
+  // Hỗ trợ 2 phương thức: SA Key (nội bộ) hoặc GAS URL (GitHub Pages/public).
+  const hasGS  = !!(S.serviceAccount && S.config.spreadsheetId);
+  const gasUrl = (typeof EMBEDDED_GAS_URL !== 'undefined' && EMBEDDED_GAS_URL && EMBEDDED_GAS_URL.trim())
+    ? EMBEDDED_GAS_URL.trim() : localStorage.getItem('ksnk_gas_url');
+  const canAutoSync = (hasGS || !!gasUrl) && navigator.onLine;
+  if(canAutoSync){
     _showAuthLoading('🔄 Đang kết nối hệ thống...');
     try{
-      const result = await pullUsersFromSheet();
+      const result = await pullUsersAuto();
       if(result){
-        _showAuthLoading('✅ Đồng bộ tài khoản thành công');
+        _showAuthLoading('✅ Đồng bộ ' + (result.total||'') + ' tài khoản thành công');
         await new Promise(r => setTimeout(r, 700));
       }
     }catch(e){}
@@ -4634,12 +4744,16 @@ async function doLogin(){
   // Bước 2: Nếu không tìm thấy + có kết nối GSheets + có Internet
   //         → Tự động fetch từ GSheets rồi thử lại.
   //         Xử lý trường hợp thiết bị mới hoặc authInit() bị offline.
-  if(!found && S.serviceAccount && S.config.spreadsheetId && navigator.onLine){
+  // Fallback: nếu không tìm thấy local, thử kéo từ GSheets/GAS rồi tìm lại
+  const gasUrl2 = (typeof EMBEDDED_GAS_URL !== 'undefined' && EMBEDDED_GAS_URL && EMBEDDED_GAS_URL.trim())
+    ? EMBEDDED_GAS_URL.trim() : localStorage.getItem('ksnk_gas_url');
+  const canFetch = (S.serviceAccount && S.config.spreadsheetId) || !!gasUrl2;
+  if(!found && canFetch && navigator.onLine){
     const btn = document.querySelector('#authLoginCard .btn-p');
     const origHTML = btn ? btn.innerHTML : '';
     if(btn){ btn.innerHTML = '🔄 Đang xác thực...'; btn.disabled = true; }
     try{
-      const result = await pullUsersFromSheet();
+      const result = await pullUsersAuto();
       if(result){
         users = loadUsers();
         found  = users.find(x => x.username === u);
@@ -5204,6 +5318,8 @@ function deleteUser(username){
     window.renderUserList();
     addLog(`Xóa tài khoản: ${username}`);
     showNotif(`✅ Đã xóa tài khoản ${username}`,'ok');
+    // Đồng bộ ngay lên GSheets — ghi đè toàn bộ sheet với danh sách đã xóa
+    syncUsersToSheet();
   });
 }
 
@@ -5333,54 +5449,59 @@ function exportActivityLog(){
 
 // ── Đồng bộ danh sách Users lên GSheet ───────────────────────
 async function pullUsersFromSheet(){
-  // Kéo danh sách người dùng từ Google Sheets về thiết bị này
+  // Kéo danh sách người dùng từ Google Sheets về thiết bị này.
+  // QUAN TRỌNG: GSheets là NGUỒN SỰ THẬT duy nhất.
+  // Hàm này THAY THẾ HOÀN TOÀN danh sách local bằng danh sách từ Sheet.
+  // Tài khoản đã bị admin xóa khỏi Sheet sẽ bị xóa khỏi local theo.
   if(!S.serviceAccount || !S.config.spreadsheetId) return false;
   try {
     const res = await gFetch('GET',`/values/Nguoi_Dung!A1:Z500`);
     if(!res || !res.values || res.values.length < 2) return false;
-    const headers = res.values[0]; // ['CMND/CCCD','Họ tên','Vai trò','Khoa','Trạng thái',...]
-    const rows    = res.values.slice(1);
-    const cmndIdx  = headers.indexOf('CMND/CCCD');
-    const nameIdx  = headers.indexOf('Họ tên');
-    const roleIdx  = headers.indexOf('Vai trò');
-    const khoaIdx  = headers.indexOf('Khoa');
-    const statIdx  = headers.indexOf('Trạng thái');
-    const passIdx  = headers.indexOf('Password_Hash'); // optional
+    const headers = res.values[0];
+    const rows    = res.values.slice(1).filter(r => r.length > 0);
+    const cmndIdx = headers.indexOf('CMND/CCCD');
+    const nameIdx = headers.indexOf('Họ tên');
+    const roleIdx = headers.indexOf('Vai trò');
+    const khoaIdx = headers.indexOf('Khoa');
+    const statIdx = headers.indexOf('Trạng thái');
+    const passIdx = headers.indexOf('Password_Hash');
     if(cmndIdx < 0 || nameIdx < 0) return false;
 
-    const existing = loadUsers();
-    let updated = 0, added = 0;
+    // Giữ lại mật khẩu local đã đổi (để không bị ghi đè bởi hash mặc định)
+    const localUsers = loadUsers();
+    const localPassMap = {};
+    localUsers.forEach(u => { localPassMap[u.username] = u.password; });
+
+    // Xây danh sách MỚI hoàn toàn từ Sheet (không merge với local cũ)
+    let added = 0, updated = 0;
+    const newUsers = [];
 
     rows.forEach(row => {
-      if(!row[cmndIdx]) return;
-      const cmnd   = String(row[cmndIdx]).trim();
+      const cmnd = String(row[cmndIdx]||'').trim();
+      if(!cmnd) return;
       const name   = String(row[nameIdx]||'').trim();
       const role   = String(row[roleIdx]||'user').trim();
       const khoa   = String(row[khoaIdx]||'').trim();
-      const active = String(row[statIdx]||'').includes('Hoạt động');
-      // Mật khẩu: dùng hash từ sheet hoặc hash mặc định
-      const passHash = passIdx >= 0 && row[passIdx]
-        ? String(row[passIdx]).trim()
-        : hashPass(DEFAULT_PASS);
-
-      const idx = existing.findIndex(u => u.username === cmnd);
-      if(idx >= 0){
-        // Update thông tin nhưng GIỮ mật khẩu hiện tại nếu đã đổi
-        const keepPass = existing[idx].password || passHash;
-        existing[idx] = { ...existing[idx], name, role, khoa, active,
-          password: keepPass, mustChangePass: existing[idx].mustChangePass ?? true };
-        updated++;
-      } else {
-        existing.push({ username: cmnd, name, role, khoa, active,
-          password: passHash, mustChangePass: true,
-          createdAt: new Date().toISOString(), _fromSheet: true });
-        added++;
-      }
+      const active = String(row[statIdx]||'').toLowerCase().includes('ho');
+      const sheetPassHash = passIdx >= 0 && row[passIdx] ? String(row[passIdx]).trim() : '';
+      // Ưu tiên: (1) mật khẩu đã đổi trên local, (2) hash từ sheet, (3) hash mặc định
+      const finalPass = localPassMap[cmnd] || sheetPassHash || hashPass(DEFAULT_PASS);
+      const wasLocal = localUsers.find(u => u.username === cmnd);
+      if(wasLocal) updated++; else added++;
+      newUsers.push({
+        username: cmnd, name, role, khoa, active,
+        password: finalPass,
+        mustChangePass: wasLocal ? (wasLocal.mustChangePass ?? true) : true,
+        createdAt: wasLocal?.createdAt || new Date().toISOString(),
+        _fromSheet: true
+      });
     });
 
-    saveUsers(existing);
-    addLog('Đồng bộ người dùng từ Sheet', `Cập nhật: ${updated}, Thêm mới: ${added}`);
-    return { updated, added, total: existing.length };
+    // Ghi đè hoàn toàn — tài khoản không có trong Sheet sẽ bị xóa khỏi local
+    const removed = localUsers.filter(u => !newUsers.find(n => n.username === u.username)).length;
+    saveUsers(newUsers);
+    addLog('Đồng bộ người dùng từ Sheet', `Thêm: ${added}, Cập nhật: ${updated}, Xóa: ${removed}, Tổng: ${newUsers.length}`);
+    return { added, updated, removed, total: newUsers.length };
   } catch(e) {
     console.error('pullUsersFromSheet error:', e);
     return false;
@@ -5419,6 +5540,11 @@ async function syncUsersToSheet(){
     _prevGo(p);
     // Page-specific renders after successful navigation
     if(p==='users'){ typeof renderUserList==='function' && renderUserList(); typeof renderPendingRequests==='function' && renderPendingRequests(); }
+    if(p==='gsheets'){
+      const saved = localStorage.getItem('ksnk_gas_url');
+      const inp = document.getElementById('gasUrlInput');
+      if(inp && saved) inp.value = saved;
+    }
     if(p==='actlog'){ typeof populateLogUserFilter==='function' && populateLogUserFilter(); typeof renderActivityLog==='function' && renderActivityLog(); }
   };
 })();
@@ -6358,6 +6484,35 @@ window.loadAllSharedConfigs = function(){
 // PAGE_PERMISSIONS matrix above covers all admin/supervisor pages including 'rptpl'.
 // No additional guard needed here — checkPagePermission() handles all cases.
 
+
+// ── GAS URL helpers ──────────────────────────────────────────
+function saveGASUrl(){
+  const url = (document.getElementById('gasUrlInput')?.value||'').trim();
+  if(!url){ showNotif('Vui long nhap URL','err'); return; }
+  localStorage.setItem('ksnk_gas_url', url);
+  showNotif('Da luu GAS URL','ok');
+  renderSharedConfigStatus && renderSharedConfigStatus();
+}
+async function testGASUrl(){
+  const url = (document.getElementById('gasUrlInput')?.value||'').trim() || localStorage.getItem('ksnk_gas_url');
+  const el = document.getElementById('gasTestResult');
+  if(!url){ showNotif('Vui long nhap URL truoc','err'); return; }
+  if(el){ el.style.display='block'; el.innerHTML='<span style="color:var(--blue)">Dang kiem tra...</span>'; }
+  try{
+    const res = await fetch(url + '?action=getUsers');
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if(data && Array.isArray(data.users)){
+      if(el) el.innerHTML = '<span style="color:var(--green)">Ket noi thanh cong! Co ' + data.users.length + ' tai khoan.</span>';
+      showNotif('Ket noi GAS thanh cong!', 'ok');
+    } else {
+      if(el) el.innerHTML = '<span style="color:var(--amber)">Ket noi duoc nhung khong co du lieu user.</span>';
+    }
+  }catch(e){
+    if(el) el.innerHTML = '<span style="color:var(--red)">Loi: ' + e.message + '. Kiem tra URL va CORS settings.</span>';
+    showNotif('Loi ket noi GAS', 'err');
+  }
+}
 
 // ── Embedded Config Status Helper ────────────────────────────
 function showEmbedStatus(){
