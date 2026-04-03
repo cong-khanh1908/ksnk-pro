@@ -409,71 +409,49 @@ body.is-supervisor .nav-supervisor { display: flex !important; }
 </style>
 </head>
 <body>
-<!-- ══ AUTH OVERLAY ══ -->
-<div class="auth-overlay" id="authOverlay">
-  <!-- LOGIN PANEL -->
-  <div class="auth-card" id="authLoginCard">
-    <div class="auth-logo">
-      <div class="auth-logo-ic">🏥</div>
+<!-- ══ ADMIN LOGIN MODAL (thay thế auth overlay toàn màn hình) ══ -->
+<!-- Người dùng thường KHÔNG cần đăng nhập — mở link là dùng được -->
+<!-- Chỉ Admin cần đăng nhập để truy cập thống kê / báo cáo / cấu hình -->
+<div class="mo" id="authOverlay" style="display:none;align-items:center;justify-content:center">
+  <div class="md" style="border-radius:16px;max-width:420px;width:calc(100% - 32px);margin:auto;padding-bottom:0">
+    <div class="auth-logo" style="padding:20px 20px 0;text-align:center">
+      <div class="auth-logo-ic" style="margin:0 auto 8px">🏥</div>
       <div class="auth-logo-t">KSNK Pro v7</div>
-      <div class="auth-logo-s">Hệ thống Giám sát Kiểm soát Nhiễm khuẩn</div>
+      <div class="auth-logo-s">Đăng nhập Quản trị viên</div>
     </div>
-    <div class="auth-title">🔐 Đăng nhập hệ thống</div>
-    <div class="auth-err" id="authErr"></div>
-    <div id="authDefaultInfo" class="auth-info" style="display:none">
-      <b>💡 Tài khoản mặc định:</b><br>
-      Tên đăng nhập: <b>Số CMND/CCCD</b><br>
-      Mật khẩu: <b>bvps@123</b>
-    </div>
-    <div class="fgp" style="margin-bottom:10px">
-      <label class="fl">Tên đăng nhập</label>
-      <input type="text" class="fc" id="loginUser" placeholder="CMND/CCCD hoặc admin" autocomplete="username" autocapitalize="none">
-    </div>
-    <div class="fgp" style="margin-bottom:14px">
-      <label class="fl">Mật khẩu</label>
-      <div style="position:relative">
-        <input type="password" class="fc" id="loginPass" placeholder="Nhập mật khẩu" autocomplete="current-password" onkeypress="if(event.key==='Enter')doLogin()">
-        <button onclick="togglePwd('loginPass',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-3)" title="Hiện/ẩn mật khẩu">👁️</button>
+    <div class="md-body" style="padding:16px 20px">
+      <div style="background:linear-gradient(90deg,var(--blue-l),var(--teal-l));border-radius:var(--r-sm);padding:10px 12px;margin-bottom:14px;font-size:12.5px;color:var(--navy);border:1px solid rgba(21,101,192,.15)">
+        👑 <b>Khu vực dành cho Admin.</b> Nhân viên nhập phiếu không cần đăng nhập.
+      </div>
+      <div class="auth-err" id="authErr" style="display:none;background:var(--red-l);color:var(--red);border-radius:var(--r-xs);padding:9px 12px;margin-bottom:12px;font-size:13px"></div>
+      <div class="fgp" style="margin-bottom:10px">
+        <label class="fl">Tên đăng nhập</label>
+        <input type="text" class="fc" id="loginUser" placeholder="admin" autocomplete="username" autocapitalize="none" value="admin">
+      </div>
+      <div class="fgp" style="margin-bottom:14px">
+        <label class="fl">Mật khẩu</label>
+        <div style="position:relative">
+          <input type="password" class="fc" id="loginPass" placeholder="Nhập mật khẩu admin" autocomplete="current-password" onkeypress="if(event.key==='Enter')doLogin()">
+          <button onclick="togglePwd('loginPass',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-3)" title="Hiện/ẩn mật khẩu">👁️</button>
+        </div>
+      </div>
+      <button class="btn btn-p btn-full" onclick="doLogin()">🔓 Đăng nhập Admin</button>
+      <div style="text-align:center;margin-top:12px;margin-bottom:4px">
+        <button onclick="closeAdminLogin()" class="btn btn-o" style="font-size:12px">✕ Đóng — Tiếp tục nhập phiếu</button>
       </div>
     </div>
-    <button class="btn btn-p btn-full" onclick="doLogin()">🔓 Đăng nhập</button>
-    <div class="auth-footer">
-      <span class="auth-req-link" onclick="showRequestPanel()">📩 Yêu cầu cấp / reset tài khoản</span><br>
-      <span id="authShowDefault" class="auth-req-link" onclick="toggleDefaultInfo()">💡 Thông tin đăng nhập mặc định</span>
-    </div>
-  </div>
-
-  <!-- REQUEST ACCOUNT PANEL -->
-  <div class="auth-card" id="authRequestCard" style="display:none">
-    <div class="auth-title">📩 Yêu cầu cấp / Reset tài khoản</div>
-    <div class="auth-info">Yêu cầu sẽ được gửi đến Admin. Admin sẽ xử lý và thông báo cho bạn.</div>
-    <div class="fgp" style="margin-bottom:10px">
-      <label class="fl fl-req">Họ và tên</label>
-      <input type="text" class="fc" id="reqHoTen" placeholder="Nguyễn Văn A">
-    </div>
-    <div class="fgp" style="margin-bottom:10px">
-      <label class="fl fl-req">Số CMND / CCCD</label>
-      <input type="text" class="fc" id="reqCMND" placeholder="012345678901" inputmode="numeric">
-    </div>
-    <div class="fgp" style="margin-bottom:10px">
-      <label class="fl fl-req">Khoa / Phòng công tác</label>
-      <input type="text" class="fc" id="reqKhoa" placeholder="Khoa Sản A, Phòng Mổ...">
-    </div>
-    <div class="fgp" style="margin-bottom:10px">
-      <label class="fl fl-req">Loại yêu cầu</label>
-      <select class="fc" id="reqType">
-        <option value="cap">Cấp tài khoản mới</option>
-        <option value="reset">Reset mật khẩu</option>
-      </select>
-    </div>
-    <div class="fgp" style="margin-bottom:14px">
-      <label class="fl">Ghi chú thêm</label>
-      <textarea class="fc" id="reqNote" placeholder="Lý do, chức danh..." style="min-height:70px;resize:none"></textarea>
-    </div>
-    <button class="btn btn-p btn-full" onclick="submitRequest()" style="margin-bottom:8px">📩 Gửi yêu cầu</button>
-    <button class="btn btn-o btn-full" onclick="showLoginPanel()">← Quay lại đăng nhập</button>
   </div>
 </div>
+
+<!-- Keep authRequestCard for compatibility but hidden -->
+<div id="authRequestCard" style="display:none">
+  <input type="text" id="reqHoTen"><input type="text" id="reqCMND">
+  <input type="text" id="reqKhoa"><select id="reqType"><option value="cap">Cấp tài khoản mới</option><option value="reset">Reset mật khẩu</option></select>
+  <textarea id="reqNote"></textarea>
+</div>
+<!-- Legacy compat stubs -->
+<div id="authDefaultInfo" style="display:none"></div>
+<span id="authShowDefault" style="display:none"></span>
 
 <!-- USER MENU DROPDOWN -->
 <div id="userMenu" style="position:fixed;top:56px;right:14px;background:var(--card);border-radius:var(--r);box-shadow:var(--shadow-lg);border:1px solid var(--border-2);z-index:250;min-width:220px;display:none;overflow:hidden">
@@ -523,6 +501,11 @@ body.is-supervisor .nav-supervisor { display: flex !important; }
     <div class="hd-right">
     <div class="sync-pill" id="syncPill"><div class="sd off" id="sd"></div><span id="syncTxt">Chưa cấu hình</span></div>
     <div id="userArea">
+      <!-- Nút đăng nhập admin (hiện khi chưa đăng nhập) -->
+      <button class="hd-btn" id="adminLoginBtn" onclick="openAdminLogin()" title="Đăng nhập Quản trị viên" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3)">
+        👑 <span class="hd-btn-txt">Admin</span>
+      </button>
+      <!-- Badge user (hiện khi đã đăng nhập admin) -->
       <div class="user-badge" id="userBadgeBtn" onclick="toggleUserMenu()" style="display:none">
         <div class="user-badge-av" id="userBadgeAv">?</div>
         <div class="user-badge-nm" id="userBadgeNm">—</div>
@@ -578,6 +561,16 @@ body.is-supervisor .nav-supervisor { display: flex !important; }
 
 <!-- ══ DASHBOARD ══ -->
 <div class="pg on" id="pg-dash">
+  <!-- Banner hướng dẫn cho khách (ẩn khi admin đăng nhập) -->
+  <div id="guestBanner" class="tip-box" style="margin-bottom:10px;background:linear-gradient(90deg,var(--teal-l),rgba(21,101,192,.06));border-color:var(--teal);color:var(--navy)">
+    <b>✅</b>
+    <div style="flex:1">
+      <b>Chào mừng!</b> Bạn có thể <b>nhập phiếu giám sát ngay</b> mà không cần đăng nhập.
+      Để xem <b>thống kê, báo cáo hoặc cấu hình hệ thống</b> — nhấn nút
+      <button class="btn btn-t btn-xs" onclick="openAdminLogin()" style="margin:0 4px">👑 Đăng nhập Admin</button>
+    </div>
+    <button onclick="document.getElementById('guestBanner').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-3)">✕</button>
+  </div>
   <div id="v7Notice" class="tip-box" style="display:none;margin-bottom:10px;background:linear-gradient(90deg,var(--teal-l),rgba(21,101,192,.06));border-color:var(--teal);color:var(--navy)">
     <b>🎉</b>
     <div style="flex:1"><b>Đã nâng cấp lên KSNK Pro v7.0!</b> Phiên bản mới có: Hướng dẫn sử dụng đầy đủ, cảnh báo bộ nhớ, bảo mật nâng cao, tối ưu hiệu suất và nhiều cải tiến UX. <button class="btn btn-t btn-xs" onclick="go('hdsd')">📖 Xem hướng dẫn</button></div>
@@ -4628,41 +4621,31 @@ async function syncLogToSheet(recentLogs){
   }catch(e){}
 }
 
-// ── Auth Init ─────────────────────────────────────────────────
+// ── Auth Init — KHÔNG yêu cầu đăng nhập cho người dùng thường ─
+// Người dùng mở link → vào thẳng hệ thống với role 'guest'
+// Chỉ Admin mới cần đăng nhập để truy cập thống kê/báo cáo/cấu hình
 async function authInit(){
-  // Load shared configs trước (cho mọi user kể cả khi chưa đăng nhập)
+  // Load shared configs (dùng chung cho mọi người)
   loadAllSharedConfigs();
 
-  // Kiểm tra session còn hiệu lực
+  // Kiểm tra session admin còn hiệu lực
   try{
     const sess = JSON.parse(sessionStorage.getItem(SESSION_KEY));
-    if(sess && sess.username){
+    if(sess && sess.username && sess.role === 'admin'){
       currentUser = sess;
       onLoginSuccess(false);
       return;
     }
   }catch(e){}
 
-  // Tự động kéo danh sách tài khoản trước khi đăng nhập.
-  // Hỗ trợ 2 phương thức: SA Key (nội bộ) hoặc GAS URL (GitHub Pages/public).
-  const hasGS  = !!(S.serviceAccount && S.config.spreadsheetId);
-  const gasUrl = (typeof EMBEDDED_GAS_URL !== 'undefined' && EMBEDDED_GAS_URL && EMBEDDED_GAS_URL.trim())
-    ? EMBEDDED_GAS_URL.trim() : localStorage.getItem('ksnk_gas_url');
-  const canAutoSync = (hasGS || !!gasUrl) && navigator.onLine;
-  if(canAutoSync){
-    _showAuthLoading('🔄 Đang kết nối hệ thống...');
-    try{
-      const result = await pullUsersAuto();
-      if(result){
-        _showAuthLoading('✅ Đồng bộ ' + (result.total||'') + ' tài khoản thành công');
-        await new Promise(r => setTimeout(r, 700));
-      }
-    }catch(e){}
-    _hideAuthLoading();
-  }
-
-  // Hiển thị form đăng nhập
-  document.getElementById('authOverlay').style.display = 'flex';
+  // ── Không cần đăng nhập — vào thẳng với role guest ──────────
+  currentUser = {
+    username: 'guest',
+    name: 'Nhân viên',
+    role: 'guest',
+    khoa: ''
+  };
+  onGuestStart();
 }
 
 // ── Loading screen helpers ────────────────────────────────────
@@ -4700,17 +4683,10 @@ function togglePwd(inputId, btn){
   btn.textContent = inp.type==='password' ? '👁️' : '🙈';
 }
 
-function showLoginPanel(){
-  document.getElementById('authLoginCard').style.display='';
-  document.getElementById('authRequestCard').style.display='none';
-}
+function showLoginPanel(){ openAdminLogin(); }
+function showRequestPanel(){ openAdminLogin(); }
 
-function showRequestPanel(){
-  document.getElementById('authLoginCard').style.display='none';
-  document.getElementById('authRequestCard').style.display='';
-}
-
-// ── Đăng nhập ─────────────────────────────────────────────────
+// ── Đăng nhập Admin ────────────────────────────────────────────
 async function doLogin(){
   const u = (document.getElementById('loginUser').value||'').trim();
   const p = document.getElementById('loginPass').value;
@@ -4722,62 +4698,38 @@ async function doLogin(){
     errEl.style.display='block'; return;
   }
 
-  // Kiểm tra admin (luôn local, không qua GSheets)
+  // Kiểm tra admin
   if(u.toLowerCase() === ADMIN_USER){
     if(hashPass(p) === loadAdminPass()){
       currentUser = { username:'admin', name:'Quản trị viên', role:'admin', khoa:'Hệ thống' };
+      closeAdminLogin();
       onLoginSuccess(true);
       return;
     } else {
       errEl.textContent='❌ Sai mật khẩu admin.';
       errEl.style.display='block';
-      addLog('Đăng nhập thất bại', `Sai mật khẩu admin, username: ${u}`);
       return;
     }
   }
 
-  // ── Kiểm tra người dùng thường ──────────────────────────────
-  // Bước 1: Thử local trước (nhanh, hoạt động offline)
+  // Thử đăng nhập user thường (supervisor/user)
   let users = loadUsers();
   let found  = users.find(x => x.username === u);
-
-  // Bước 2: Nếu không tìm thấy + có kết nối GSheets + có Internet
-  //         → Tự động fetch từ GSheets rồi thử lại.
-  //         Xử lý trường hợp thiết bị mới hoặc authInit() bị offline.
-  // Fallback: nếu không tìm thấy local, thử kéo từ GSheets/GAS rồi tìm lại
   const gasUrl2 = (typeof EMBEDDED_GAS_URL !== 'undefined' && EMBEDDED_GAS_URL && EMBEDDED_GAS_URL.trim())
     ? EMBEDDED_GAS_URL.trim() : localStorage.getItem('ksnk_gas_url');
   const canFetch = (S.serviceAccount && S.config.spreadsheetId) || !!gasUrl2;
   if(!found && canFetch && navigator.onLine){
-    const btn = document.querySelector('#authLoginCard .btn-p');
+    const btn = document.querySelector('#authOverlay .btn-p');
     const origHTML = btn ? btn.innerHTML : '';
     if(btn){ btn.innerHTML = '🔄 Đang xác thực...'; btn.disabled = true; }
-    try{
-      const result = await pullUsersAuto();
-      if(result){
-        users = loadUsers();
-        found  = users.find(x => x.username === u);
-      }
-    }catch(e){}
+    try{ const result = await pullUsersAuto(); if(result){ users = loadUsers(); found = users.find(x => x.username === u); } }catch(e){}
     if(btn){ btn.innerHTML = origHTML; btn.disabled = false; }
   }
-
-  if(!found){
-    errEl.textContent='❌ Tài khoản không tồn tại hoặc chưa được cấp.';
-    errEl.style.display='block';
-    return;
-  }
-  if(!found.active){
-    errEl.textContent='❌ Tài khoản đã bị vô hiệu hóa. Liên hệ Admin.';
-    errEl.style.display='block'; return;
-  }
-  if(found.password !== hashPass(p)){
-    errEl.textContent='❌ Sai mật khẩu. Vui lòng thử lại.';
-    errEl.style.display='block';
-    addLog('Đăng nhập thất bại', `Sai mật khẩu, username: ${u}`);
-    return;
-  }
+  if(!found){ errEl.textContent='❌ Tài khoản không tồn tại.'; errEl.style.display='block'; return; }
+  if(!found.active){ errEl.textContent='❌ Tài khoản đã bị vô hiệu hóa.'; errEl.style.display='block'; return; }
+  if(found.password !== hashPass(p)){ errEl.textContent='❌ Sai mật khẩu.'; errEl.style.display='block'; return; }
   currentUser = { username: found.username, name: found.name, role: found.role||'user', khoa: found.khoa||'' };
+  closeAdminLogin();
   onLoginSuccess(true);
 }
 
@@ -4805,35 +4757,41 @@ const ROLE_DEFS = {
     color: 'var(--teal)',
     bg: 'var(--teal-l)',
     desc: 'Nhập phiếu bảng kiểm, xem kết quả của khoa mình, không truy cập cấu hình và quản lý'
+  },
+  guest: {
+    label: '📋 Nhập phiếu',
+    color: 'var(--teal)',
+    bg: 'var(--teal-l)',
+    desc: 'Nhập phiếu giám sát cơ bản — không cần đăng nhập'
   }
 };
 
 // Ma trận phân quyền: { trang: [role được phép] }
+// 'guest' = người dùng không đăng nhập — được nhập phiếu cơ bản
 const PAGE_PERMISSIONS = {
-  // Tất cả đều truy cập được
-  dash:    ['admin','supervisor','user'],
-  hdsd:    ['admin','supervisor','user'],
-  // Nhập liệu bảng kiểm — tất cả
-  rt:      ['admin','supervisor','user'],
-  tb:      ['admin','supervisor','user'],
-  td:      ['admin','supervisor','user'],
-  tm:      ['admin','supervisor','user'],
-  // Tiêu chí C4 — supervisor và admin
+  // Tất cả (kể cả guest) đều truy cập được
+  dash:    ['admin','supervisor','user','guest'],
+  hdsd:    ['admin','supervisor','user','guest'],
+  // Nhập liệu bảng kiểm — tất cả (kể cả guest)
+  rt:      ['admin','supervisor','user','guest'],
+  tb:      ['admin','supervisor','user','guest'],
+  td:      ['admin','supervisor','user','guest'],
+  tm:      ['admin','supervisor','user','guest'],
+  dl:      ['admin','supervisor','user','guest'],
+  // Tiêu chí C4 — chỉ admin (yêu cầu đăng nhập)
   c41:     ['admin','supervisor'],
   c42:     ['admin','supervisor'],
   c43:     ['admin','supervisor'],
   c44:     ['admin','supervisor'],
   c45:     ['admin','supervisor'],
   c46:     ['admin','supervisor'],
-  // NKBV — supervisor và admin
+  // NKBV — chỉ admin
   nkbv:    ['admin','supervisor'],
   visinh:  ['admin','supervisor'],
   nkbv_bc: ['admin','supervisor'],
-  // Báo cáo & phân tích — supervisor và admin
+  // Báo cáo & phân tích — chỉ admin (yêu cầu đăng nhập)
   bc:      ['admin','supervisor'],
   tk:      ['admin','supervisor'],
-  // Dữ liệu đã nhập — supervisor và admin (user chỉ xem khoa mình — xử lý trong renderDL)
-  dl:      ['admin','supervisor','user'],
   // Chỉ admin
   admin:   ['admin'],
   gsheets: ['admin'],
@@ -4860,10 +4818,10 @@ function canAccessPage(p, role){
 }
 
 /**
- * Áp dụng phân quyền lên toàn bộ UI sau khi đăng nhập
+ * Áp dụng phân quyền lên toàn bộ UI sau khi đăng nhập / init guest
  */
 function applyRolePermissions(role){
-  role = role || 'user';
+  role = role || 'guest';
 
   // ── 1. Sidebar nav visibility ────────────────────────────────
   document.querySelectorAll('.nav[data-p]').forEach(btn => {
@@ -4874,7 +4832,6 @@ function applyRolePermissions(role){
 
   // ── 2. Sidebar section headers — ẩn nếu tất cả nav bên dưới bị ẩn
   document.querySelectorAll('.sb-sec').forEach(sec => {
-    // Tìm các nav items tiếp theo (siblings) cho đến sb-sec kế tiếp
     let next = sec.nextElementSibling;
     let hasVisible = false;
     while(next && !next.classList.contains('sb-sec')){
@@ -4884,44 +4841,98 @@ function applyRolePermissions(role){
     sec.style.display = hasVisible ? '' : 'none';
   });
 
-  // ── 3. Admin-only CSS class (backward compat) ────────────────
+  // ── 3. Admin-only CSS class ──────────────────────────────────
   document.body.classList.toggle('is-admin', role === 'admin');
 
-  // ── 4. Bottom nav — ẩn/hiện theo role ───────────────────────
-  // (Bottom nav chỉ có các trang cơ bản nên để nguyên)
-
-  // ── 5. Thêm role badge vào sidebar footer ───────────────────
+  // ── 4. Sidebar footer role badge ────────────────────────────
   const sbFoot = document.getElementById('sbFooterUser');
   if(sbFoot){
-    const rd = ROLE_DEFS[role] || ROLE_DEFS.user;
-    sbFoot.innerHTML = `<span style="display:flex;align-items:center;gap:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">
-      <span style="background:${rd.bg};color:${rd.color};border-radius:20px;padding:2px 7px;font-size:10px;font-weight:700;white-space:nowrap">${rd.label}</span>
-      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10.5px">${currentUser?.name||''}</span>
-    </span>`;
+    const rd = ROLE_DEFS[role] || ROLE_DEFS.guest;
+    if(role === 'guest'){
+      sbFoot.innerHTML = `<span style="display:flex;align-items:center;gap:4px">
+        <span style="background:var(--teal-l);color:var(--teal);border-radius:20px;padding:2px 7px;font-size:10px;font-weight:700">📋 Nhập phiếu</span>
+        <span style="font-size:10.5px">Không cần đăng nhập</span>
+      </span>`;
+    } else {
+      sbFoot.innerHTML = `<span style="display:flex;align-items:center;gap:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">
+        <span style="background:${rd.bg};color:${rd.color};border-radius:20px;padding:2px 7px;font-size:10px;font-weight:700;white-space:nowrap">${rd.label}</span>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10.5px">${currentUser?.name||''}</span>
+      </span>`;
+    }
   }
 
-  // ── 6. Header sync button — chỉ hiện với admin ──────────────
+  // ── 5. Header sync button ────────────────────────────────────
   const syncBtn = document.getElementById('syncBtn');
   if(syncBtn) syncBtn.style.display = (role==='admin' && S?.serviceAccount && S?.config?.spreadsheetId) ? 'flex' : 'none';
 }
 
 /**
  * Guard tập trung: kiểm tra quyền trước khi chuyển trang
- * Trả về true nếu được phép, false + hiện thông báo nếu không
+ * Trả về true nếu được phép, false + mở admin login nếu là trang admin-only
  */
 function checkPagePermission(p){
-  if(!currentUser){
-    showNotif('🔒 Vui lòng đăng nhập để sử dụng','err');
-    return false;
-  }
-  const role = currentUser.role || 'user';
+  const role = currentUser ? (currentUser.role || 'guest') : 'guest';
   if(!canAccessPage(p, role)){
-    const rd = ROLE_DEFS[role] || ROLE_DEFS.user;
-    showNotif(`🔒 ${rd.label} không có quyền truy cập trang này`, 'err');
+    // Trang yêu cầu admin — mở hộp thoại đăng nhập admin
+    showNotif('🔒 Trang này yêu cầu đăng nhập Admin', 'err');
+    setTimeout(()=>openAdminLogin(), 300);
     return false;
   }
   return true;
 }
+
+// ── Mở / đóng hộp thoại đăng nhập Admin ──────────────────────
+function openAdminLogin(){
+  const ov = document.getElementById('authOverlay');
+  if(ov){
+    ov.style.display='flex';
+    ov.style.opacity='1';
+    ov.style.pointerEvents='all';
+    ov.style.alignItems='center';
+  }
+  const pi = document.getElementById('loginPass');
+  if(pi){ pi.value=''; setTimeout(()=>pi.focus(),200); }
+  const errEl = document.getElementById('authErr');
+  if(errEl) errEl.style.display='none';
+}
+function closeAdminLogin(){
+  const ov = document.getElementById('authOverlay');
+  if(ov){
+    ov.style.display='none';
+    ov.style.opacity='0';
+    ov.style.pointerEvents='none';
+  }
+}
+
+// ── Bắt đầu với role guest (không đăng nhập) ─────────────────
+function onGuestStart(){
+  // Áp dụng shared config
+  loadAllSharedConfigs && loadAllSharedConfigs();
+  applySharedConfigToUI && applySharedConfigToUI();
+  applyRolePermissions('guest');
+  renderDashboard && renderDashboard();
+  updatePendingBadge && updatePendingBadge();
+  populateKhoas && populateKhoas();
+  // Ẩn user badge (guest không hiện badge)
+  const ubtn = document.getElementById('userBadgeBtn');
+  if(ubtn) ubtn.style.display='none';
+  // Hiện nút admin login
+  const alb = document.getElementById('adminLoginBtn');
+  if(alb) alb.style.display='flex';
+}
+
+// Click nền ngoài modal để đóng
+document.addEventListener('click', function(e){
+  const ov = document.getElementById('authOverlay');
+  if(ov && ov.style.display==='flex' && e.target === ov) closeAdminLogin();
+});
+// ESC để đóng admin login modal
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape'){
+    const ov = document.getElementById('authOverlay');
+    if(ov && ov.style.display==='flex') closeAdminLogin();
+  }
+});
 
 // ── Ghi đè go() với guard tập trung ─────────────────────────
 (function(){
@@ -4935,11 +4946,10 @@ function checkPagePermission(p){
 function onLoginSuccess(doLog){
   // Lưu session
   sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
-  // Ẩn overlay
-  document.getElementById('authOverlay').style.display='none';
+  // Đóng modal đăng nhập
+  closeAdminLogin();
 
   // ── Reset về Dashboard sau mỗi lần đăng nhập ────────────────
-  // Đảm bảo không còn trang nào đang hiển thị trừ dash
   document.querySelectorAll('.pg').forEach(x => x.classList.remove('on'));
   document.querySelectorAll('.nav').forEach(x => x.classList.remove('on'));
   document.querySelectorAll('.bnav-btn').forEach(x => x.classList.remove('on'));
@@ -4953,19 +4963,22 @@ function onLoginSuccess(doLog){
 
   // ── Gán class phân quyền ─────────────────────────────────────
   const role = currentUser.role || 'user';
-  // Xóa hết class role cũ
   document.body.classList.remove('is-admin','is-supervisor','is-user');
-  document.body.classList.add('is-admin');  // default false
   document.body.classList.toggle('is-admin', role === 'admin');
   document.body.classList.toggle('is-supervisor', role === 'supervisor');
   document.body.classList.toggle('is-user', role === 'user');
 
+  // Ẩn nút admin login, hiện user badge
+  const adminLoginBtn = document.getElementById('adminLoginBtn');
+  if(adminLoginBtn) adminLoginBtn.style.display='none';
+  // Ẩn guest banner
+  const gb = document.getElementById('guestBanner');
+  if(gb) gb.style.display='none';
+
   // ── Áp dụng phân quyền sidebar nav ──────────────────────────
   applyRolePermissions(role);
-
-  // Cập nhật badge
   updateUserBadge();
-  if(doLog) addLog('Đăng nhập thành công', `Role: ${role}, Khoa: ${currentUser.khoa}`);
+  if(doLog) addLog('Đăng nhập thành công', `Role: ${role}`);
 
   // ── Áp dụng shared config vào UI ────────────────────────────
   applySharedConfigToUI();
@@ -4976,7 +4989,6 @@ function onLoginSuccess(doLog){
     : `✅ Xin chào ${roleLabel} ${currentUser.name}!`;
   showNotif(greet,'ok');
 
-  // Render dashboard sau khi login
   renderDashboard && renderDashboard();
 }
 
@@ -5025,14 +5037,14 @@ function doLogout(){
   closeUserMenu();
   addLog('Đăng xuất');
   sessionStorage.removeItem(SESSION_KEY);
-  currentUser = null;
 
-  // ── Quan trọng: Reset toàn bộ trạng thái trang về dash ──────
-  // Xoá class 'on' khỏi TẤT CẢ trang và nav items
+  // Về lại chế độ guest
+  currentUser = { username:'guest', name:'Nhân viên', role:'guest', khoa:'' };
+
+  // Reset trang về dash
   document.querySelectorAll('.pg').forEach(x => x.classList.remove('on'));
   document.querySelectorAll('.nav').forEach(x => x.classList.remove('on'));
   document.querySelectorAll('.bnav-btn').forEach(x => x.classList.remove('on'));
-  // Chuyển về dash page nhưng KHÔNG qua go() (vì chưa có currentUser)
   const pgDash = document.getElementById('pg-dash');
   const navDash = document.querySelector('[data-p="dash"]');
   if(pgDash) pgDash.classList.add('on');
@@ -5040,25 +5052,24 @@ function doLogout(){
   const bnavDash = document.querySelector('.bnav-btn[data-bnav="dash"]');
   if(bnavDash) bnavDash.classList.add('on');
 
-  // Xoá TẤT CẢ class role
+  // Xóa class role
   document.body.classList.remove('is-admin','is-supervisor','is-user');
-  // Reset nav items về mặc định (bỏ display style do RBAC đặt)
-  document.querySelectorAll('.nav[data-p]').forEach(btn => btn.style.display = '');
-  document.querySelectorAll('.sb-sec').forEach(sec => sec.style.display = '');
-  // Ẩn user badge
+  // Reset nav hiển thị theo guest
+  applyRolePermissions('guest');
+  // Ẩn user badge, hiện nút admin login
   const userBadgeBtn = document.getElementById('userBadgeBtn');
   if(userBadgeBtn) userBadgeBtn.style.display='none';
+  const adminLoginBtn = document.getElementById('adminLoginBtn');
+  if(adminLoginBtn) adminLoginBtn.style.display='flex';
   // Ẩn sync button
   const syncBtn = document.getElementById('syncBtn');
   if(syncBtn) syncBtn.style.display='none';
 
-  // Reset login form
-  document.getElementById('loginUser').value='';
-  document.getElementById('loginPass').value='';
-  document.getElementById('authErr').style.display='none';
-  document.getElementById('authDefaultInfo').style.display='none';
-  document.getElementById('authOverlay').style.display='flex';
-  showLoginPanel();
+  renderDashboard && renderDashboard();
+  showNotif('👋 Đã đăng xuất — Tiếp tục nhập phiếu bình thường', 'ok');
+  // Hiện lại guest banner
+  const gb = document.getElementById('guestBanner');
+  if(gb) gb.style.display='flex';
 }
 
 // ── User Badge ─────────────────────────────────────────────────
