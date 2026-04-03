@@ -2084,10 +2084,21 @@ body.is-supervisor .nav-supervisor { display: flex !important; }
         <button class="btn btn-o btn-sm" onclick="showBulkImportModal()">📥 Nhập hàng loạt</button>
         <button class="btn btn-o btn-sm" onclick="downloadUserTemplate()">📋 Tải file mẫu</button>
         <button class="btn btn-o btn-sm" onclick="exportUserList()">📊 Xuất danh sách</button>
+        <button class="btn btn-t btn-sm" onclick="doPullUsersFromSheet()" title="Đẩy/Kéo danh sách người dùng với Google Sheets để đồng bộ giữa các thiết bị">☁️ Đồng bộ GSheets</button>
       </div>
     </div>
     <div class="tip-box">
       <b>💡</b><span>Tên đăng nhập = <b>Số CMND/CCCD</b>, mật khẩu mặc định <b>bvps@123</b>. Dùng <b>"Nhập hàng loạt"</b> để tạo nhiều tài khoản cùng lúc từ file Excel.</span>
+    </div>
+    <div class="tip-warn" style="margin-top:8px">
+      <b>📱</b>
+      <div>
+        <b>Quan trọng — Đồng bộ đa thiết bị:</b> Danh sách tài khoản lưu trong bộ nhớ trình duyệt của từng thiết bị. 
+        Khi tạo tài khoản trên máy Admin, các thiết bị khác <b>chưa tự động có</b> danh sách này.
+        <br>Giải pháp: <b>(1)</b> Kết nối Google Sheets → mỗi lần tạo/sửa tài khoản sẽ tự đẩy lên Sheet.
+        <b>(2)</b> Trên thiết bị mới, sau khi cấu hình GS, bấm <b>☁️ Đồng bộ GSheets</b> để kéo danh sách về.
+        Không có GS: xuất Excel → gửi file → import trên thiết bị kia.
+      </div>
     </div>
     <!-- Search bar -->
     <div class="sb-search" style="margin-top:10px" onclick="document.getElementById('userSearch').focus()">
@@ -3686,6 +3697,21 @@ document.addEventListener('DOMContentLoaded',()=>{
   // v7: passive touch listeners for performance
   document.addEventListener('touchstart', ()=>{}, {passive:true});
   document.addEventListener('touchmove', ()=>{}, {passive:true});
+
+  // v7: Auto pull users from GSheets on startup (silent, non-blocking)
+  // Chỉ pull khi: có GS config, không phải admin device (admin đã có users local),
+  // hoặc local users trống
+  setTimeout(async () => {
+    const localUsers = loadUsers();
+    const hasGS = S.serviceAccount && S.config.spreadsheetId;
+    if(hasGS && localUsers.length === 0){
+      // Thiết bị mới chưa có users → tự pull
+      const result = await pullUsersFromSheet();
+      if(result && result.added > 0){
+        showNotif(`✅ Đã tải ${result.added} tài khoản từ Google Sheets`, 'ok');
+      }
+    }
+  }, 2000); // Delay 2s để app load xong
   // VS rate calculator
   ['vs-total','vs-neg','vs-pos'].forEach(id=>{
     document.getElementById(id)?.addEventListener('input',()=>{
@@ -4745,8 +4771,11 @@ function doLogout(){
   const bnavDash = document.querySelector('.bnav-btn[data-bnav="dash"]');
   if(bnavDash) bnavDash.classList.add('on');
 
-  // Xoá admin class
-  document.body.classList.remove('is-admin');
+  // Xoá TẤT CẢ class role
+  document.body.classList.remove('is-admin','is-supervisor','is-user');
+  // Reset nav items về mặc định (bỏ display style do RBAC đặt)
+  document.querySelectorAll('.nav[data-p]').forEach(btn => btn.style.display = '');
+  document.querySelectorAll('.sb-sec').forEach(sec => sec.style.display = '');
   // Ẩn user badge
   const userBadgeBtn = document.getElementById('userBadgeBtn');
   if(userBadgeBtn) userBadgeBtn.style.display='none';
@@ -4841,6 +4870,24 @@ function doChangePass(){
 }
 
 // ── Quản lý người dùng (Admin) ────────────────────────────────
+async function doPullUsersFromSheet(){
+  if(!S.serviceAccount || !S.config.spreadsheetId){
+    showNotif('⚠️ Cần cấu hình Google Sheets trước (Hệ thống → Kết nối Google Sheets)','err');
+    return;
+  }
+  showNotif('⏳ Đang đồng bộ người dùng từ Google Sheets...','info');
+  // Push first to make sure sheet is up-to-date
+  await syncUsersToSheet();
+  // Then pull
+  const result = await pullUsersFromSheet();
+  if(result){
+    renderUserList();
+    showNotif(`✅ Đồng bộ hoàn tất: ${result.added} thêm mới, ${result.updated} cập nhật (Tổng: ${result.total} tài khoản)`,'ok');
+  } else {
+    showNotif('❌ Không thể đồng bộ. Kiểm tra kết nối và cấu hình Google Sheets.','err');
+  }
+}
+
 function renderUserList(){
   const users = loadUsers();
   const body = document.getElementById('userListBody');
@@ -5130,11 +5177,76 @@ function exportActivityLog(){
 }
 
 // ── Đồng bộ danh sách Users lên GSheet ───────────────────────
+async function pullUsersFromSheet(){
+  // Kéo danh sách người dùng từ Google Sheets về thiết bị này
+  if(!S.serviceAccount || !S.config.spreadsheetId) return false;
+  try {
+    const res = await gFetch('GET',`/values/Nguoi_Dung!A1:Z500`);
+    if(!res || !res.values || res.values.length < 2) return false;
+    const headers = res.values[0]; // ['CMND/CCCD','Họ tên','Vai trò','Khoa','Trạng thái',...]
+    const rows    = res.values.slice(1);
+    const cmndIdx  = headers.indexOf('CMND/CCCD');
+    const nameIdx  = headers.indexOf('Họ tên');
+    const roleIdx  = headers.indexOf('Vai trò');
+    const khoaIdx  = headers.indexOf('Khoa');
+    const statIdx  = headers.indexOf('Trạng thái');
+    const passIdx  = headers.indexOf('Password_Hash'); // optional
+    if(cmndIdx < 0 || nameIdx < 0) return false;
+
+    const existing = loadUsers();
+    let updated = 0, added = 0;
+
+    rows.forEach(row => {
+      if(!row[cmndIdx]) return;
+      const cmnd   = String(row[cmndIdx]).trim();
+      const name   = String(row[nameIdx]||'').trim();
+      const role   = String(row[roleIdx]||'user').trim();
+      const khoa   = String(row[khoaIdx]||'').trim();
+      const active = String(row[statIdx]||'').includes('Hoạt động');
+      // Mật khẩu: dùng hash từ sheet hoặc hash mặc định
+      const passHash = passIdx >= 0 && row[passIdx]
+        ? String(row[passIdx]).trim()
+        : hashPass(DEFAULT_PASS);
+
+      const idx = existing.findIndex(u => u.username === cmnd);
+      if(idx >= 0){
+        // Update thông tin nhưng GIỮ mật khẩu hiện tại nếu đã đổi
+        const keepPass = existing[idx].password || passHash;
+        existing[idx] = { ...existing[idx], name, role, khoa, active,
+          password: keepPass, mustChangePass: existing[idx].mustChangePass ?? true };
+        updated++;
+      } else {
+        existing.push({ username: cmnd, name, role, khoa, active,
+          password: passHash, mustChangePass: true,
+          createdAt: new Date().toISOString(), _fromSheet: true });
+        added++;
+      }
+    });
+
+    saveUsers(existing);
+    addLog('Đồng bộ người dùng từ Sheet', `Cập nhật: ${updated}, Thêm mới: ${added}`);
+    return { updated, added, total: existing.length };
+  } catch(e) {
+    console.error('pullUsersFromSheet error:', e);
+    return false;
+  }
+}
+
 async function syncUsersToSheet(){
   if(!S.serviceAccount||!S.config.spreadsheetId||!navigator.onLine) return;
   try{
     const users=loadUsers();
-    const rows=[['CMND/CCCD','Họ tên','Vai trò','Khoa','Trạng thái','Tạo lúc'],...users.map(u=>[u.username,u.name,u.role,u.khoa,u.active?'Hoạt động':'Vô hiệu',u.createdAt])];
+    // Bao gồm Password_Hash để thiết bị khác có thể pull về và dùng được
+    const rows=[
+      ['CMND/CCCD','Họ tên','Vai trò','Khoa','Trạng thái','Tạo lúc','Password_Hash','MustChangePass'],
+      ...users.map(u=>[
+        u.username, u.name, u.role, u.khoa,
+        u.active ? 'Hoạt động' : 'Vô hiệu',
+        u.createdAt || '',
+        u.password || '',        // hash — không phải plain text
+        u.mustChangePass ? 'true' : 'false'
+      ])
+    ];
     // Kiểm tra sheet tồn tại
     const info=await gFetch('GET','');
     if(!info) return;
